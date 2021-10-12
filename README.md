@@ -1,6 +1,8 @@
-# Template de plugin pour Jeedom
+# Plugin Easee pour Jeedom
 
-Ce "template de plugin" sert de base à la réalisation de plugins pour **Jeedom**.
+Ce plugin permet de remonter les information de ses équipement dans Jeedom
+
+Ce plugin est en cours de préparation. Il n'y a aucune prévision pour la date de publication
 
 La documentation générale relative à la conception de plugin est consultable [ici](https://doc.jeedom.com/fr_FR/dev/). Dans le détail :   
 * [Utilisation du template de plugin](https://doc.jeedom.com/fr_FR/dev/plugin_template) : Le template de plugin est une base de plugin pour Jeedom qui doit être adaptée avec l'id de votre plugin et à laquelle il suffit d'ajouter vos propres fonctions. 
