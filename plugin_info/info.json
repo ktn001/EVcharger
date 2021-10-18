@@ -1,8 +1,8 @@
 {
-	"id" : "easee",
-	"name" : "Easee",
+	"id" : "chargeurVE",
+	"name" : "Chargeur VE",
 	"description" : {
-		"fr_FR": "Plugin pour les station de charde Easee pour véhicules électriques"
+		"fr_FR": "Plugin pour les station de charge pour véhicules électriques"
 	},
 	"licence" : "GNU",
 	"author" : "ktn",

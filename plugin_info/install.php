@@ -19,17 +19,17 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 // Fonction exécutée automatiquement après l'installation du plugin
-  function easee_install() {
+  function chargeurVE_install() {
 
   }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
-  function easee_update() {
+  function chargeurVE_update() {
 
   }
 
 // Fonction exécutée automatiquement après la suppression du plugin
-  function easee_remove() {
+  function chargeurVE_remove() {
 
   }
 

@@ -20,7 +20,7 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/account.class.php';
 
-class easee extends eqLogic {
+class chargeurVE extends eqLogic {
     /*     * *************************Attributs****************************** */
     
   /*
@@ -35,7 +35,7 @@ class easee extends eqLogic {
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
      */
 	public static function cron() {
-		log::add("easee","debug","Lancement du Cron");
+		log::add("chargeurVE","debug","Lancement du Cron");
 		$curl = curl_init();
 
 			 // 'userName' => '+41797491023'
@@ -66,11 +66,11 @@ class easee extends eqLogic {
 		curl_close($curl);
 
 		if ($err) {
-			log::add("easee","debug", "cURL Error #:" . $err);
+			log::add("chargeurVE","debug", "cURL Error #:" . $err);
 		} else {
-			log::add("easee","debug", "XXX " . $response);
+			log::add("chargeurVE","debug", "XXX " . $response);
 		}
-		log::add("easee","debug","Fin du Cron");
+		log::add("chargeurVE","debug","Fin du Cron");
     }
 
     /*
@@ -175,7 +175,7 @@ class easee extends eqLogic {
     /*     * **********************Getteur Setteur*************************** */
 }
 
-class easeeCmd extends cmd {
+class chargeurVECmd extends cmd {
     /*     * *************************Attributs****************************** */
     
     /*

@@ -35,8 +35,8 @@ class account {
 	 * Retourne le prochain Id disponible
 	 */
 	private static function nextId() {
-		$id = config::byKey ('nextId','easee',0,true);
-		config::save('nextId',$id+1,'easee');
+		$id = config::byKey ('nextId','chargeurVE',0,true);
+		config::save('nextId',$id+1,'chargeurVE');
 		return($id);
 	}
 
@@ -54,7 +54,7 @@ class account {
 			}
 			chmod(self::$accountsFile,0664);
 		} catch (Exception $e) {
-			log::add('easee','error', $e->getMessage());
+			log::add('chargeurVE','error', $e->getMessage());
 			return false;
 		}
 		return true;
@@ -128,10 +128,10 @@ class account {
 	}
 
 	public function getDatas() {
-		log::add("easee","debug","id: " . $this->_id);
-		log::add("easee","debug","login: " . $this->_login);
-		log::add("easee","debug","name: " . $this->_name);
-		log::add("easee","debug","url: " . $this->_url);
+		log::add("chargeurVE","debug","id: " . $this->_id);
+		log::add("chargeurVE","debug","login: " . $this->_login);
+		log::add("chargeurVE","debug","name: " . $this->_name);
+		log::add("chargeurVE","debug","url: " . $this->_url);
 		$data = array(
 			'id'    => $this->_id,
 			'login' => $this->_login,
@@ -169,11 +169,11 @@ class account {
 
 	public function setUrl($url) {
 		$this->_url = $url;
-		log::add("easee","debug","id: " . $this->_id);
-		log::add("easee","debug","login: " . $this->_login);
-		log::add("easee","debug","name: " . $this->_name);
-		log::add("easee","debug","url: " . $this->_url);
-		log::add("easee","debug","urlx: " . $url);
+		log::add("chargeurVE","debug","id: " . $this->_id);
+		log::add("chargeurVE","debug","login: " . $this->_login);
+		log::add("chargeurVE","debug","name: " . $this->_name);
+		log::add("chargeurVE","debug","url: " . $this->_url);
+		log::add("chargeurVE","debug","urlx: " . $url);
 	}
 
 	public function getUrl() {

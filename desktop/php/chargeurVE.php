@@ -3,7 +3,7 @@ if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 // Déclaration des variables obligatoires
-$plugin = plugin::byId('easee');
+$plugin = plugin::byId('chargeurVE');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
 ?>
@@ -31,7 +31,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			</div>
 		</div>
 		<legend><i class="fas fa-table"></i> {{Mes comptes Easee}}</legend>
-		<div class="easeeAccountContainer">
+		<div class="chargeurVEAccountContainer">
 			<table id="table_account" class="table table-bordered table-condensed" style='max-width: 1100px'>
 				<thead>
 					<tr>
@@ -220,6 +220,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
-<?php include_file('desktop', 'easee', 'js', 'easee');?>
+<?php include_file('desktop', 'chargeurVE', 'js', 'chargeurVE');?>
 <!-- Inclusion du fichier javascript du core - NE PAS MODIFIER NI SUPPRIMER -->
 <?php include_file('core', 'plugin.template', 'js');?>

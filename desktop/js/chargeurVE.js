@@ -45,7 +45,7 @@ $('#bt_saveAccounts').on('click',function() {
 	accounts = json_encode($(this).closest('table').find('tr.account').getValues('.accountAttr'));
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/easee/core/ajax/easee.ajax.php',
+		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
 		data: {
 			action: 'saveAccounts',
 			accounts: accounts
@@ -183,7 +183,7 @@ function addCmdToTable(_cmd) {
 
 $.ajax({
 	type: 'POST',
-	url: 'plugins/easee/core/ajax/easee.ajax.php',
+	url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
 	data: {
 		action: 'getAccounts',
 	},

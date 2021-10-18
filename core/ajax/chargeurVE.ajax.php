@@ -30,7 +30,7 @@ try {
 	 * Chargement des accouts
 	 */
 	if (init('action') == 'getAccounts') {
-		log::add ('easee', 'debug', 'AJAX: début de "getAccounts"');
+		log::add ('chargeurVE', 'debug', 'AJAX: début de "getAccounts"');
 		ajax::success(account::getAll());
 	}
 
@@ -38,7 +38,7 @@ try {
 	 * Sauvegarde des accounts
 	 */
 	if (init('action') == 'saveAccounts') {
-		log::add ('easee', 'debug', 'AJAX: début de "saveAccounts"');
+		log::add ('chargeurVE', 'debug', 'AJAX: début de "saveAccounts"');
 		account::saveAll(init('accounts'));
 		ajax::success(account::getAll());
 	}
