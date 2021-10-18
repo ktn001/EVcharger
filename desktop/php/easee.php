@@ -14,16 +14,43 @@ $eqLogics = eqLogic::byType($plugin->getId());
 		<legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
 		<!-- Boutons de gestion du plugin -->
 		<div class="eqLogicThumbnailContainer">
+			<div class="cursor accountAction logoPrimary" data-action="add">
+				<i class="fas fa-user-plus"></i>
+				<br>
+				<span>{{Ajouter un compte}}</span>
+			</div>
 			<div class="cursor eqLogicAction logoPrimary" data-action="add">
 				<i class="fas fa-plus-circle"></i>
 				<br>
-				<span>{{Ajouter}}</span>
+				<span>{{Ajouter un chargeur}}</span>
 			</div>
 			<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
 				<i class="fas fa-wrench"></i>
 				<br>
 				<span>{{Configuration}}</span>
 			</div>
+		</div>
+		<legend><i class="fas fa-table"></i> {{Mes comptes Easee}}</legend>
+		<div class="easeeAccountContainer">
+			<table id="table_account" class="table table-bordered table-condensed" style='max-width: 1100px'>
+				<thead>
+					<tr>
+						<th style='min-width:50px;width:70px'>{{Id}}</th>
+						<th style='min-width:50px;width:150px'>{{Nom}}</th>
+						<th style='min-width:50px;width:200px'>{{Login}}</th>
+						<th style='min-width:50px;width:200px'>{{URL}}</th>
+						<th style='width:200px'>{{Clé d'accès}}</th>
+						<th style='width:200px'>{{Action}}
+							<a id="bt_saveAccounts" class="btn btn-success btn-xs pull-right disabled">
+								<i class="fas fa-check-circle icon-white"></i>
+								{{Sauvegarder}}
+							</a>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
 		</div>
 		<legend><i class="fas fa-table"></i> {{Mes chargeurs}}</legend>
 		<!-- Champ de recherche -->

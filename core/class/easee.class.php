@@ -18,6 +18,7 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/account.class.php';
 
 class easee extends eqLogic {
     /*     * *************************Attributs****************************** */
