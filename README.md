@@ -1,6 +1,6 @@
-# Plugin Easee pour Jeedom
+# Plugin chargeurVE pour Jeedom
 
-Ce plugin permet de remonter les information de ses équipement dans Jeedom
+Ce plugin permet de remonter les informations de chargeurs de véhicules électriques dans Jeedom
 
 Ce plugin est en cours de préparation. Il n'y a aucune prévision pour la date de publication
 
