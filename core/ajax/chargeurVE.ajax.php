@@ -27,20 +27,37 @@ try {
 	}
 
 	/*
+	 * Liste des type d'accounts
+	 */
+	if (init('action') == 'getAccountTypeLabels') {
+		log::add ('chargeurVE', 'debug', 'AJAX: début de "getAccountLabels"');
+		ajax::success(json_encode(account::getTypeLabels()));
+	}
+
+	/*
 	 * Chargement des accouts
 	 */
 	if (init('action') == 'getAccounts') {
 		log::add ('chargeurVE', 'debug', 'AJAX: début de "getAccounts"');
-		ajax::success(account::getAll());
+		try {
+			ajax::success(account::getAll());
+		} catch (Exception $e) {
+			ajax::error();
+		}
 	}
 
 	/*
-	 * Sauvegarde des accounts
+	 * Sauvegarde d'un account
 	 */
-	if (init('action') == 'saveAccounts') {
-		log::add ('chargeurVE', 'debug', 'AJAX: début de "saveAccounts"');
-		account::saveAll(init('accounts'));
-		ajax::success(account::getAll());
+	if (init('action') == 'saveAccount') {
+		log::add ('chargeurVE', 'debug', 'AJAX: début de "saveAccount"');
+		try {
+			$account = account::fromData(init('account'));
+			//$account->save();
+			ajax::success();
+		} catch (Exception $e) {
+			ajax::error();
+		}
 	}
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

@@ -17,6 +17,15 @@
 */
 
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+$dir = __DIR__ . '/../class/account';
+if ($dh = opendir($dir)){
+    while (($file = readdir($dh)) !== false){
+	    if (substr_compare($file, ".class.php",-10,10) === 0) {
+        	require_once  $dir . '/' . $file;
+	    }
+    }
+    closedir($dh);
+}
 /*
  *
  * Fichier d’inclusion si vous avez plusieurs fichiers de class ou 3rdParty à inclure

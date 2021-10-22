@@ -15,27 +15,114 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /*
  * Permet la réorganisation des commandes dans l'équipement et des accounts
  */
 $('#table_cmd').sortable({axis: 'y', cursor: 'move', items: '.cmd', placeholder: 'ui-state-highlight', tolerance: 'intersect', forcePlaceholderSize: true});
-$('#table_account').sortable({axis: 'y', cursor: 'move', items: '.account', placeholder: 'ui-state-highlight', tolerance: 'intersect', forcePlaceholderSize: true});
 $('#table_cmd').on('sortupdate',function(event,ui){
 	modifyWithoutSave = true;
 });
-$('#table_account').on('sortupdate',function(event,ui){
-	$('#bt_saveAccounts').removeClass('disabled');
-	modifyWithoutSave = true;
-});
+
+/*
+ * Edition d'un account
+ */
+function editAccount (account) {
+	if (account === undefined) {
+		$('#div_alert').showAlert({message: "{{Account non défini}}", level: 'danger'});
+		return;
+	}
+	if (account.type === undefined) {
+		$('#div_alert').showAlert({message: "{{Le type de l'account n'est pas défini}}", level: 'danger'});
+		return;
+	}
+	mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + account.type + 'Account';
+	mod_id = 'mod_EditAccountType' + account.type;
+	type_label = $('.accountTypeThumbnailContainer[type=' + account.type + ']').attr('label');
+	if ($('#' + mod_id).length == 0){
+		$('body').append('<div id="' + mod_id + '" title="{{Account type:}} ' + type_label + '"/>');
+		$('#' + mod_id).dialog({
+			closeText: '',
+			autoOpen: false,
+			modal: true,
+			height:280,
+			width:680
+		});
+		jQuery.ajaxSetup({async: false});
+		$('#' + mod_id).load(mod_url);
+		jQuery.ajaxSetup({async: true});
+		$('#' + mod_id).on('dialogopen', function (event) {
+			console.log(account);
+			$('#' + mod_id).setValues(account, '.accountAttr');
+		});
+
+	}
+	$('#' + mod_id).dialog('option', 'buttons', {
+		"{{Annuler}}": function () {
+			$(this).dialog("close");
+		},
+		"{{Valider}}": function () {
+			$(this).dialog("close");
+			account =  json_encode($('#' + mod_id).getValues('.accountAttr'));
+			$.ajax({
+				type: 'POST',
+				url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+				data: {
+					action: 'saveAccount',
+					account: account
+				},
+				dataType : 'json',
+				global:false,
+				error: function (request, status, error) {
+					handleAjaxError(request, status, error);
+				},
+				success: function (data) {
+					if (data.state != 'ok') {
+						$('#div_alert').showAlert({message: data.result, level: 'danger'});
+						return;
+					}
+				}
+			});
+		}
+	});
+	$('#' + mod_id).dialog('open');
+}
 
 /*
  * Ajout d'un account
  */
 $('.accountAction[data-action=add]').off('click').on('click',function() {
-	addAccount();
-	modifyWithoutSave = true;
-	$('#bt_saveAccounts').removeClass('disabled');
+	if (nbAccountType == 0) {
+		$('#div_alert').showAlert({message: "{{Aucun type d'account trouvable}}", level: 'danger'});
+		return;
+	}
+	if (nbAccountType == 1) {
+		editAccount ({type: $('.accountTypeThumbnailContainer').attr('type')});
+		return;
+	}
+	if ($('#mod_selectAccountTypeToInsert').length == 0) {
+		$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélectionnez un type d\'account}}"/>');
+		$("#mod_selectAccountTypeToInsert").dialog({
+			closeText: '',
+			autoOpen: false,
+			modal: true,
+			height:200,
+			width:300
+		});
+		jQuery.ajaxSetup({async: false});
+		$('#mod_selectAccountTypeToInsert').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountType');
+		jQuery.ajaxSetup({async: true});
+	}
+	$('#mod_selectAccountTypeToInsert').dialog('option', 'buttons', {
+		"{{Annuler}}": function () {
+			$(this).dialog("close");
+		},
+		"{{Valider}}": function () {
+			$(this).dialog("close");
+			editAccount({type: $('#selectAccountType').value()});
+		}
+	});
+	$('#mod_selectAccountTypeToInsert').dialog('open');
+
 });
 
 /*
@@ -57,7 +144,7 @@ $('#bt_saveAccounts').on('click',function() {
 		},
 		success: function (data) {
 			if (data.state != 'ok') {
-				$('#div_alert').showAlert({message: data.state, level: 'danger'});
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
 			console.log(json_decode(data.result));
@@ -181,6 +268,41 @@ function addCmdToTable(_cmd) {
 	});
 }
 
+
+/*
+ * Préparation de la place plour les listes d'accounts
+ */
+nbAccountType = 0;
+$.ajax({
+	type: 'POST',
+	url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+	data: {
+		action: 'getAccountTypeLabels',
+	},
+	dataType: 'json',
+	global:false,
+	error: function (request, status, error) {
+		handleAjaxError(request, status, error);
+	},
+	success: function (data) {
+		if (data.state != 'ok') {
+			$('#div_alert').showAlert({message: data.result, level: 'danger'});
+			return;
+		}
+		types = json_decode(data.result);
+		for (type in types) {
+			accountType  = '<legend><em>' + types[type] + '</em></legend>';
+			accountType += '<div class="accountTypeThumbnailContainer" type="' + type + '" label="' + types[type] + '">';
+			accountType += '</div>';
+			$('.accountThumbnailContainer').append(accountType);
+			nbAccountType += 1;
+		}
+	}
+});
+
+/*
+ * Chargement des accounts existants
+ */
 $.ajax({
 	type: 'POST',
 	url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
@@ -194,7 +316,7 @@ $.ajax({
 	},
 	success: function (data) {
 		if (data.state != 'ok') {
-			$('#div_alert').showAlert({message: data.state, level: 'danger'});
+			$('#div_alert').showAlert({message: data.result, level: 'danger'});
 			return;
 		}
 		$('#table_account tbody').empty();

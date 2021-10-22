@@ -20,9 +20,14 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<span>{{Ajouter un compte}}</span>
 			</div>
 			<div class="cursor eqLogicAction logoPrimary" data-action="add">
-				<i class="fas fa-plus-circle"></i>
+				<i class="fas fa-charging-station"></i>
 				<br>
 				<span>{{Ajouter un chargeur}}</span>
+			</div>
+			<div class="cursor carAction logoPrimary" data-action="add">
+				<i class="fas fa-car"></i>
+				<br>
+				<span>{{Ajouter un véhicule}}</span>
 			</div>
 			<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
 				<i class="fas fa-wrench"></i>
@@ -30,37 +35,24 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<span>{{Configuration}}</span>
 			</div>
 		</div>
-		<legend><i class="fas fa-table"></i> {{Mes comptes Easee}}</legend>
-		<div class="chargeurVEAccountContainer">
-			<table id="table_account" class="table table-bordered table-condensed" style='max-width: 1100px'>
-				<thead>
-					<tr>
-						<th style='min-width:50px;width:70px'>{{Id}}</th>
-						<th style='min-width:50px;width:150px'>{{Nom}}</th>
-						<th style='min-width:50px;width:200px'>{{Login}}</th>
-						<th style='min-width:50px;width:200px'>{{URL}}</th>
-						<th style='width:200px'>{{Clé d'accès}}</th>
-						<th style='width:200px'>{{Action}}
-							<a id="bt_saveAccounts" class="btn btn-success btn-xs pull-right disabled">
-								<i class="fas fa-check-circle icon-white"></i>
-								{{Sauvegarder}}
-							</a>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
+
+		<legend><i class="fas fa-user"></i> {{Mes comptes Easee}}</legend>
+
+		<!-- Liste des accounts -->
+		<div class="accountThumbnailContainer" style='margin-left:30px'>
 		</div>
-		<legend><i class="fas fa-table"></i> {{Mes chargeurs}}</legend>
-		<!-- Champ de recherche -->
+
+		<legend><i class="fas fa-charging-station ></i> {{Mes chargeurs}}</legend>
+
+		<!-- Champ de recherche des chargeur -->
 		<div class="input-group" style="margin:5px;">
 			<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic"/>
 			<div class="input-group-btn">
 				<a id="bt_resetSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 			</div>
 		</div>
-		<!-- Liste des équipements du plugin -->
+
+		<!-- Liste des chargeurs  -->
 		<div class="eqLogicThumbnailContainer">
 			<?php
 			foreach ($eqLogics as $eqLogic) {

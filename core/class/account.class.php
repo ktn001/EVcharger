@@ -18,18 +18,27 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+$dir = __DIR__ . '/../class/account';
+if ($dh = opendir($dir)){
+    while (($file = readdir($dh)) !== false){
+	    if (substr_compare($file, ".class.php",-10,10) === 0) {
+        	require_once  $dir . '/' . $file;
+	    }
+    }
+    closedir($dh);
+}
 
 class account {
     /*     * *************************Attributs****************************** */
 
 	private static $accountsFile = __DIR__ . "/../../data/accounts.json";
 
-	private $_id;
-	private $_login;
-	private $_name;
-	private $_url;
+	protected $_id;
+	public $_TypeLabel;
+
     
     /*     * ***********************Methode static*************************** */
+
 
 	/*
 	 * Retourne le prochain Id disponible
@@ -38,6 +47,51 @@ class account {
 		$id = config::byKey ('nextId','chargeurVE',0,true);
 		config::save('nextId',$id+1,'chargeurVE');
 		return($id);
+	}
+
+	/*
+	 * Création d'une instance à partir de données
+	 */
+	public static function fromData ($data) {
+		log::add("chargeurVE", "debug", $data);
+		if (gettype($data) == "string") {
+			$data = json_decode($data,true)[0];
+		}
+		log::add("chargeurVE", "debug", print_r($data,true));
+		if (!array_key_exists('type', $data)) {
+			throw new Exception("Type d'account non défini");
+		}
+		$classe = $data['type'] . "Account";
+		log::add("chargeurVE","debug",$classe);
+		$account = new $classe();
+	}
+
+	public static function getTypeLabels() {
+		$dir = __DIR__ . '/account';
+		$labels = array();
+		try {
+			$dh = opendir($dir);
+			while (($file = readdir($dh)) !== false) {
+				if (substr_compare($file, '.class.php', -10, 10) === 0) {
+					$account = substr_replace($file,'',-10);
+					$accountClass = $account . 'Account';
+					$acc = new $accountClass();
+					$label = $acc->getTypeLabel();
+					$labels[$account] = $label;
+				}
+			}
+		} catch (Exception $e) {
+			log::add('chargeurVE','error', $e->getMessage());
+			return false;
+		}
+		return $labels;
+	}
+	
+	/*
+	 * Retoune les infos pour l'affichage des thumbnails
+	 */
+	public static function ThumbnailsInfos() {
+		self::checkFile();
 	}
 
 	/*
@@ -83,100 +137,19 @@ class account {
 		return file_get_contents(self::$accountsFile);
 	}
 
-	/*
-	 * Création d'un account à partir de données fournies
-	 */
-	public static function initialise ($data) {
-		$account = new account;
-
-		// _id
-		if ( array_key_exists("id",$data)) {
-			if (empty($data['id'])) {
-				$account->setId(self::nextId());
-			} else {
-				$account->setId($data['id']);
-			}
-		} else {
-			$account->setId(self::nextId());
-		}
-
-		// _login
-		if ( array_key_exists("login",$data)) {
-			$account->setLogin($data['login']);
-		}
-
-		// _name
-		if ( array_key_exists("name",$data)) {
-			$account->setName($data['name']);
-		}
-
-		// _url
-		if ( array_key_exists("url",$data)) {
-			$account->setUrl($data['url']);
-		}
-
-		return $account;
-	}
-
     /*     * *********************Méthodes d'instance************************* */
-    	public function __construct() {
-		$this->checkFile();
-		$this->_id = -1;
-		$this->_login = "";
-		$this->_name = "";
-		$this->_url = "";
-	}
 
-	public function getDatas() {
-		log::add("chargeurVE","debug","id: " . $this->_id);
-		log::add("chargeurVE","debug","login: " . $this->_login);
-		log::add("chargeurVE","debug","name: " . $this->_name);
-		log::add("chargeurVE","debug","url: " . $this->_url);
-		$data = array(
-			'id'    => $this->_id,
-			'login' => $this->_login,
-			'name'  => $this->_name,
-			'url'   => $this->_url
-		);
-		return $data;
+	public function save() {
 	}
 
     /*     * **********************Getteur Setteur*************************** */
 
-	public function setId($id) {
-		$this->_id = $id;
+	public function getTypeLabel() {
+		if ($this->_typeLabel == "") {
+			return get_class($this);
+		} else {
+			return $this->_typeLabel;
+		}
 	}
 
-	public function getId() {
-		return $this->_id;
-	}
-
-	public function setLogin($login) {
-		$this->_login = $login;
-	}
-
-	public function getLogin() {
-		return $this->_login;
-	}
-
-	public function setName($name) {
-		$this->_name = $name;
-	}
-
-	public function getName() {
-		return $this->_name;
-	}
-
-	public function setUrl($url) {
-		$this->_url = $url;
-		log::add("chargeurVE","debug","id: " . $this->_id);
-		log::add("chargeurVE","debug","login: " . $this->_login);
-		log::add("chargeurVE","debug","name: " . $this->_name);
-		log::add("chargeurVE","debug","url: " . $this->_url);
-		log::add("chargeurVE","debug","urlx: " . $url);
-	}
-
-	public function getUrl() {
-		return $this->_url;
-	}
 }
