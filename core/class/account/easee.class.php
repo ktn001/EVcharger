@@ -23,10 +23,64 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
     
-	public $_typeLabel = "Easee";
+	public static $typeLabel = "Easee";
+
+	protected $login;
+	protected $password;
+	protected $url;
 
     /*     * *********************Méthodes d'instance************************* */
 
+	function __construct () {
+		parent::__construct();
+		$this->url = "https://easee.cloud";
+	}
+
+	function save () {
+		if (trim($this->login) == "") {
+			throw new Exception (__("le login n'est pas défini!",__FILE__));
+		}
+		$this->login = trim $this->login;
+		if (trim($this->password) == "") {
+			throw new Exception (__("le password n'est pas défini!",__FILE__));
+		}
+		$this->password = trim $this->password;
+		if (trim($this->url) == "") {
+			throw new Exception (__("l'url n'est pas définie!",__FILE__));
+		}
+		$this->url = trim $this->url;
+		parent::save();
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
+	/* login */
+	public function setLogin($login) {
+		$this->login = $login;
+		return $this;
+	}
+
+	public function getLogin() {
+		return $this->login;
+	}
+
+	/* password */
+	public function setPassword($password) {
+		$this->password = $password;
+		return $this;
+	}
+
+	public function getPassword() {
+		return $this->password;
+	}
+
+	/* url */
+	public function setUrl($url) {
+		$this->url = $url;
+		return $this;
+	}
+
+	public function getUrl() {
+		return $this->url;
+	}
 }

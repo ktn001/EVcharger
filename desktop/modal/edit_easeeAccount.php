@@ -42,7 +42,7 @@ if (!isConnect('admin')) {
     </div>
     <div class="form-group">
       <label class="control-label col-sm-2">{{URL}}:</label>
-      <input class="accountAttr col-sm-9" type="text" data-l1key="url" placeholder="{{URL}}" value="https://easee.cloud"></input>
+      <input class="accountAttr col-sm-9" type="text" data-l1key="url" placeholder="{{URL}}"></input>
     </div>
   </fieldset>
 </form>

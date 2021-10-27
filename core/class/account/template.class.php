@@ -23,10 +23,14 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class templateAccount extends account {
     /*     * *************************Attributs****************************** */
     
-	public $_typeLabel = "Template";
+	public static $typeLabel = "Template";
 
     /*     * *********************Méthodes d'instance************************* */
 
+	function __construct() {
+		parent::__construct();
+	}
+ 
     /*     * **********************Getteur Setteur*************************** */
 
 }

@@ -24,22 +24,61 @@ $('#table_cmd').on('sortupdate',function(event,ui){
 });
 
 /*
+ * Cahrgement des acountDisplayCards
+ */
+function loadAccountCards() {
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		data: {
+			action: 'displayCards',
+		},
+		dataType : 'json',
+		global:false,
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			}
+			accounts = json_decode(data.result);
+			$('.accountThumbnailContainer').empty();
+			for (account of accounts) {
+				opacity = account.enabled ? '' : 'disableCard';
+				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
+				html += '<img src="' + account.image + '"/>';
+				html += '<br/>';
+				html += '<span class="name">' + account.humanName + '</span>';
+				html += '</div>';
+				$('.accountThumbnailContainer').append(html);
+				$('.accountThumbnailContainer').packery('reloadItems').packery();
+			}
+		}
+	});
+}
+
+loadAccountCards();
+/*
  * Edition d'un account
  */
-function editAccount (account) {
-	if (account === undefined) {
+function editAccount (accountType ,accountId = '') {
+	if (accountType === undefined) {
 		$('#div_alert').showAlert({message: "{{Account non défini}}", level: 'danger'});
 		return;
 	}
-	if (account.type === undefined) {
-		$('#div_alert').showAlert({message: "{{Le type de l'account n'est pas défini}}", level: 'danger'});
-		return;
+	for (a of accountTypes) {
+		if (a.type == accountType){
+			accountType_label = a.label;
+			break;
+		}
 	}
-	mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + account.type + 'Account';
-	mod_id = 'mod_EditAccountType' + account.type;
-	type_label = $('.accountTypeThumbnailContainer[type=' + account.type + ']').attr('label');
+
+	mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + accountType + 'Account';
+	mod_id = 'mod_EditAccountType' + accountType;
 	if ($('#' + mod_id).length == 0){
-		$('body').append('<div id="' + mod_id + '" title="{{Account type:}} ' + type_label + '"/>');
+		$('body').append('<div id="' + mod_id + '" title="{{Account de type:}} ' + accountType_label + '"/>');
 		$('#' + mod_id).dialog({
 			closeText: '',
 			autoOpen: false,
@@ -50,28 +89,44 @@ function editAccount (account) {
 		jQuery.ajaxSetup({async: false});
 		$('#' + mod_id).load(mod_url);
 		jQuery.ajaxSetup({async: true});
-		$('#' + mod_id).on('dialogopen', function (event) {
-			console.log(account);
-			$('#' + mod_id).setValues(account, '.accountAttr');
-		});
-
 	}
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		data: {
+			action: 'byId',
+			id: accountId,
+			type: accountType
+		},
+		dataType : 'json',
+		global:false,
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			}
+			$('#' + mod_id).setValues(data.result,'.accountAttr');
+		}
+	});
 	$('#' + mod_id).dialog('option', 'buttons', {
 		"{{Annuler}}": function () {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
 			$(this).dialog("close");
-			account =  json_encode($('#' + mod_id).getValues('.accountAttr'));
+			account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
 			$.ajax({
 				type: 'POST',
-				url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+				url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
 				data: {
-					action: 'saveAccount',
+					action: 'save',
 					account: account
 				},
-				dataType : 'json',
-				global:false,
+				dataType: 'json',
+				global: false,
 				error: function (request, status, error) {
 					handleAjaxError(request, status, error);
 				},
@@ -80,6 +135,7 @@ function editAccount (account) {
 						$('#div_alert').showAlert({message: data.result, level: 'danger'});
 						return;
 					}
+					loadAccountCards();
 				}
 			});
 		}
@@ -88,19 +144,19 @@ function editAccount (account) {
 }
 
 /*
- * Ajout d'un account
+ * Action du bouton d'ajout d'un account
  */
-$('.accountAction[data-action=add]').off('click').on('click',function() {
-	if (nbAccountType == 0) {
+$('.accountAction[data-action=add]').off('click').on('click', function() {
+	if ( accountTypes.length == 0) {
 		$('#div_alert').showAlert({message: "{{Aucun type d'account trouvable}}", level: 'danger'});
 		return;
 	}
-	if (nbAccountType == 1) {
-		editAccount ({type: $('.accountTypeThumbnailContainer').attr('type')});
+	if ( accountTypes.length == 1) {
+		editAccount (accountTypes[0]);
 		return;
 	}
 	if ($('#mod_selectAccountTypeToInsert').length == 0) {
-		$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélectionnez un type d\'account}}"/>');
+		$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélection d\'un type d\'account}}"/>');
 		$("#mod_selectAccountTypeToInsert").dialog({
 			closeText: '',
 			autoOpen: false,
@@ -118,13 +174,22 @@ $('.accountAction[data-action=add]').off('click').on('click',function() {
 		},
 		"{{Valider}}": function () {
 			$(this).dialog("close");
-			editAccount({type: $('#selectAccountType').value()});
+			editAccount(mod_selectAccountType('result'));
 		}
 	});
 	$('#mod_selectAccountTypeToInsert').dialog('open');
 
 });
 
+/*
+ * Action click sur account Display card
+ */
+$('.accountDisplayCard').off('click').on('click', function () {
+	account_id = $(this).attr("data-account_id");
+	account_type = $(this).attr("data-account_type");
+	console.log('type: ' + account_type + ' id: ' + account_id);
+	editAccount(account_type, account_id);
+});
 /*
  * Sauvegarde des accounts
  */
@@ -147,11 +212,9 @@ $('#bt_saveAccounts').on('click',function() {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
-			console.log(json_decode(data.result));
 			$('#table_account tbody').empty();
 			accounts =  json_decode(data.result);
 			for (i in json_decode(data.result)){
-				console.log(accounts[i]);
 				addAccount(accounts[i]);
 			}
 			$('#bt_saveAccounts').addClass('disabled');
@@ -268,63 +331,6 @@ function addCmdToTable(_cmd) {
 	});
 }
 
-
-/*
- * Préparation de la place plour les listes d'accounts
- */
-nbAccountType = 0;
-$.ajax({
-	type: 'POST',
-	url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
-	data: {
-		action: 'getAccountTypeLabels',
-	},
-	dataType: 'json',
-	global:false,
-	error: function (request, status, error) {
-		handleAjaxError(request, status, error);
-	},
-	success: function (data) {
-		if (data.state != 'ok') {
-			$('#div_alert').showAlert({message: data.result, level: 'danger'});
-			return;
-		}
-		types = json_decode(data.result);
-		for (type in types) {
-			accountType  = '<legend><em>' + types[type] + '</em></legend>';
-			accountType += '<div class="accountTypeThumbnailContainer" type="' + type + '" label="' + types[type] + '">';
-			accountType += '</div>';
-			$('.accountThumbnailContainer').append(accountType);
-			nbAccountType += 1;
-		}
-	}
-});
-
-/*
- * Chargement des accounts existants
- */
-$.ajax({
-	type: 'POST',
-	url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
-	data: {
-		action: 'getAccounts',
-	},
-	dataType : 'json',
-	global:false,
-	error: function (request, status, error) {
-		handleAjaxError(request, status, error);
-	},
-	success: function (data) {
-		if (data.state != 'ok') {
-			$('#div_alert').showAlert({message: data.result, level: 'danger'});
-			return;
-		}
-		$('#table_account tbody').empty();
-		accounts =  json_decode(data.result);
-		for (i in json_decode(data.result)){
-			console.log(accounts[i]);
-			addAccount(accounts[i]);
-		}
-		$('#bt_saveAccounts').addClass('disabled');
-	}
-});
+setTimeout(function() {
+	$('.accountThumbnailContainer').packery();
+}, 500);

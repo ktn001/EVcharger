@@ -21,39 +21,28 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div>
+<div id="mod_selectAccountType">
   <form class="form-vertical">
     <div class="form-group">
       <label class="control-label">{{Type d'account}}:</label>
-      <div id="mod_selectAccountType"></div>
+      <div>
+        <select>
+        </select>
+      </div>
     </div>
   </form>
 </div>
 
 <script>
-$.ajax({
-  type: 'POST',
-  url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
-  data: {
-    action: 'getAccountTypeLabels'
-  },
-  dataType: 'json',
-  global: false,
-  error: function (request, status, error) {
-    handleAjaxError(request, status, error);
-  },
-  success: function (data) {
-    if (data.state != 'ok') {
-      $('#div_alert').showAlert({message: date.state, level: 'danger'});
-      return;
-    }
-    types = json_decode(data.result);
-    select = '<select id="selectAccountType">';
-    for (type in types) {
-      select += '<option value=' + type + '>' + types[type] + '</option>';
-    }
-    select += '</select>';
-    $('#mod_selectAccountType').empty().append(select);
-  }
-});
+for (i in accountTypes) {
+	option = '<option value="' + i + '">' + accountTypes[i].label + '</option>';
+	$('#mod_selectAccountType select').append(option);
+}
+
+function mod_selectAccountType(action) {
+	if (action = 'result') {
+		selected = $('#mod_selectAccountType select').value();
+		return accountTypes[selected].type;
+	}
+}
 </script>

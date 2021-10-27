@@ -18,6 +18,10 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+
+/*
+ * Inclusion des classes héritières
+ */
 $dir = __DIR__ . '/../class/account';
 if ($dh = opendir($dir)){
     while (($file = readdir($dh)) !== false){
@@ -31,124 +35,175 @@ if ($dh = opendir($dir)){
 class account {
     /*     * *************************Attributs****************************** */
 
-	private static $accountsFile = __DIR__ . "/../../data/accounts.json";
+	protected static $plugin_id = "chargeurVE";
+	public static $typeLabel = "";
 
-	protected $_id;
-	public $_TypeLabel;
-
+	protected $type;
+	protected $name = "";
+	protected $id;
+	protected $isEnable;
     
-    /*     * ***********************Methode static*************************** */
-
+    /*     * ***********************Methodes static************************** */
 
 	/*
 	 * Retourne le prochain Id disponible
 	 */
 	private static function nextId() {
-		$id = config::byKey ('nextId','chargeurVE',0,true);
-		config::save('nextId',$id+1,'chargeurVE');
+		$id = config::byKey ('accountId::next',self::$plugin_id,1,true);
+		config::save('accountId::next',$id+1,self::$plugin_id);
 		return($id);
 	}
 
-	/*
-	 * Création d'une instance à partir de données
-	 */
-	public static function fromData ($data) {
-		log::add("chargeurVE", "debug", $data);
-		if (gettype($data) == "string") {
-			$data = json_decode($data,true)[0];
-		}
-		log::add("chargeurVE", "debug", print_r($data,true));
-		if (!array_key_exists('type', $data)) {
-			throw new Exception("Type d'account non défini");
-		}
-		$classe = $data['type'] . "Account";
-		log::add("chargeurVE","debug",$classe);
-		$account = new $classe();
+	public static function byId($id) {
+		return unserialize (config::byKey('account::' . $id, self::$plugin_id));
 	}
 
-	public static function getTypeLabels() {
+	public static function byTypeAndName ($type, $name) {
+		log::add("chargeurVE","info","type: " . $type . "   nom: " . $name);
+		$configs = config::searchKey('account::', self::$plugin_id);
+		$accounts = array();
+		log::add("chargeurVE","info","configs : " . print_r($configs,true));
+		foreach ($configs as $config) {
+			log::add("chargeurVE","info","config : " . print_r($config['value'],true));
+			$account = unserialize ($config['value']);
+			log::add("chargeurVE","  info","type: " . $account->getType() . "   nom: " . $account->getName());
+			if ($account->getType() == $type and $account->getName() == $name) {
+				$accounts[] = $account;
+			}
+		}
+		log::add("chargeurVE","info","CC " . print_r($accounts,true));
+		switch (count($accounts)) {
+		case 0:
+			return NULL;
+			break;
+		case 1:
+			return $accounts[0];
+		default:
+			return $accounts;
+		}
+	}
+
+	public static function all () {
+		$configs = config::searchKey("account::", self::$plugin_id);
+		$accounts = array();
+		foreach ($configs as $config) {
+			$accounts[] = unserialize($config['value']);
+		}
+		return $accounts;
+	}
+
+	public static function types() {
 		$dir = __DIR__ . '/account';
-		$labels = array();
+		$types = array();
 		try {
 			$dh = opendir($dir);
 			while (($file = readdir($dh)) !== false) {
 				if (substr_compare($file, '.class.php', -10, 10) === 0) {
-					$account = substr_replace($file,'',-10);
-					$accountClass = $account . 'Account';
-					$acc = new $accountClass();
-					$label = $acc->getTypeLabel();
-					$labels[$account] = $label;
+					$type = substr_replace($file,'',-10);
+					$accountClass = $type . 'Account';
+					$account = new $accountClass();
+					$label = $account->getTypeLabel();
+					$types[] = array('type' => $type, "label" => $label); 
 				}
 			}
 		} catch (Exception $e) {
 			log::add('chargeurVE','error', $e->getMessage());
 			return false;
 		}
-		return $labels;
-	}
-	
-	/*
-	 * Retoune les infos pour l'affichage des thumbnails
-	 */
-	public static function ThumbnailsInfos() {
-		self::checkFile();
+		return $types;
 	}
 
-	/*
-	 * Création du répertoire et fichier json s'ils n'existent pas encore
-	 */
-	private static function checkFile () {
-		$dataDir = dirname(self::$accountsFile);
-		try {
-			if ( !is_dir($dataDir)) {
-				mkdir($dataDir,0775);
-			}
-			if ( !file_exists(self::$accountsFile)) {
-				touch(self::$accountsFile);
-			}
-			chmod(self::$accountsFile,0664);
-		} catch (Exception $e) {
-			log::add('chargeurVE','error', $e->getMessage());
-			return false;
-		}
-		return true;
-	}
+    /*     * *********************Methodes d'instance************************ */
 
-	/*
-	 * Sauvegarde de tous les accounts qui sont founis dans le json passé en argument.
-	 *
-	 * Les accounts existants seront tous supprimés
-	 */
-	public static function saveAll ($accounts) {
-		self::checkFile();
-		$accounts = json_decode($accounts,true);
-		$accounts2Save = array();
-		foreach ($accounts as $account) {
-			$a = self::initialise($account);
-			$accounts2Save[] = $a->getDatas();
-		}
-		file_put_contents(self::$accountsFile,json_encode($accounts2Save,JSON_PRETTY_PRINT));
+	public function __construct() {
+		$this->type = substr_replace(get_class($this),'',-7);
 	}
-
-	/*
-	 * retourne la config de tous les accounts sous la forme d'un json
-	 */
-	public static function getAll () {
-		return file_get_contents(self::$accountsFile);
-	}
-
-    /*     * *********************Méthodes d'instance************************* */
 
 	public function save() {
+		if (trim($this->name) == "") {
+			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
+		}
+		$accounts = self::byTypeAndName($this->getType(),$this->name);
+		log::add("chargeurVE","info","XX " . print_r($accounts,true));
+		if (!isset($this->_id) or $this->id == '' ) {
+			if ($accounts) {
+				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
+			}
+			$this->_id = self::nextId();
+		}
+		config::save('account::' . $this->_id, serialize($this), self::$plugin_id);
+	}
+
+	public function getHumanName($_tag = false, $_prettify = false) {
+		$name = '';
+		if ($_tag) {
+			if ($_prettify) {
+				$name .= '<span class="label labelObjectHuman">' . $this->getType() . '</span>';
+			} else {
+				$name .= $this->getType();
+			}
+		} else {
+			$name .= '['.$this->getType().']'; 
+		}
+		if ($_prettify) {
+			$name .= '<br/><strong>';
+		}
+		if ($_tag) {
+			$name .= ' ' . $this->getName();
+		} else {
+			$name .= '[' . $this->getName() . ']';
+		}
+		if ($_prettify) {
+			$name .= '</strong>';
+		}
+		return $name;
+	}
+
+	public function getType() {
+		return substr_replace(get_class($this),'',-7);
 	}
 
     /*     * **********************Getteur Setteur*************************** */
 
+	/** id **/
+	public function getId() {
+		return $this->id;
+	}
+
+	public function setId($_id) {
+		$this->id = $_id;
+		return $this;
+	}
+
+	/** isEnable **/
+	public function getIsEnable() {
+		if ($this->isEnable == '' || !is_numeric($this->isEnable)){
+			return 0;
+		}
+		return $this->isEnable;
+	}
+
+	public function setIsEnable($_isEnable) {
+		$this->isEnable = $_isEnable;
+		return $this;
+	}
+
+	/** name **/
+	public function getName() {
+		return $this->name;
+	}
+
+	public function setName($_name) {
+		$this->name = $_name;
+		return $this;
+	}
+
+	/** get type Label **/
 	public function getTypeLabel() {
-		if ($this->_typeLabel == "") {
+		if ($this::$typeLabel == "") {
 			return get_class($this);
 		} else {
-			return $this->_typeLabel;
+			return $this::$typeLabel;
 		}
 	}
 

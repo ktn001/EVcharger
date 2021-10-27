@@ -26,40 +26,6 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
-	/*
-	 * Liste des type d'accounts
-	 */
-	if (init('action') == 'getAccountTypeLabels') {
-		log::add ('chargeurVE', 'debug', 'AJAX: début de "getAccountLabels"');
-		ajax::success(json_encode(account::getTypeLabels()));
-	}
-
-	/*
-	 * Chargement des accouts
-	 */
-	if (init('action') == 'getAccounts') {
-		log::add ('chargeurVE', 'debug', 'AJAX: début de "getAccounts"');
-		try {
-			ajax::success(account::getAll());
-		} catch (Exception $e) {
-			ajax::error();
-		}
-	}
-
-	/*
-	 * Sauvegarde d'un account
-	 */
-	if (init('action') == 'saveAccount') {
-		log::add ('chargeurVE', 'debug', 'AJAX: début de "saveAccount"');
-		try {
-			$account = account::fromData(init('account'));
-			//$account->save();
-			ajax::success();
-		} catch (Exception $e) {
-			ajax::error();
-		}
-	}
-
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
