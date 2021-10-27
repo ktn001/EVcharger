@@ -116,7 +116,6 @@ function editAccount (accountType ,accountId = '') {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
-			$(this).dialog("close");
 			account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
 			$.ajax({
 				type: 'POST',
@@ -135,6 +134,7 @@ function editAccount (accountType ,accountId = '') {
 						$('#div_alert').showAlert({message: data.result, level: 'danger'});
 						return;
 					}
+					$('#' + mod_id).dialog("close");
 					loadAccountCards();
 				}
 			});
