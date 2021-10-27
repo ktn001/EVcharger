@@ -59,19 +59,14 @@ class account {
 	}
 
 	public static function byTypeAndName ($type, $name) {
-		log::add("chargeurVE","info","type: " . $type . "   nom: " . $name);
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
-		log::add("chargeurVE","info","configs : " . print_r($configs,true));
 		foreach ($configs as $config) {
-			log::add("chargeurVE","info","config : " . print_r($config['value'],true));
 			$account = unserialize ($config['value']);
-			log::add("chargeurVE","  info","type: " . $account->getType() . "   nom: " . $account->getName());
 			if ($account->getType() == $type and $account->getName() == $name) {
 				$accounts[] = $account;
 			}
 		}
-		log::add("chargeurVE","info","CC " . print_r($accounts,true));
 		switch (count($accounts)) {
 		case 0:
 			return NULL;
@@ -107,7 +102,6 @@ class account {
 				}
 			}
 		} catch (Exception $e) {
-			log::add('chargeurVE','error', $e->getMessage());
 			return false;
 		}
 		return $types;
@@ -124,7 +118,6 @@ class account {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
 		$accounts = self::byTypeAndName($this->getType(),$this->name);
-		log::add("chargeurVE","info","XX " . print_r($accounts,true));
 		if (!isset($this->_id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
