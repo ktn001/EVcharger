@@ -40,15 +40,15 @@ class easeeAccount extends account {
 		if (trim($this->login) == "") {
 			throw new Exception (__("le login n'est pas défini!",__FILE__));
 		}
-		$this->login = trim $this->login;
+		$this->login = trim ($this->login);
 		if (trim($this->password) == "") {
 			throw new Exception (__("le password n'est pas défini!",__FILE__));
 		}
-		$this->password = trim $this->password;
+		$this->password = trim ($this->password);
 		if (trim($this->url) == "") {
 			throw new Exception (__("l'url n'est pas définie!",__FILE__));
 		}
-		$this->url = trim $this->url;
+		$this->url = trim ($this->url);
 		parent::save();
 	}
 
