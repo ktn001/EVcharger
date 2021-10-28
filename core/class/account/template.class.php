@@ -22,15 +22,29 @@ require_once dirname(__FILE__) . '/../account.class.php';
 
 class templateAccount extends account {
     /*     * *************************Attributs****************************** */
-    
+
+	/* ### Mettre ici le nom affiché pour ce type de compte ### */
 	public static $typeLabel = "Template";
+	
+	/* ### Ajouter ici les attributs spécifiques aux instances de ce type de compte ### */ 
 
     /*     * *********************Méthodes d'instance************************* */
 
 	function __construct() {
 		parent::__construct();
+		
+		/* ### ajouter ici les initialisations d'attributs spécifiques ### */
 	}
  
+	function save () {
+		/* ### Vérification des valeurs des attributs spécifiques de ce type de compte.
+		   ### Une exception doit être levée si l'accompte ne doit pas être enregistré
+		   ### */
+		parent::save();
+	}
+	
     /*     * **********************Getteur Setteur*************************** */
+
+	/* ### Ajouter ici les fonctions get* et set* pour les attributs spécifiques de ce type de compte ### */ 
 
 }
