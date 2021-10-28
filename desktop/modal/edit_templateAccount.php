@@ -21,28 +21,20 @@ if (!isConnect('admin')) {
 }
 ?>
 
+<!-- ### Ajouter les champ de saisie pour les attributs spécifiques au type de compte
+     ###   * Chaque champ de saisie d'un attribut doit avoir la classe "accountAttr"
+     ###   * Chaque champ de saisie doit avoir un attribut *data-l1key* dont la valeur doit être le nom de l'attribut du type de ccompte
+     ### -->
+
 <form class="form-horizontal">
   <fieldset>
     <div class="form-group">
       <label class="control-label col-sm-2">Id:</label>
-      <span class="accounAttr col-sm-2" data-l1key="id">123</span>
+      <span class="accountAttr col-sm-2" data-l1key="id">123</span>
     </div>
     <div class="form-group">
       <label class="control-label col-sm-2">{{Nom}}:</label>
-      <input class="acounAttr col-sm-9" type="text" data-l1key="name" placeholder="{{Nom}}"></input>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2">{{Login}}:</label>
-      <input class="acounAttr col-sm-9" type="text" data-l1key="login" placeholder="{{Login}}"></input>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2">{{Password}}:</label>
-      <input class="acounAttr col-sm-9" type="password" data-l1key="password" placeholder="{{Password}}"></input>
-    </div>
-    <div class="form-group">
-      <label class="control-label col-sm-2">{{URL}}:</label>
-      <input class="acounAttr col-sm-9" type="text" data-l1key="url" placeholder="{{URL}}"></input>
+      <input class="acountAttr col-sm-9" type="text" data-l1key="name" placeholder="{{Nom}}"></input>
     </div>
   </fieldset>
 </form>
-
