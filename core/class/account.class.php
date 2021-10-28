@@ -54,10 +54,16 @@ class account {
 		return($id);
 	}
 
+	/*
+	 * retourne l'account dont l'id est donné en argument
+	 */
 	public static function byId($id) {
 		return unserialize (config::byKey('account::' . $id, self::$plugin_id));
 	}
 
+	/*
+	 * Recherche les objets qui le type et le nom dunnés en argument
+	 */
 	public static function byTypeAndName ($type, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
@@ -78,15 +84,29 @@ class account {
 		}
 	}
 
-	public static function all () {
+	/*
+	 * Retounre une liste contenant tous les accounts
+	 */
+	public static function all ( $sortBy="type") {
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$accounts[] = unserialize($config['value']);
 		}
+		if (in_array($sortBy, array('name', 'type'))) {
+			usort($accounts, function ($a, $b) {
+				if (($sortBy == "type") and ($a->getType() != $b->getType())) {
+					return strcmp ($a->getType(), $b->getType());
+				}
+				return strcmp ($a->getName(), $b->getName());
+			});
+		}
 		return $accounts;
 	}
 
+	/*
+	 * Retoune la liste de tous les types d'account connus
+	 */
 	public static function types() {
 		$dir = __DIR__ . '/account';
 		$types = array();
@@ -109,22 +129,38 @@ class account {
 
     /*     * *********************Methodes d'instance************************ */
 
+	/*
+	 * Constructeur
+	 */
 	public function __construct() {
 		$this->type = substr_replace(get_class($this),'',-7);
 	}
 
+	/*
+	 * Enregistrement de la définition de l'account
+	 */
 	public function save() {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
 		$accounts = self::byTypeAndName($this->getType(),$this->name);
-		if (!isset($this->_id) or $this->id == '' ) {
+		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
 			}
-			$this->_id = self::nextId();
+			$this->id = self::nextId();
 		}
-		config::save('account::' . $this->_id, serialize($this), self::$plugin_id);
+		config::save('account::' . $this->id, serialize($this), self::$plugin_id);
+	}
+
+	/*
+	 * suppression de l'account
+	 */
+	public function remove() {
+		config::remove('account::' . $this->id, self::$plugin_id);
+		if (config::byKey('account::' . $this->id, self::$plugin_id) != '') {
+			throw new Exception (__("L'account n'a pas pu être supprimé!",__FILE__));
+		}
 	}
 
 	public function getHumanName($_tag = false, $_prettify = false) {

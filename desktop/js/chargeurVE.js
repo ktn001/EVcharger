@@ -24,7 +24,7 @@ $('#table_cmd').on('sortupdate',function(event,ui){
 });
 
 /*
- * Cahrgement des acountDisplayCards
+ * Chargement des acountDisplayCards
  */
 function loadAccountCards() {
 	$.ajax({
@@ -46,7 +46,7 @@ function loadAccountCards() {
 			accounts = json_decode(data.result);
 			$('.accountThumbnailContainer').empty();
 			for (account of accounts) {
-				opacity = account.enabled ? '' : 'disableCard';
+				opacity = (account.isEnable == 1) ? '' : 'disableCard';
 				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
 				html += '<img src="' + account.image + '"/>';
 				html += '<br/>';
@@ -59,13 +59,18 @@ function loadAccountCards() {
 	});
 }
 
+/*
+ * Chargement initial des accounts
+ */
+$('.accountThumbnailContainer').packery();
 loadAccountCards();
+
 /*
  * Edition d'un account
  */
 function editAccount (accountType ,accountId = '') {
 	if (accountType === undefined) {
-		$('#div_alert').showAlert({message: "{{Account non défini}}", level: 'danger'});
+		$('#div_alert').showAlert({message: "{{Compte non défini}}", level: 'danger'});
 		return;
 	}
 	for (a of accountTypes) {
@@ -78,7 +83,7 @@ function editAccount (accountType ,accountId = '') {
 	mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + accountType + 'Account';
 	mod_id = 'mod_EditAccountType' + accountType;
 	if ($('#' + mod_id).length == 0){
-		$('body').append('<div id="' + mod_id + '" title="{{Account de type:}} ' + accountType_label + '"/>');
+		$('body').append('<div id="' + mod_id + '" title="{{Compte de type:}} ' + accountType_label + '"/>');
 		$('#' + mod_id).dialog({
 			closeText: '',
 			autoOpen: false,
@@ -108,14 +113,50 @@ function editAccount (accountType ,accountId = '') {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
+			$('#' + mod_id + ' .accountAttr').value('');
 			$('#' + mod_id).setValues(data.result,'.accountAttr');
 		}
 	});
-	$('#' + mod_id).dialog('option', 'buttons', {
-		"{{Annuler}}": function () {
+	buttons = []
+	buttons.push( {
+		text: "{{Annuler}}",
+		click: function() {
 			$(this).dialog("close");
-		},
-		"{{Valider}}": function () {
+		}
+	});
+	if ( accountId != '') {
+		buttons.push( {
+			text: "{{Supprimer}}",
+			click: function() {
+				account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
+				$.ajax({
+					type: 'POST',
+					url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+					data: {
+						action: 'remove',
+						account: account
+					},
+					dataType: 'json',
+					global: false,
+					error: function (request, status, error) {
+						handleAjaxError(request, status, error);
+						loadAccountCards();
+					},
+					success: function (data) {
+						if (data.state != 'ok') {
+							$('#div_alert').showAlert({message: data.result, level: 'danger'});
+							return;
+						}
+						$('#' + mod_id).dialog("close");
+						loadAccountCards();
+					}
+				})
+			}
+		});
+	};
+	buttons.push( {
+		text: "{{Sauvegarder}}",
+		click: function () {
 			account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
 			$.ajax({
 				type: 'POST',
@@ -128,6 +169,7 @@ function editAccount (accountType ,accountId = '') {
 				global: false,
 				error: function (request, status, error) {
 					handleAjaxError(request, status, error);
+					loadAccountCards();
 				},
 				success: function (data) {
 					if (data.state != 'ok') {
@@ -140,6 +182,7 @@ function editAccount (accountType ,accountId = '') {
 			});
 		}
 	});
+	$('#' + mod_id).dialog('option', 'buttons', buttons);
 	$('#' + mod_id).dialog('open');
 }
 
@@ -156,7 +199,7 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 		return;
 	}
 	if ($('#mod_selectAccountTypeToInsert').length == 0) {
-		$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélection d\'un type d\'account}}"/>');
+		$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélection d\'un type de comptet}}"/>');
 		$("#mod_selectAccountTypeToInsert").dialog({
 			closeText: '',
 			autoOpen: false,
@@ -184,10 +227,9 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 /*
  * Action click sur account Display card
  */
-$('.accountDisplayCard').off('click').on('click', function () {
+$('.accountThumbnailContainer').off('click').on('click','.accountDisplayCard', function () {
 	account_id = $(this).attr("data-account_id");
 	account_type = $(this).attr("data-account_type");
-	console.log('type: ' + account_type + ' id: ' + account_id);
 	editAccount(account_type, account_id);
 });
 /*

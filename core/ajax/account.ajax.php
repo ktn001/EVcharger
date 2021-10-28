@@ -30,7 +30,7 @@ try {
 		$type = init('type');
 		$id = init('id');
 		if ($type == ''){
-			throw new Exception(__("Le type d'account n'est pas indiqué",__FILE__));
+			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
 		if ($id == '') {
 			$classe = $type . 'Account';
@@ -39,10 +39,10 @@ try {
 			$account = account::byId(init('id'));
 		}
 		if (!is_object($account)) {
-			throw new Exception(__('Account inconnu: ',__FILE__) . init(id));
+			throw new Exception(__('Compte inconnu: ',__FILE__) . init(id));
 		}
 		if ($account->getType() != $type) {
-			throw new Exception(__("Le type de l'account n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
+			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
 		}
 		ajax::success(utils::o2a($account));
 	}
@@ -50,7 +50,7 @@ try {
 	if (init('action') == 'save') {
 		$data = json_decode(init('account'),true);
 		if ($data['type'] == ''){
-			throw new Exception(__("Le type d'account n'est pas indiqué",__FILE__));
+			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
 		$classe = $data['type'] . 'Account';
 		if ($data['id'] == '') {
@@ -58,10 +58,19 @@ try {
 		} else {
 			$account = account::byId($data['id']);
 		}
-		log::add("chargeurVE","info","avant a2o " . print_r($account,true));
 		utils::a2o($account,$data);
-		log::add("chargeurVE","info","apres a2o " . print_r($account,true));
 		$account->save();
+		ajax::success();
+	}
+
+	if (init('action') == 'remove') {
+		$data = json_decode(init('account'),true);
+		if ($data['id'] == '') {
+			throw new Exception(__("L'id du compte n'est pas défini",__FILE__));
+		}
+		$account = account::byId($data['id']);
+		utils::a2o($account,$data);
+		$account->remove();
 		ajax::success();
 	}
 
@@ -69,7 +78,7 @@ try {
 		$cards = array ();
 		foreach (account::all() as $account) {
 			$data = array(
-				'enabled' => $account->getIsEnable(),
+				'isEnable' => $account->getIsEnable(),
 				'id' => $account->getId(),
 				'type' => $account->getType(),
 				'humanName' => $account->getHumanName(true,true),
