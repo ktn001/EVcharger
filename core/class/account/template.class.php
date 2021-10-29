@@ -23,8 +23,16 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class templateAccount extends account {
     /*     * *************************Attributs****************************** */
 
-	/* ### Mettre ici le nom affiché pour ce type de compte ### */
+	/* ### Mettre ici le nom à afficher pour ce type de compte ### */
 	public static $typeLabel = "Template";
+	
+	/* ### Le fichier image pour ce type d'account ### */
+	/* ###
+	   ### Cet attrubut peurt être omis s'il l'image par défaut doit être utilisée
+	   ### Le nom du fichier image ne doit pat contenir de "/"
+	   ### Le fichier doit se trouver dans le répertoire "destktop/img" du plugin
+	   ### */
+	// public static $image = "account_template.png";
 	
 	/* ### Ajouter ici les attributs spécifiques aux instances de ce type de compte ### */ 
 
