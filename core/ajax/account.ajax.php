@@ -82,7 +82,7 @@ try {
 				'id' => $account->getId(),
 				'type' => $account->getType(),
 				'humanName' => $account->getHumanName(true,true),
-				'image' => 'plugins/chargeurVE/desktop/img/account.png',
+				'image' => $account->getImage(),
 			);
 			$cards[] = $data;
 		}
