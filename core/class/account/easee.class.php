@@ -24,6 +24,7 @@ class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
     
 	public static $typeLabel = "Easee";
+	public static $image = "account_easee.png";
 
 	protected $login;
 	protected $password;
