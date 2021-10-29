@@ -37,6 +37,7 @@ class account {
 
 	protected static $plugin_id = "chargeurVE";
 	public static $typeLabel = "";
+	public static $image = "account.png";
 
 	protected $type;
 	protected $name = "";
@@ -125,6 +126,14 @@ class account {
 			return false;
 		}
 		return $types;
+	}
+	
+	public static function getImage() {
+		if (strpos(self::$image, "/") === false) {
+			return "plugins/" . self::$plugin_id . "/desktop/img/" . self::$image;
+		} else {
+			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
+		}
 	}
 
     /*     * *********************Methodes d'instance************************ */
