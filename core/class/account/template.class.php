@@ -23,36 +23,97 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class templateAccount extends account {
     /*     * *************************Attributs****************************** */
 
-	/* ### Mettre ici le nom à afficher pour ce type de compte ### */
+	/* ###
+	 * ### Mettre ici le nom à afficher pour ce type de compte
+	 * ### */
 	public static $typeLabel = "Template";
 	
-	/* ### Le fichier image pour ce type d'account ### */
-	/* ###
-	   ### Cet attrubut peurt être omis s'il l'image par défaut doit être utilisée
-	   ### Le nom du fichier image ne doit pat contenir de "/"
-	   ### Le fichier doit se trouver dans le répertoire "destktop/img" du plugin
-	   ### */
-	// public static $image = "account_template.png";
+	/* ### Le fichier image pour ce type d'account ### 
+	 * ###
+	 * ### Cet attrubut peurt être omis s'il l'image par défaut doit être utilisée
+	 * ### Le nom du fichier image ne doit pat contenir de "/"
+	 * ### Le fichier doit se trouver dans le répertoire "destktop/img" du plugin
+	 * ### */
+
+	 public static $image = "account_template.png";
 	
-	/* ### Ajouter ici les attributs spécifiques aux instances de ce type de compte ### */ 
+	/* ###
+	 * ### Ajouter ici les attributs spécifiques aux instances de ce type de compte
+	 * ### */ 
 
     /*     * *********************Méthodes d'instance************************* */
 
 	function __construct() {
 		parent::__construct();
 		
-		/* ### ajouter ici les initialisations d'attributs spécifiques ### */
+		/* ###
+		 * ### ajouter ici les initialisations d'attributs spécifiques
+		 * ### */
 	}
  
-	function save () {
-		/* ### Vérification des valeurs des attributs spécifiques de ce type de compte.
-		   ### Une exception doit être levée si l'accompte ne doit pas être enregistré
-		   ### */
-		parent::save();
-	}
+	/* ###
+	 * ### Function optionnelle appelée avant la sauvegarde de l'account
+	 * ### 
+	 * ### public function preSave() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée avant la sauvegarde d'un nouvel account
+	 * ### 
+	 * ### public function preInsert() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée avant la sauvegarde d'une mise a jour
+	 * ### d'un account existant
+	 * ### 
+	 * ### public function preUpdate() {
+	 * ### }
+	 * ### */ 
+
+	/* ###
+	 * ### Function optionnelle appelée après la sauvegarde de l'account
+	 * ### 
+	 * ### public function postSave() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée après la sauvegarde d'un nouvel account
+	 * ### 
+	 * ### public function postInsert() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée après la sauvegarde d'une mise a jour
+	 * ### d'un account existant
+	 * ### 
+	 * ### public function postUpdate() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée avant la suppression de l'account
+	 * ### 
+	 * ### public function preRemove() {
+	 * ### }
+	 * ### */ 
+	
+	/* ###
+	 * ### Function optionnelle appelée après la suppression de l'account
+	 * ### 
+	 * ### public function postRemove() {
+	 * ### }
+	 * ### */ 
 	
     /*     * **********************Getteur Setteur*************************** */
-
-	/* ### Ajouter ici les fonctions get* et set* pour les attributs spécifiques de ce type de compte ### */ 
+	
+	/* ###
+	 * ### Ajouter ici les fonctions get* et set* pour les attributs
+	 * ### spécifiques de ce type de compte
+	 * ### */ 
 
 }

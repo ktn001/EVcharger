@@ -29,12 +29,13 @@ if (!isConnect('admin')) {
 <form class="form-horizontal">
   <fieldset>
     <div class="form-group">
+	<span class="accountAttr" data-l1key="type" style="display:none"></span>
       <label class="control-label col-sm-2">Id:</label>
       <span class="accountAttr col-sm-2" data-l1key="id">123</span>
     </div>
     <div class="form-group">
       <label class="control-label col-sm-2">{{Nom}}:</label>
-      <input class="acountAttr col-sm-9" type="text" data-l1key="name" placeholder="{{Nom}}"></input>
+      <input class="accountAttr col-sm-9" type="text" data-l1key="name" placeholder="{{Nom}}"></input>
     </div>
   </fieldset>
 </form>

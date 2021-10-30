@@ -96,9 +96,9 @@ class account {
 		}
 		if (in_array($sortBy, array('name', 'type'))) {
 			usort($accounts, function ($a, $b) {
-				if (($sortBy == "type") and ($a->getType() != $b->getType())) {
-					return strcmp ($a->getType(), $b->getType());
-				}
+				//if (($sortBy == "type") and ($a->getType() != $b->getType())) {
+				//	return strcmp ($a->getType(), $b->getType());
+				//}
 				return strcmp ($a->getName(), $b->getName());
 			});
 		}
@@ -128,14 +128,6 @@ class account {
 		return $types;
 	}
 	
-	public static function getImage() {
-		if (strpos(self::$image, "/") === false) {
-			return "plugins/" . self::$plugin_id . "/desktop/img/" . self::$image;
-		} else {
-			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
-		}
-	}
-
     /*     * *********************Methodes d'instance************************ */
 
 	/*
@@ -152,23 +144,53 @@ class account {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
+		if (method_exists($this, 'preSave')) {
+			$this->preSave();
+		}
 		$accounts = self::byTypeAndName($this->getType(),$this->name);
+		$onInsert = false;
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
 			}
+			if (method_exists($this, 'preInsert')) {
+				$this->preInsert();
+			}
+			$onInsert = true;
 			$this->id = self::nextId();
+		} else {
+			if (method_exists($this, 'preUpdate')) {
+				$this->preUpdate();
+			}
 		}
 		config::save('account::' . $this->id, serialize($this), self::$plugin_id);
+		if (onInsert) {
+			if (method_exists($this, 'postInsert')) {
+				$this->postInsert();
+			}
+		} else {
+			if (method_exists($this, 'postUpdate')) {
+				$this->postUpdate();
+			}
+		}
+		if (method_exists($this, 'postInsert')) {
+			$this->postSave();
+		}
 	}
 
 	/*
 	 * suppression de l'account
 	 */
 	public function remove() {
+		if (method_exists($this, 'preRemove')) {
+			$this->preRemove();
+		}
 		config::remove('account::' . $this->id, self::$plugin_id);
 		if (config::byKey('account::' . $this->id, self::$plugin_id) != '') {
 			throw new Exception (__("L'account n'a pas pu être supprimé!",__FILE__));
+		}
+		if (method_exists($this, 'postRemove')) {
+			$this->postRemove();
 		}
 	}
 
@@ -195,6 +217,14 @@ class account {
 			$name .= '</strong>';
 		}
 		return $name;
+	}
+
+	public function getImage() {
+		if (strpos($this::$image, "/") === false) {
+			return "plugins/" . self::$plugin_id . "/desktop/img/" . $this::$image;
+		} else {
+			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
+		}
 	}
 
 	public function getType() {
