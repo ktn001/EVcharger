@@ -21,28 +21,31 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_selectAccountType">
-  <form class="form-vertical">
-    <div class="form-group">
-      <label class="control-label">{{Type d'account}}:</label>
-      <div>
-        <select>
-        </select>
+<div id="mod_chargeurNameAndType">
+  <form class="form-horizontal">
+    <fieldset>
+      <div class="form-group">
+        <label class="control-label col-sm-3">{{Nom}}:</label>
+        <input class="eqLogicAttr col-sm-8" data-l1key='name' type="text" placeholder="{{Nom}}"></input>
       </div>
-    </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3">{{Type}}:</label>
+          <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='type'>
+	  </select>
+      </div>
+    </fieldset>
   </form>
 </div>
 
 <script>
-for (i in accountTypes) {
-	option = '<option value="' + i + '">' + accountTypes[i].label + '</option>';
-	$('#mod_selectAccountType select').append(option);
+for (def of chargeursDefs) {
+	option = '<option value="' + def.type + '">' + def.label + '</option>';
+	$('#mod_chargeurNameAndType select').append(option);
 }
 
-function mod_selectAccountType(action) {
+function mod_chargeurNameAndType(action) {
 	if (action = 'result') {
-		selected = $('#mod_selectAccountType select').value();
-		return accountTypes[selected].accountType;
+		return $('#mod_chargeurNameAndType').getValues('.eqLogicAttr');
 	}
 }
 </script>

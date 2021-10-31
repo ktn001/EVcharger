@@ -27,13 +27,13 @@ try {
 	}
 
 	if (init('action') == 'byId') {
-		$type = init('type');
+		$accountType = init('accountType');
 		$id = init('id');
-		if ($type == ''){
+		if ($accountType == ''){
 			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
 		if ($id == '') {
-			$classe = $type . 'Account';
+			$classe = $accountType . 'Account';
 			$account = new $classe();
 		} else {
 			$account = account::byId(init('id'));
@@ -41,18 +41,18 @@ try {
 		if (!is_object($account)) {
 			throw new Exception(__('Compte inconnu: ',__FILE__) . init(id));
 		}
-		if ($account->getType() != $type) {
-			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
+		if ($account->getType() != $accountType) {
+			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $accountType . '" (' . $account->getType() . ')');
 		}
 		ajax::success(utils::o2a($account));
 	}
 
 	if (init('action') == 'save') {
 		$data = json_decode(init('account'),true);
-		if ($data['type'] == ''){
+		if ($data['accountType'] == ''){
 			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
-		$classe = $data['type'] . 'Account';
+		$classe = $data['accountType'] . 'Account';
 		if ($data['id'] == '') {
 			$account = new $classe();
 		} else {
@@ -80,7 +80,7 @@ try {
 			$data = array(
 				'isEnable' => $account->getIsEnable(),
 				'id' => $account->getId(),
-				'type' => $account->getType(),
+				'accountType' => $account->getType(),
 				'humanName' => $account->getHumanName(true,true),
 				'image' => $account->getImage(),
 			);

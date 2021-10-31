@@ -39,7 +39,7 @@ class account {
 	public static $typeLabel = "";
 	public static $image = "account.png";
 
-	protected $type;
+	protected $accountType;
 	protected $name = "";
 	protected $id;
 	protected $isEnable;
@@ -65,12 +65,12 @@ class account {
 	/*
 	 * Recherche les objets qui le type et le nom dunnés en argument
 	 */
-	public static function byTypeAndName ($type, $name) {
+	public static function byTypeAndName ($accountType, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
-			if ($account->getType() == $type and $account->getName() == $name) {
+			if ($account->getType() == $accountType and $account->getName() == $name) {
 				$accounts[] = $account;
 			}
 		}
@@ -88,15 +88,15 @@ class account {
 	/*
 	 * Retounre une liste contenant tous les accounts
 	 */
-	public static function all ( $sortBy="type") {
+	public static function all ( $sortBy="accountType") {
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$accounts[] = unserialize($config['value']);
 		}
-		if (in_array($sortBy, array('name', 'type'))) {
+		if (in_array($sortBy, array('name', 'accountType'))) {
 			usort($accounts, function ($a, $b) {
-				//if (($sortBy == "type") and ($a->getType() != $b->getType())) {
+				//if (($sortBy == "accountType") and ($a->getType() != $b->getType())) {
 				//	return strcmp ($a->getType(), $b->getType());
 				//}
 				return strcmp ($a->getName(), $b->getName());
@@ -108,24 +108,24 @@ class account {
 	/*
 	 * Retoune la liste de tous les types d'account connus
 	 */
-	public static function types() {
+	public static function accountTypes() {
 		$dir = __DIR__ . '/account';
-		$types = array();
+		$accountTypes = array();
 		try {
 			$dh = opendir($dir);
 			while (($file = readdir($dh)) !== false) {
 				if (substr_compare($file, '.class.php', -10, 10) === 0) {
-					$type = substr_replace($file,'',-10);
-					$accountClass = $type . 'Account';
+					$accountType = substr_replace($file,'',-10);
+					$accountClass = $accountType . 'Account';
 					$account = new $accountClass();
 					$label = $account->getTypeLabel();
-					$types[] = array('type' => $type, "label" => $label); 
+					$accountTypes[] = array('accountType' => $accountType, "label" => $label); 
 				}
 			}
 		} catch (Exception $e) {
 			return false;
 		}
-		return $types;
+		return $accountTypes;
 	}
 	
     /*     * *********************Methodes d'instance************************ */
@@ -134,7 +134,7 @@ class account {
 	 * Constructeur
 	 */
 	public function __construct() {
-		$this->type = substr_replace(get_class($this),'',-7);
+		$this->accountType = substr_replace(get_class($this),'',-7);
 	}
 
 	/*

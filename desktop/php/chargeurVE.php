@@ -5,9 +5,35 @@ if (!isConnect('admin')) {
 // Déclaration des variables obligatoires
 $plugin = plugin::byId('chargeurVE');
 sendVarToJS('eqType', $plugin->getId());
-sendVarToJS('accountTypes',account::types());
+sendVarToJS('accountTypes',account::accountTypes());
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
+
+$dirPath = __DIR__ . "/../../data";
+$dir = opendir($dirPath);
+$data = '[';
+$firstFile = true;
+while (($fileName = readdir($dir)) !== false) {
+	if (preg_match('/^chargeur_.*\.json$/',$fileName)) {
+		$filePath = $dirPath . "/" . $fileName;
+		$file = fopen($filePath, 'r');
+		if ($firstFile) {
+			$firstFile = false;
+		} else {
+			$data .= ",";
+		}
+		$data .= fread($file, fileSize($filePath));
+		fclose($file);
+	}
+}
+$data .= ']';
+$defs = json_decode($data,true);
+function cmpDefs ($a, $b) {
+	return strcasecmp($a['label'],$b['label']);
+}
+usort($defs,'cmpDefs');
+sendVarToJS('chargeursDefs',$defs);
+closedir($dir);
 ?>
 
 <div class="row row-overflow">
@@ -21,7 +47,7 @@ $accounts = account::all();
                 <br>
                 <span>{{Ajouter un compte}}</span>
             </div>
-            <div class="cursor eqLogicAction logoPrimary" data-action="add">
+            <div class="cursor chargeurAction logoPrimary" data-action="add">
                 <i class="fas fa-charging-station"></i>
                 <br>
                 <span>{{Ajouter un chargeur}}</span>
@@ -150,7 +176,7 @@ $accounts = account::all();
                             <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">{{Compte}}</label>
-                                <div class="col-sm-7">
+                                <div class="col-sm-7 selectAccount">
                                     <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="param1" placeholder="{{Paramètre n°1}}"/>
                                 </div>
                             </div>

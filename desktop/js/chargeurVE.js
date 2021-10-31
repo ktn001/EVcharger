@@ -47,7 +47,7 @@ function loadAccountCards() {
 			$('.accountThumbnailContainer').empty();
 			for (account of accounts) {
 				opacity = (account.isEnable == 1) ? '' : 'disableCard';
-				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
+				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.accountType + '">';
 				html += '<img src="' + account.image + '"/>';
 				html += '<br/>';
 				html += '<span class="name">' + account.humanName + '</span>';
@@ -74,7 +74,7 @@ function editAccount (accountType ,accountId = '') {
 		return;
 	}
 	for (a of accountTypes) {
-		if (a.type == accountType){
+		if (a.accountType == accountType){
 			accountType_label = a.label;
 			break;
 		}
@@ -101,7 +101,7 @@ function editAccount (accountType ,accountId = '') {
 		data: {
 			action: 'byId',
 			id: accountId,
-			type: accountType
+			accountType: accountType
 		},
 		dataType : 'json',
 		global:false,
@@ -221,7 +221,6 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 		}
 	});
 	$('#mod_selectAccountTypeToInsert').dialog('open');
-
 });
 
 /*
@@ -232,6 +231,7 @@ $('.accountThumbnailContainer').off('click').on('click','.accountDisplayCard', f
 	account_type = $(this).attr("data-account_type");
 	editAccount(account_type, account_id);
 });
+
 /*
  * Sauvegarde des accounts
  */
@@ -271,6 +271,56 @@ $('#bt_saveAccounts').on('click',function() {
 $('#table_account').on('change','.accountAttr',function() {
 	$('#bt_saveAccounts').removeClass('disabled');
 	modifyWithoutSave = true;
+});
+
+/*
+ * Action click sur account Display card
+ */
+$('.chargeurAction[data-action=add').off('click').on('click',function () {
+	if ($('#mod_chargeurNameAndType').length == 0) {
+		$('body').append('<div id="mod_chargeurNameAndType" title="{{Nouveau chargeur:}}"/>');
+		$("#mod_chargeurNameAndType").dialog({
+			closeText: '',
+			autoOpen: false,
+			modal: true,
+			height:200,
+			width:400
+		});
+		jQuery.ajaxSetup({async: false});
+		$('#mod_chargeurNameAndType').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndType');
+		jQuery.ajaxSetup({async: true});
+	}
+	$('#mod_chargeurNameAndType').dialog('option', 'buttons', {
+		"{{Annuler}}": function () {
+			$(this).dialog("close");
+		},
+		"{{Valider}}": function () {
+			chargeurs = mod_chargeurNameAndType('result');
+			if ( chargeurs[0].name != '') {
+				$(this).dialog("close");
+				jeedom.eqLogic.save({
+					type: eqType,
+					eqLogics: chargeurs,
+					error: function(error) {
+						$('#div_alert').showAlert({message: error.message, level: 'danger'});
+					},
+					success: function(_data) {
+						var vars = getUrlVars();
+						var url = 'index.php?';
+						for (var i in vars) {
+							if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+								url += i + '=' + vars[i].replace('#', '') + '&';
+							}
+						}
+						modifyWithoutSave = false;
+						url += 'id=' + _data.id + '&saveSuccessFull=1';
+						loadPage(url);
+					}
+				})
+			}
+		}
+	});
+	$('#mod_chargeurNameAndType').dialog('open');
 });
 
 /*
@@ -373,6 +423,3 @@ function addCmdToTable(_cmd) {
 	});
 }
 
-setTimeout(function() {
-	$('.accountThumbnailContainer').packery();
-}, 500);

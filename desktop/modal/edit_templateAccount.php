@@ -29,7 +29,7 @@ if (!isConnect('admin')) {
 <form class="form-horizontal">
   <fieldset>
     <div class="form-group">
-	<span class="accountAttr" data-l1key="type" style="display:none"></span>
+	<span class="accountAttr" data-l1key="accountType" style="display:none"></span>
       <label class="control-label col-sm-2">Id:</label>
       <span class="accountAttr col-sm-2" data-l1key="id">123</span>
     </div>
