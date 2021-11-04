@@ -63,7 +63,22 @@ class account {
 	}
 
 	/*
-	 * Recherche les objets qui le type et le nom dunnés en argument
+	 * Recherche d'accounts selon le type
+	 */
+	public static function byType ($accountType) {
+		$configs = config::searchKey('account::', self::$plugin_id);
+		$accounts = array();
+		foreach ($configs as $config) {
+			$account = unserialize ($config['value']);
+			if ($account->getType() == $accountType) {
+				$accounts[] = $account;
+			}
+		}
+		return $accounts;
+	}
+
+	/*
+	 * Recherche les objets qui ont le type et le nom donnés en argument
 	 */
 	public static function byTypeAndName ($accountType, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);

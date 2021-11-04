@@ -172,6 +172,14 @@ class chargeurVE extends eqLogic {
     }
      */
 
+    public function getPathImg () {
+	$image = $this->getConfiguration('image');
+	if ($image == '') {
+	    return "plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+	}
+	return "plugins/chargeurVE/desktop/img/" . $image;
+    }
+
     /*     * **********************Getteur Setteur*************************** */
 }
 

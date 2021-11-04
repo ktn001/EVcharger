@@ -89,6 +89,18 @@ try {
 		ajax::success(json_encode($cards));
 	}
 
+	if (init('action') == 'getAccountToSelect') {
+		$result = array();
+		foreach (account::byType(init('accountType')) as $account) {
+			$data = array(
+				'id' => $account->getId(),
+				'value' => $account->getHumanName(),
+			);
+			$result[] = $data;
+		}
+		ajax::success(json_encode($result));
+	}
+
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
