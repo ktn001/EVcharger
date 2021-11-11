@@ -19,16 +19,19 @@ import sys
 import os
 import time
 import datetime
+import traceback
 import re
 import signal
 from optparse import OptionParser
 from os.path import join
 import json
+import argparse
 
+sys.path.append (os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib'))
 try:
 	from jeedom.jeedom import *
 except ImportError:
-	print "Error: importing module jeedom.jeedom"
+	print("Error: importing module jeedom.jeedom")
 	sys.exit(1)
 
 def read_socket():
@@ -40,8 +43,8 @@ def read_socket():
 			logging.error("Invalid apikey from socket : " + str(message))
 			return
 		try:
-			print 'read'
-		except Exception, e:
+			print ('read')
+		except Exception as e:
 			logging.error('Send command to demon error : '+str(e))
 
 def listen():
@@ -70,10 +73,6 @@ def shutdown():
 		jeedom_socket.close()
 	except:
 		pass
-	try:
-		jeedom_serial.close()
-	except:
-		pass
 	logging.debug("Exit 0")
 	sys.stdout.flush()
 	os._exit(0)
@@ -81,26 +80,39 @@ def shutdown():
 # ----------------------------------------------------------------------------
 
 _log_level = "error"
-_socket_port = 55009
+_socket_port = 34739
 _socket_host = 'localhost'
 _device = 'auto'
-_pidfile = '/tmp/demond.pid'
+_pidfile = '/tmp/chargeurVE/demond.pid'
 _apikey = ''
 _callback = ''
+_cycle = 0.3
 
-for arg in sys.argv:
-	if arg.startswith("--loglevel="):
-		temp, _log_level = arg.split("=")
-	elif arg.startswith("--socketport="):
-		temp, _socket_port = arg.split("=")
-	elif arg.startswith("--sockethost="):
-		temp, _socket_host = arg.split("=")
-	elif arg.startswith("--pidfile="):
-		temp, _pidfile = arg.split("=")
-	elif arg.startswith("--apikey="):
-		temp, _apikey = arg.split("=")
-	elif arg.startswith("--device="):
-		temp, _device = arg.split("=")
+parser = argparse.ArgumentParser(
+    description='chargeurVE Daemon for Jeedom plugin')
+parser.add_argument("--device", help="Device", type=str)
+parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
+parser.add_argument("--callback", help="Callback", type=str)
+parser.add_argument("--apikey", help="Apikey", type=str)
+parser.add_argument("--cycle", help="Cycle to send event", type=str)
+parser.add_argument("--pid", help="Pid file", type=str)
+parser.add_argument("--socketport", help="Port for Zigbee server", type=str)
+args = parser.parse_args()
+
+if args.device:
+	_device = args.device
+if args.loglevel:
+    _log_level = args.loglevel
+if args.callback:
+    _callback = args.callback
+if args.apikey:
+    _apikey = args.apikey
+if args.pid:
+    _pidfile = args.pid
+if args.cycle:
+    _cycle = float(args.cycle)
+if args.socketport:
+	_socketport = args.socketport
 		
 _socket_port = int(_socket_port)
 
@@ -121,6 +133,7 @@ try:
 	jeedom_utils.write_pid(str(_pidfile))
 	jeedom_socket = jeedom_socket(port=_socket_port,address=_socket_host)
 	listen()
-except Exception,e:
+except Exception as e:
 	logging.error('Fatal error : '+str(e))
+	logging.info(traceback.format_exc())
 	shutdown()

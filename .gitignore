@@ -1,3 +1,4 @@
 /data/*
 *.php~
 .*.swp
+__pycache__
