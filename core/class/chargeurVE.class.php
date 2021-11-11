@@ -55,7 +55,7 @@ class chargeurVE extends eqLogic {
         }
 
         $path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
-        $cmd = 'python3 ' . $path . '/chargeurVE.py'; // nom du démon
+        $cmd = 'python3 ' . $path . '/chargeurVEd.py'; // nom du démon
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
         $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '34739'); // port par défaut
         $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/template/core/php/jeeTemplate.php'; // chemin de la callback url à modifier (voir ci-dessous)
@@ -86,8 +86,32 @@ class chargeurVE extends eqLogic {
             $pid = intval(trim(file_get_contents($pid_file)));
             system::kill($pid);
         }
-        system::kill('chargeurVE.py'); // nom du démon à modifier
+        system::kill('chargeurVEd.py'); // nom du démon à modifier
         sleep(1);
+    }
+    
+    public static function dependancy_install() {
+        # log::remove(__CLASS__ . '_update');
+	return array(
+	    'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency',
+	    'log' => log::getPathToLog(__CLASS__ . '_update')
+	);
+    }
+
+    public static function dependancy_info(){
+    	$return = array();
+	$return ['log'] = log::getPathToLog(__CLASS__ . '_update');
+	$return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . 'dependency';
+	if (file_exists(jeedom::getTmpFolder(__CLASS__) . 'dependency')) {
+	    $return['state'] = 'in_progress';
+	} else {
+	    if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {
+		$return['state'] = 'nok';
+	    } else {
+		$return['state'] = 'ok';
+	    }
+	}
+	return $return;
     }
 
     /*

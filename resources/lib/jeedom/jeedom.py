@@ -28,7 +28,6 @@ import socketserver
 from socketserver import (TCPServer, StreamRequestHandler)
 import signal
 import unicodedata
-import pyudev
 
 # ------------------------------------------------------------------------------
 
@@ -159,22 +158,6 @@ class jeedom_utils():
 	def set_log_level(level = 'error'):
 		FORMAT = '[%(asctime)-15s][%(levelname)s] : %(message)s'
 		logging.basicConfig(level=jeedom_utils.convert_log_level(level),format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
-
-	@staticmethod
-	def find_tty_usb(idVendor, idProduct, product = None):
-		context = pyudev.Context()
-		for device in context.list_devices(subsystem='tty'):
-			if 'ID_VENDOR' not in device:
-				continue
-			if device['ID_VENDOR_ID'] != idVendor:
-				continue
-			if device['ID_MODEL_ID'] != idProduct:
-				continue
-			if product is not None:
-				if 'ID_VENDOR' not in device or device['ID_VENDOR'].lower().find(product.lower()) == -1 :
-					continue
-			return str(device.device_node)
-		return None
 
 	@staticmethod
 	def stripped(str):
