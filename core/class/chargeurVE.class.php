@@ -31,6 +31,9 @@ class chargeurVE extends eqLogic {
     
     /*     * ***********************Methode static*************************** */
 
+    /*
+     * Info sur le daemon
+     */
     public static function deamon_info() {
         $return = array();
         $return['log'] = __CLASS__;
@@ -47,6 +50,9 @@ class chargeurVE extends eqLogic {
         return $return;
     }
 
+    /*
+     * Lancement de deamon
+     */
     public static function deamon_start() {
         self::deamon_stop();
         $deamon_info = self::deamon_info();
@@ -55,14 +61,14 @@ class chargeurVE extends eqLogic {
         }
 
         $path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
-        $cmd = 'python3 ' . $path . '/chargeurVEd.py'; // nom du démon
+        $cmd = 'python3 ' . $path . '/chargeurVEd.py'; 
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-        $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '34739'); // port par défaut
-        $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/template/core/php/jeeTemplate.php'; // chemin de la callback url à modifier (voir ci-dessous)
-        $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
-        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
+        $cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
+        $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/template/core/php/jeechargeurVE.php';
+        $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
+        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; 
         log::add(__CLASS__, 'info', 'Lancement démon');
-        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &'); // 'template_daemon' est le nom du log pour votre démon, vous devez nommer votre log en commençant par le pluginid pour que le fichier apparaisse dans la page de config
+        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
         $i = 0;
         while ($i < 20) {
             $deamon_info = self::deamon_info();
@@ -72,7 +78,7 @@ class chargeurVE extends eqLogic {
             sleep(1);
             $i++;
         }
-        if ($i >= 30) {
+        if ($deamon_info['state'] != 'ok') {
             log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDeamon');
             return false;
         }
@@ -118,6 +124,20 @@ class chargeurVE extends eqLogic {
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
      */
 	public static function cron() {
+		$deamon_info = self::deamon_info();
+		if ($deamon_info['state'] != 'ok') {
+			throw new Exception("Le démon n'est pas démarré");
+		}
+		$params['apikey'] = jeedom::getApiKey(__CLASS__);
+		$params['message'] = "Ceci est un message";
+		$payLoad = json_encode($params);
+		log::add(__CLASS__,"info",$payLoad);
+		log::add(__CLASS__,"info",config::byKey('deamon::port', __CLASS__));
+		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
+		socket_connect($socket,'127.0.0.1', config::byKey('deamon::port', __CLASS__));
+		socket_write($socket, $payLoad, strlen($payLoad));
+		socket_close($socket);
+	}
 //		log::add("chargeurVE","debug","Lancement du Cron");
 //		$curl = curl_init();
 //
@@ -154,7 +174,7 @@ class chargeurVE extends eqLogic {
 //			log::add("chargeurVE","debug", "XXX " . $response);
 //		}
 //		log::add("chargeurVE","debug","Fin du Cron");
-    }
+//    }
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom

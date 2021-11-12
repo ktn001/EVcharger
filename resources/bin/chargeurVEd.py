@@ -27,13 +27,17 @@ from os.path import join
 import json
 import argparse
 
+# --------- Import de jeedom.jeedom ------------------------------------------
+
 sys.path.append (os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib'))
 try:
     from jeedom.jeedom import *
 except ImportError as e:
-    print("Error: importing module jeedom.jeedom")
+    print("Error: importing module jeedom.jeedom:")
     print(e)
     sys.exit(1)
+
+# -------- Lecture du socket ------------------------------------------------
 
 def read_socket():
     global JEEDOM_SOCKET_MESSAGE
@@ -57,7 +61,7 @@ def listen():
     except KeyboardInterrupt:
         shutdown()
 
-# ----------------------------------------------------------------------------
+# ----------- procédureis d'arrêt -------------------------------------------
 
 def handler(signum=None, frame=None):
     logging.debug("Signal %i caught, exiting..." % int(signum))
@@ -78,7 +82,7 @@ def shutdown():
     sys.stdout.flush()
     os._exit(0)
 
-# ----------------------------------------------------------------------------
+# ---------------- MAIN -----------------------------------------------------
 
 _log_level = "error"
 _socket_port = 34739
