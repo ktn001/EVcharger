@@ -32,7 +32,7 @@ class chargeurVE extends eqLogic {
     /*     * ***********************Methode static*************************** */
 
     /*
-     * Info sur le daemon
+     * Info sur le deamon
      */
     public static function deamon_info() {
         $return = array();
@@ -64,11 +64,12 @@ class chargeurVE extends eqLogic {
         $cmd = 'python3 ' . $path . '/chargeurVEd.py'; 
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
         $cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
-        $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/template/core/php/jeechargeurVE.php';
+        $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
         $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
         $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; 
         log::add(__CLASS__, 'info', 'Lancement démon');
-        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
+	log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon') . ' 2>&1 &');
+        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon.out') . ' 2>&1 &');
         $i = 0;
         while ($i < 20) {
             $deamon_info = self::deamon_info();

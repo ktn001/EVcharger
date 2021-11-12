@@ -13,29 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+
 import string
 import sys
 import os
 import time
-import datetime
 import traceback
 import re
-import signal
 from optparse import OptionParser
-from os.path import join
 import json
 import argparse
+import importlib
 
-# --------- Import de jeedom.jeedom ------------------------------------------
+libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
+sys.path.append (libDir)
 
-sys.path.append (os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib'))
-try:
-    from jeedom.jeedom import *
-except ImportError as e:
-    print("Error: importing module jeedom.jeedom:")
-    print(e)
-    sys.exit(1)
+from jeedom.jeedom import *
+import account
 
 # -------- Lecture du socket ------------------------------------------------
 
@@ -43,11 +37,13 @@ def read_socket():
     global JEEDOM_SOCKET_MESSAGE
     if not JEEDOM_SOCKET_MESSAGE.empty():
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
-        message = json.loads(jeedom_utils.stripped(JEEDOM_SOCKET_MESSAGE.get()))
+        message = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
+        print ('message........')
         if message['apikey'] != _apikey:
             logging.error("Invalid apikey from socket : " + str(message))
             return
         try:
+            logging.info ('read')
             print ('read')
         except Exception as e:
             logging.error('Send command to demon error : '+str(e))
@@ -88,7 +84,7 @@ _log_level = "error"
 _socket_port = 34739
 _socket_host = 'localhost'
 _device = 'auto'
-_pidfile = '/tmp/chargeurVE/demond.pid'
+_pidfile = '/tmp/jeedom/chargeurVE/deamond.pid'
 _apikey = ''
 _callback = ''
 _cycle = 0.3
@@ -101,7 +97,7 @@ parser.add_argument("--callback", help="Callback", type=str)
 parser.add_argument("--apikey", help="Apikey", type=str)
 parser.add_argument("--cycle", help="Cycle to send event", type=str)
 parser.add_argument("--pid", help="Pid file", type=str)
-parser.add_argument("--socketport", help="Port for Zigbee server", type=str)
+parser.add_argument("--socketport", help="Port pour réception des commandes du plugin", type=str)
 args = parser.parse_args()
 
 if args.device:
@@ -119,7 +115,7 @@ if args.cycle:
 if args.socketport:
     _socketport = args.socketport
 
-_socket_port = int(_socket_port)
+_socket_port = int(_socketport)
 
 jeedom_utils.set_log_level(_log_level)
 
