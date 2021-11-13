@@ -22,12 +22,29 @@ if (!isConnect()) {
   die();
 }
 ?>
+
 <form class="form-horizontal">
   <fieldset>
     <div class="form-group">
-      <label class="col-sm-3 control-label">{{Port du deamon}}</label>
-      <div class="col-sm-7">
-        <input class="configKey form-control" data-l1key="deamon::port" placeholder="34739"></input>
+      <div class='col-sm-6'>
+        <legend>{{Démon}}:</legend>
+        <label class="col-sm-2 control-label">{{Port}}</label>
+	<input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"></input>
+      </div>
+      <div class='col-sm-6'>
+        <legend>{{Les types de chargeurs}}:</legend>
+        <table class='table table-bordered'>
+          <thead>
+            <tr>
+              <th>{{Type}}</th>
+              <th>{{Activer}}</th>
+              <th>{{Couleur du tag}}</th>
+              <th>{{Couleur du texte du tag}}</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
       </div>
     </div>
   </fieldset>

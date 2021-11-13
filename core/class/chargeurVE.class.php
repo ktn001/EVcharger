@@ -25,16 +25,16 @@ class chargeurVE extends eqLogic {
 
     /*     * ***********************Methode static*************************** */
 
-    /*     * **********************Gestion du deamon************************* */
+    /*     * **********************Gestion du daemon************************* */
 
     /*
-     * Info sur le deamon
+     * Info sur le daemon
      */
     public static function deamon_info() {
         $return = array();
         $return['log'] = __CLASS__;
         $return['state'] = 'nok';
-        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
+        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
         if (file_exists($pid_file)) {
             if (@posix_getsid(trim(file_get_contents($pid_file)))) {
                 $return['state'] = 'ok';
@@ -47,35 +47,35 @@ class chargeurVE extends eqLogic {
     }
 
     /*
-     * Lancement de deamon
+     * Lancement de daemon
      */
     public static function deamon_start() {
         self::deamon_stop();
-        $deamon_info = self::deamon_info();
-        if ($deamon_info['launchable'] != 'ok') {
+        $daemon_info = self::deamon_info();
+        if ($daemon_info['launchable'] != 'ok') {
             throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
         }
 
         $path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
         $cmd = 'python3 ' . $path . '/chargeurVEd.py';
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-        $cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
+        $cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
         $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
         $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
-        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
+        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
         log::add(__CLASS__, 'info', 'Lancement démon');
-        log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon') . ' 2>&1 &');
-        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon.out') . ' 2>&1 &');
+        log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
+        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon.out') . ' 2>&1 &');
         $i = 0;
         while ($i < 20) {
-            $deamon_info = self::deamon_info();
-            if ($deamon_info['state'] == 'ok') {
+            $daemon_info = self::deamon_info();
+            if ($daemon_info['state'] == 'ok') {
                 break;
             }
             sleep(1);
             $i++;
         }
-        if ($deamon_info['state'] != 'ok') {
+        if ($daemon_info['state'] != 'ok') {
             log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDeamon');
             return false;
         }
@@ -84,10 +84,10 @@ class chargeurVE extends eqLogic {
     }
 
     /*
-     * Arret de deamon
+     * Arret de daemon
      */
     public static function deamon_stop() {
-        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; // ne pas modifier
+        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid'; // ne pas modifier
         if (file_exists($pid_file)) {
             $pid = intval(trim(file_get_contents($pid_file)));
             system::kill($pid);
@@ -133,17 +133,17 @@ class chargeurVE extends eqLogic {
      */
     public static function cron() {
     log::add("chargeurVE","debug","Lancement du Cron");
-        $deamon_info = self::deamon_info();
-        if ($deamon_info['state'] != 'ok') {
+        $daemon_info = self::deamon_info();
+        if ($daemon_info['state'] != 'ok') {
             throw new Exception("Le démon n'est pas démarré");
         }
         $params['apikey'] = jeedom::getApiKey(__CLASS__);
         $params['message'] = "Ceci est un message";
         $payLoad = json_encode($params);
         log::add(__CLASS__,"info",$payLoad);
-        log::add(__CLASS__,"info",config::byKey('deamon::port', __CLASS__));
+        log::add(__CLASS__,"info",config::byKey('daemon::port', __CLASS__));
         $socket = socket_create(AF_INET, SOCK_STREAM, 0);
-        socket_connect($socket,'127.0.0.1', config::byKey('deamon::port', __CLASS__));
+        socket_connect($socket,'127.0.0.1', config::byKey('daemon::port', __CLASS__));
         socket_write($socket, $payLoad, strlen($payLoad));
         socket_close($socket);
     }
