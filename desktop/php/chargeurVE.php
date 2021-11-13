@@ -9,30 +9,7 @@ sendVarToJS('accountTypes',account::accountTypes());
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
-$dirPath = __DIR__ . "/../../data";
-$dir = opendir($dirPath);
-$chargeursDefs_json = '[';
-$firstFile = true;
-while (($fileName = readdir($dir)) !== false) {
-    if (preg_match('/^chargeur_.*\.json$/',$fileName)) {
-	$filePath = $dirPath . "/" . $fileName;
-	$file = fopen($filePath, 'r');
-	if ($firstFile) {
-	    $firstFile = false;
-	} else {
-	    $chargeursDefs_json .= ",";
-	}
-	$chargeursDefs_json .= fread($file, fileSize($filePath));
-	fclose($file);
-    }
-}
-$chargeursDefs_json .= ']';
-$chargeursDefs = json_decode($chargeursDefs_json,true);
-function cmpDefs ($a, $b) {
-    return strcasecmp($a['label'],$b['label']);
-}
-usort($chargeursDefs,'cmpDefs');
-sendVarToJS('chargeursDefs',$chargeursDefs);
+sendVarToJS('chargeursDefs',chargeurVE::types());
 closedir($dir);
 ?>
 

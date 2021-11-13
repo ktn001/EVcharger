@@ -1,0 +1,11 @@
+{
+	"type": "easee",
+	"label": "{{Easee}}",
+	"images": [
+		"chargeur_easee_noir.png",
+		"chargeur_easee_gris.png",
+		"chargeur_easee_bleu.png",
+		"chargeur_easee_rouge.png",
+		"chargeur_easee_blanc.png"
+	]
+}

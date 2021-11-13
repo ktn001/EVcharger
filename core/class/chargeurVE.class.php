@@ -22,14 +22,10 @@ require_once __DIR__  . '/account.class.php';
 
 class chargeurVE extends eqLogic {
     /*     * *************************Attributs****************************** */
-    
-  /*
-   * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
-   * Tableau multidimensionnel - exemple: array('custom' => true, 'custom::layout' => false)
-	public static $_widgetPossibility = array();
-   */
-    
+
     /*     * ***********************Methode static*************************** */
+
+    /*     * **********************Gestion du deamon************************* */
 
     /*
      * Info sur le deamon
@@ -61,14 +57,14 @@ class chargeurVE extends eqLogic {
         }
 
         $path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
-        $cmd = 'python3 ' . $path . '/chargeurVEd.py'; 
+        $cmd = 'python3 ' . $path . '/chargeurVEd.py';
         $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
         $cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
         $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
         $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
-        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; 
+        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/deamon.pid';
         log::add(__CLASS__, 'info', 'Lancement démon');
-	log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon') . ' 2>&1 &');
+        log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon') . ' 2>&1 &');
         $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_deamon.out') . ' 2>&1 &');
         $i = 0;
         while ($i < 20) {
@@ -87,6 +83,9 @@ class chargeurVE extends eqLogic {
         return true;
     }
 
+    /*
+     * Arret de deamon
+     */
     public static function deamon_stop() {
         $pid_file = jeedom::getTmpFolder(__CLASS__) . '/deamon.pid'; // ne pas modifier
         if (file_exists($pid_file)) {
@@ -96,165 +95,202 @@ class chargeurVE extends eqLogic {
         system::kill('chargeurVEd.py'); // nom du démon à modifier
         sleep(1);
     }
-    
+
+    /*
+     * Installation des dépendances
+     */
     public static function dependancy_install() {
         # log::remove(__CLASS__ . '_update');
-	return array(
-	    'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency',
-	    'log' => log::getPathToLog(__CLASS__ . '_update')
-	);
+        return array(
+            'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency',
+            'log' => log::getPathToLog(__CLASS__ . '_update')
+        );
     }
 
+    /*
+     * Etat de dépendances
+     */
     public static function dependancy_info(){
-    	$return = array();
-	$return ['log'] = log::getPathToLog(__CLASS__ . '_update');
-	$return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . 'dependency';
-	if (file_exists(jeedom::getTmpFolder(__CLASS__) . 'dependency')) {
-	    $return['state'] = 'in_progress';
-	} else {
-	    if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {
-		$return['state'] = 'nok';
-	    } else {
-		$return['state'] = 'ok';
-	    }
-	}
-	return $return;
+        $return = array();
+        $return ['log'] = log::getPathToLog(__CLASS__ . '_update');
+        $return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . 'dependency';
+        if (file_exists(jeedom::getTmpFolder(__CLASS__) . 'dependency')) {
+            $return['state'] = 'in_progress';
+        } else {
+            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {
+                $return['state'] = 'nok';
+            } else {
+                $return['state'] = 'ok';
+            }
+        }
+        return $return;
     }
+
+    /*     * ************************Les crons**************************** */
 
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
      */
-	public static function cron() {
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] != 'ok') {
-			throw new Exception("Le démon n'est pas démarré");
-		}
-		$params['apikey'] = jeedom::getApiKey(__CLASS__);
-		$params['message'] = "Ceci est un message";
-		$payLoad = json_encode($params);
-		log::add(__CLASS__,"info",$payLoad);
-		log::add(__CLASS__,"info",config::byKey('deamon::port', __CLASS__));
-		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
-		socket_connect($socket,'127.0.0.1', config::byKey('deamon::port', __CLASS__));
-		socket_write($socket, $payLoad, strlen($payLoad));
-		socket_close($socket);
-	}
-//		log::add("chargeurVE","debug","Lancement du Cron");
-//		$curl = curl_init();
+    public static function cron() {
+    log::add("chargeurVE","debug","Lancement du Cron");
+        $deamon_info = self::deamon_info();
+        if ($deamon_info['state'] != 'ok') {
+            throw new Exception("Le démon n'est pas démarré");
+        }
+        $params['apikey'] = jeedom::getApiKey(__CLASS__);
+        $params['message'] = "Ceci est un message";
+        $payLoad = json_encode($params);
+        log::add(__CLASS__,"info",$payLoad);
+        log::add(__CLASS__,"info",config::byKey('deamon::port', __CLASS__));
+        $socket = socket_create(AF_INET, SOCK_STREAM, 0);
+        socket_connect($socket,'127.0.0.1', config::byKey('deamon::port', __CLASS__));
+        socket_write($socket, $payLoad, strlen($payLoad));
+        socket_close($socket);
+    }
+//        $curl = curl_init();
 //
-//			 // 'userName' => '+41797491023'
-//		$data = array (
-//			 'userName' => 'christian@ockolly.ch',
-//			 'password' => 'EMobile&1e'
-//		);
-//		
-//		$post_data = json_encode($data);
+//                   // 'userName' => '+41797491023'
+//        $data = array (
+//             'userName' => 'christian@ockolly.ch',
+//             'password' => 'EMobile&1e'
+//        );
 //
-//		curl_setopt_array($curl, [
-//			CURLOPT_URL => "https://api.easee.cloud/api/accounts/token",
-//			CURLOPT_RETURNTRANSFER => true,
-//			CURLOPT_ENCODING => "",
-//			CURLOPT_MAXREDIRS => 10,
-//			CURLOPT_TIMEOUT => 30,
-//			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-//			CURLOPT_CUSTOMREQUEST => "POST",
-//			CURLOPT_HTTPHEADER => [
-//				"Accept: application/json",
-//				"Content-Type: application/*+json"
-//			],
-//			CURLOPT_POSTFIELDS => $post_data,
-//		]);
-//		$response = curl_exec($curl);
-//		$err = curl_error($curl);
+//        $post_data = json_encode($data);
 //
-//		curl_close($curl);
+//        curl_setopt_array($curl, [
+//            CURLOPT_URL => "https://api.easee.cloud/api/accounts/token",
+//            CURLOPT_RETURNTRANSFER => true,
+//            CURLOPT_ENCODING => "",
+//            CURLOPT_MAXREDIRS => 10,
+//            CURLOPT_TIMEOUT => 30,
+//            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+//            CURLOPT_CUSTOMREQUEST => "POST",
+//            CURLOPT_HTTPHEADER => [
+//                  "Accept: application/json",
+//                  "Content-Type: application/*+json"
+//            ],
+//            CURLOPT_POSTFIELDS => $post_data,
+//        ]);
+//        $response = curl_exec($curl);
+//        $err = curl_error($curl);
 //
-//		if ($err) {
-//			log::add("chargeurVE","debug", "cURL Error #:" . $err);
-//		} else {
-//			log::add("chargeurVE","debug", "XXX " . $response);
-//		}
-//		log::add("chargeurVE","debug","Fin du Cron");
+//        curl_close($curl);
+//
+//        if ($err) {
+//            log::add("chargeurVE","debug", "cURL Error #:" . $err);
+//        } else {
+//            log::add("chargeurVE","debug", "XXX " . $response);
+//        }
+//        log::add("chargeurVE","debug","Fin du Cron");
 //    }
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-      public static function cron5() {
-      }
+    public static function cron5() {
+    }
      */
 
     /*
      * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
-      public static function cron10() {
-      }
+    public static function cron10() {
+    }
      */
-    
+
     /*
      * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
-      public static function cron15() {
-      }
+    public static function cron15() {
+    }
      */
-    
+
     /*
      * Fonction exécutée automatiquement toutes les 30 minutes par Jeedom
-      public static function cron30() {
-      }
+    public static function cron30() {
+    }
      */
-    
+
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-      }
+    public static function cronHourly() {
+    }
      */
 
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-      }
+    public static function cronDaily() {
+    }
      */
 
+    /*     * ********************Methode static ************************** */
+
+    public function types() {
+        $dirPath = __DIR__ . "/../../data";
+        $dir = opendir($dirPath);
+        $chargeursDefs_json = '[';
+        $firstFile = true;
+        while (($fileName = readdir($dir)) !== false) {
+            if (preg_match('/^chargeur_.*\.json$/',$fileName)) {
+                $filePath = $dirPath . '/' . $fileName;
+                $file = fopen( $filePath, 'r');
+                if ($firstFile) {
+                    $firstFile = false;
+                } else {
+                    $chargeursDefs_json .= ",";
+                }
+                $chargeursDefs_json .= fread($file, fileSize($filePath));
+                fclose($file);
+            }
+        }
+        closedir($dir);
+        $chargeurDefs_json .= ']';
+        $chargeurDefs = json_decode($chargeursDefs_json,true);
+        function cmpDefs ($a, $b) {
+            return strcasecmp($a[label],$b['label']);
+        }
+        usort($chargeursDefs,'cmpDefs');
+	return $chargeursDefs;
+    }
 
 
     /*     * *********************Méthodes d'instance************************* */
-    
- // Fonction exécutée automatiquement avant la création de l'équipement 
+
+ // Fonction exécutée automatiquement avant la création de l'équipement
     public function preInsert() {
-        
+
     }
 
- // Fonction exécutée automatiquement après la création de l'équipement 
+ // Fonction exécutée automatiquement après la création de l'équipement
     public function postInsert() {
-        
+
     }
 
- // Fonction exécutée automatiquement avant la mise à jour de l'équipement 
+ // Fonction exécutée automatiquement avant la mise à jour de l'équipement
     public function preUpdate() {
-        
+
     }
 
- // Fonction exécutée automatiquement après la mise à jour de l'équipement 
+ // Fonction exécutée automatiquement après la mise à jour de l'équipement
     public function postUpdate() {
-        
+
     }
 
- // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement 
+ // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
     public function preSave() {
-        
+
     }
 
- // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement 
+ // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
     public function postSave() {
-        
+
     }
 
- // Fonction exécutée automatiquement avant la suppression de l'équipement 
+ // Fonction exécutée automatiquement avant la suppression de l'équipement
     public function preRemove() {
-        
+
     }
 
- // Fonction exécutée automatiquement après la suppression de l'équipement 
+ // Fonction exécutée automatiquement après la suppression de l'équipement
     public function postRemove() {
-        
+
     }
 
     /*
@@ -277,11 +313,11 @@ class chargeurVE extends eqLogic {
      */
 
     public function getPathImg () {
-	$image = $this->getConfiguration('image');
-	if ($image == '') {
-	    return "plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
-	}
-	return "plugins/chargeurVE/desktop/img/" . $image;
+        $image = $this->getConfiguration('image');
+        if ($image == '') {
+            return "plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+        }
+        return "plugins/chargeurVE/desktop/img/" . $image;
     }
 
     /*     * **********************Getteur Setteur*************************** */
@@ -289,11 +325,11 @@ class chargeurVE extends eqLogic {
 
 class chargeurVECmd extends cmd {
     /*     * *************************Attributs****************************** */
-    
+
     /*
       public static $_widgetPossibility = array();
     */
-    
+
     /*     * ***********************Methode static*************************** */
 
 
@@ -306,9 +342,9 @@ class chargeurVECmd extends cmd {
       }
      */
 
-  // Exécution d'une commande  
+  // Exécution d'une commande
      public function execute($_options = array()) {
-        
+
      }
 
     /*     * **********************Getteur Setteur*************************** */
