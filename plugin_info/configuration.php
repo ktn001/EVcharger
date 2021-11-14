@@ -23,6 +23,8 @@ if (!isConnect()) {
 }
 include_file('core', 'chargeurVE', 'class', 'chargeurVE');
 $chargeurVETypes = chargeurVE::types();
+$defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
+$defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
 ?>
 
 <form class="form-horizontal">
