@@ -21,6 +21,8 @@ if (!isConnect()) {
   include_file('desktop', '404', 'php');
   die();
 }
+include_file('core', 'chargeurVE', 'class', 'chargeurVE');
+$chargeurVETypes = chargeurVE::types();
 ?>
 
 <form class="form-horizontal">
@@ -37,12 +39,22 @@ if (!isConnect()) {
           <thead>
             <tr>
               <th>{{Type}}</th>
-              <th>{{Activer}}</th>
-              <th>{{Couleur du tag}}</th>
-              <th>{{Couleur du texte du tag}}</th>
+              <th style='text-align:center'>{{Activer}}</th>
+              <th style="text-align:center">{{Couleur du tag}}</th>
+              <th style="text-align:center">{{Couleur du texte du tag}}</th>
             </tr>
           </thead>
           <tbody>
+            <?php
+            foreach ($chargeurVETypes as $type) {
+              echo '<tr>';
+	      echo '<td>' . $type['label'] . '</td>';
+	      echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="chargeurEV::' . $type['type'] . '" data-l2key="enable"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-likey="chargeurEV::' . $type['type'] . '" data-l2key="tagColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-likey="chargeurEV::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
+              echo '</tr>';
+	    }
+            ?>
           </tbody>
         </table>
       </div>
