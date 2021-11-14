@@ -25,6 +25,17 @@ class chargeurVE extends eqLogic {
 
     /*     * ***********************Methode static*************************** */
 
+    public static function isTypeEnable($type) {
+        $config = config::bykey('chargeurVE::' . $type, 'chargeurVE');
+        $enabled = false;
+        if (is_Array($config) and array_key_exists('enable',$config)) {
+            if ($config['enable'] == 1){
+                $enabled = true;
+            }
+        }
+        return $enabled;
+    }
+
     /*     * **********************Gestion du daemon************************* */
 
     /*
@@ -216,19 +227,23 @@ class chargeurVE extends eqLogic {
 
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom
-    public static function cronDaily() {
+    public static function cronDaily() {1G
     }
      */
 
     /*     * ********************Methode static ************************** */
 
-    public function types() {
+    public static function types($onlyActif = true) {
         $dirPath = __DIR__ . "/../../data";
         $dir = opendir($dirPath);
         $chargeursDefs_json = '[';
         $firstFile = true;
         while (($fileName = readdir($dir)) !== false) {
-            if (preg_match('/^chargeur_.*\.json$/',$fileName)) {
+            if (preg_match('/^chargeur_(?P<type>.*)\.json$/',$fileName,$matches)) {
+                if ( (! self::isTypeEnable($matches['type'])) and $onlyActif) {
+                    continue;
+                }
+		$config = 
                 $filePath = $dirPath . '/' . $fileName;
                 $file = fopen( $filePath, 'r');
                 if ($firstFile) {
@@ -247,7 +262,7 @@ class chargeurVE extends eqLogic {
             return strcasecmp($a['label'],$b['label']);
         }
         usort($chargeursDefs,'cmpDefs');
-	return $chargeursDefs;
+        return $chargeursDefs;
     }
 
 
