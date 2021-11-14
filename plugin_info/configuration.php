@@ -49,11 +49,17 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
           <tbody>
             <?php
             foreach ($chargeurVETypes as $type) {
+	      $config = config::byKey('chargeurVE::' . $type['type'],'chargeurVE');
+	      if ($config == '') {
+		      $cfg['tagColor'] = $defaultTagColor;
+		      $cfg['tagTextColor'] = $defaultTextTagColor;
+		      config::save('chargeurVE::' . $type['type'],$cfg,'chargeurVE');
+	      }
               echo '<tr>';
 	      echo '<td>' . $type['label'] . '</td>';
-	      echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="chargeurEV::' . $type['type'] . '" data-l2key="enable"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-likey="chargeurEV::' . $type['type'] . '" data-l2key="tagColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-likey="chargeurEV::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
+	      echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="chargeurVE::' . $type['type'] . '" data-l2key="enable"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="chargeurVE::' . $type['type'] . '" data-l2key="tagColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="chargeurVE::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
               echo '</tr>';
 	    }
             ?>

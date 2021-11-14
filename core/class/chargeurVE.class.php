@@ -244,7 +244,7 @@ class chargeurVE extends eqLogic {
         $chargeursDefs_json .= ']';
         $chargeursDefs = json_decode($chargeursDefs_json,true);
         function cmpDefs ($a, $b) {
-            return strcasecmp($a[label],$b['label']);
+            return strcasecmp($a['label'],$b['label']);
         }
         usort($chargeursDefs,'cmpDefs');
 	return $chargeursDefs;

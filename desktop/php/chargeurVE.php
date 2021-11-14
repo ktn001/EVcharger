@@ -9,8 +9,8 @@ sendVarToJS('accountTypes',account::accountTypes());
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
-sendVarToJS('chargeursDefs',chargeurVE::types());
-closedir($dir);
+$chargeursDefs = chargeurVE::types();
+sendVarToJS('chargeursDefs',$chargeursDefs);
 ?>
 
 <div class="row row-overflow">
