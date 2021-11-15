@@ -212,6 +212,7 @@ class account {
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
 		if ($_tag) {
+			$typeConfig = config::byKey('ChargeurVE::' . $this->getType, 'chargeurVE');
 			if ($_prettify) {
 				$name .= '<span class="label labelObjectHuman">' . $this->getType() . '</span>';
 			} else {

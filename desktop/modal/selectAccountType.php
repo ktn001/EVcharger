@@ -21,28 +21,55 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_selectAccountType">
-  <form class="form-vertical">
-    <div class="form-group">
+<div id="selectAccountType">
+  <form class="form-horizontal">
+    <fieldset>
       <label class="control-label">{{Type d'account}}:</label>
-      <div>
-        <select>
-        </select>
-      </div>
-    </div>
+      <select class="toto">
+      </select>
+    </fieldset>
   </form>
 </div>
 
 <script>
-for (i in accountTypes) {
-	option = '<option value="' + i + '">' + accountTypes[i].label + '</option>';
-	$('#mod_selectAccountType select').append(option);
+function selectAccountType_actualizeTypes() {
+    $.ajax({
+        type: 'POST',
+        url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+        data: {
+            action: 'chargeurTypes',
+        },
+        dataType: 'json',
+        global: false,
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            }
+            types = json_decode(data.result);
+            $('#selectAccountType select').empty();
+            for (type of types) {
+                option = '<option value="' + type.type + '">' + type.label + '</option>';
+		console.log(option);
+                $('#selectAccountType select').append(option);
+            }
+        },
+    });
 }
 
-function mod_selectAccountType(action) {
-	if (action = 'result') {
-		selected = $('#mod_selectAccountType select').value();
-		return accountTypes[selected].accountType;
-	}
+function selectAccountType(action) {
+    if (action = 'result') {
+        return $('#mod_selectAccountType select').value();
+    }
 }
+
+$('#selectAccountType').parent().closest('div').dialog({
+    focus: function (event, ui) {
+        selectAccountType_actualizeTypes();
+    }
+})
+
 </script>

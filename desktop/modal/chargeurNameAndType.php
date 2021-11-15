@@ -31,22 +31,51 @@ if (!isConnect('admin')) {
       </div>
       <div class="form-group">
         <label class="control-label col-sm-3">{{Type}}:</label>
-          <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='type'>
-	  </select>
+        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='type'>
+        </select>
       </div>
     </fieldset>
   </form>
 </div>
 
 <script>
-for (def of chargeursDefs) {
-	option = '<option value="' + def.type + '">' + def.label + '</option>';
-	$('#mod_chargeurNameAndType select').append(option);
+function mod_cargeurNameAndType_actualizeTypes() {
+    $.ajax({
+        type: 'POST',
+        url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+        data: {
+            action: 'chargeurTypes',
+        },
+        dataType: 'json',
+        global: false,
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                return;
+            }
+            types = json_decode(data.result);
+            $('#mod_chargeurNameAndType select').empty();
+            for (type of types) {
+                option = '<option value="' + type.type + '">' + type.label + '</option>';
+                $('#mod_chargeurNameAndType select').append(option);
+            }
+        },
+    });
 }
 
 function mod_chargeurNameAndType(action) {
-	if (action = 'result') {
-		return $('#mod_chargeurNameAndType').getValues('.eqLogicAttr');
-	}
+    if (action = 'result') {
+        return $('#mod_chargeurNameAndType').getValues('.eqLogicAttr');
+    }
 }
+
+$('#mod_chargeurNameAndType').dialog({
+    focus: function (event, ui) {
+        mod_cargeurNameAndType_actualizeTypes();
+    }
+})
+
 </script>

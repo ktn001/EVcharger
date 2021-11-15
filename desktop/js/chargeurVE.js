@@ -70,7 +70,7 @@ loadAccountCards();
  */
 function editAccount (accountType ,accountId = '') {
     if (accountType === undefined) {
-	$('#div_alert').showAlert({message: "{{Compte non défini}}", level: 'danger'});
+	$('#div_alert').showAlert({message: "{{Type de compte pas défini!}}", level: 'danger'});
 	return;
     }
     for (a of accountTypes) {
@@ -88,7 +88,7 @@ function editAccount (accountType ,accountId = '') {
 	    closeText: '',
 	    autoOpen: false,
 	    modal: true,
-	    height:280,
+	    height:300,
 	    width:680
 	});
 	jQuery.ajaxSetup({async: false});
@@ -190,17 +190,9 @@ function editAccount (accountType ,accountId = '') {
  * Action du bouton d'ajout d'un account
  */
 $('.accountAction[data-action=add]').off('click').on('click', function() {
-    if ( accountTypes.length == 0) {
-	$('#div_alert').showAlert({message: "{{Aucun type d'account trouvable}}", level: 'danger'});
-	return;
-    }
-    if ( accountTypes.length == 1) {
-	editAccount (accountTypes[0]);
-	return;
-    }
-    if ($('#mod_selectAccountTypeToInsert').length == 0) {
-	$('body').append('<div id="mod_selectAccountTypeToInsert" title="{{Sélection d\'un type de comptet}}"/>');
-	$("#mod_selectAccountTypeToInsert").dialog({
+    if ($('#mod_selectAccountType').length == 0) {
+	$('body').append('<div id="mod_selectAccountType" title="{{Sélection d\'un type de compte}}"/>');
+	$("#mod_selectAccountType").dialog({
 	    closeText: '',
 	    autoOpen: false,
 	    modal: true,
@@ -208,19 +200,19 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 	    width:300
 	});
 	jQuery.ajaxSetup({async: false});
-	$('#mod_selectAccountTypeToInsert').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountType');
+	$('#mod_selectAccountType').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountType');
 	jQuery.ajaxSetup({async: true});
     }
-    $('#mod_selectAccountTypeToInsert').dialog('option', 'buttons', {
+    $('#mod_selectAccountType').dialog('option', 'buttons', {
 	"{{Annuler}}": function () {
 	    $(this).dialog("close");
 	},
 	"{{Valider}}": function () {
 	    $(this).dialog("close");
-	    editAccount(mod_selectAccountType('result'));
+	    editAccount(selectAccountType('result'));
 	}
     });
-    $('#mod_selectAccountTypeToInsert').dialog('open');
+    $('#mod_selectAccountType').dialog('open');
 });
 
 /*
@@ -277,8 +269,11 @@ $('#table_account').on('change','.accountAttr',function() {
  * Action du bouton d'ajout d'un chargeur
  */
 $('.chargeurAction[data-action=add').off('click').on('click',function () {
-    if ($('#mod_chargeurNameAndType').length == 0) {
-	$('body').append('<div id="mod_chargeurNameAndType" title="{{Nouveau chargeur:}}"/>');
+    if ($('#modContainer_chargeurNameAndType').length == 0) {
+	$('body').append('<div id="modContainer_chargeurNameAndType" title="{{Nouveau chargeur:}}"/>');
+	jQuery.ajaxSetup({async: false});
+	$('#modContainer_chargeurNameAndType').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndType');
+	jQuery.ajaxSetup({async: true});
 	$("#mod_chargeurNameAndType").dialog({
 	    closeText: '',
 	    autoOpen: false,
@@ -286,9 +281,6 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 	    height:200,
 	    width:400
 	});
-	jQuery.ajaxSetup({async: false});
-	$('#mod_chargeurNameAndType').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndType');
-	jQuery.ajaxSetup({async: true});
     }
     $('#mod_chargeurNameAndType').dialog('option', 'buttons', {
 	"{{Annuler}}": function () {
