@@ -5,7 +5,7 @@ if (!isConnect('admin')) {
 // Déclaration des variables obligatoires
 $plugin = plugin::byId('chargeurVE');
 sendVarToJS('eqType', $plugin->getId());
-sendVarToJS('accountTypes',account::accountTypes());
+sendVarToJS('typeLabels',type::labels(false));
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 

@@ -1,7 +1,0 @@
-{
-	"type": "template",
-	"label": "{{Template}}",
-	"images": [
-		"chargeur_template.png"
-	]
-}

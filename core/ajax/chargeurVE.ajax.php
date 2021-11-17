@@ -26,9 +26,9 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
-	if (init('action') == 'chargeurTypes') {
-		$json = json_encode(chargeurVE::types());
-		ajax::success(translate::exec($json,__FILE__));
+	if (init('action') == 'typeLabels') {
+		$json = json_encode(type::labels());
+		ajax::success($json);
 	}
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

@@ -18,19 +18,7 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
-
-/*
- * Inclusion des classes héritières
- */
-$dir = __DIR__ . '/../class/account';
-if ($dh = opendir($dir)){
-    while (($file = readdir($dh)) !== false){
-	    if (substr_compare($file, ".class.php",-10,10) === 0) {
-        	require_once  $dir . '/' . $file;
-	    }
-    }
-    closedir($dh);
-}
+require_once __DIR__ . '/../php/chargeurVE.inc.php';
 
 class account {
     /*     * *************************Attributs****************************** */
@@ -212,7 +200,6 @@ class account {
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
 		if ($_tag) {
-			$typeConfig = config::byKey('ChargeurVE::' . $this->getType, 'chargeurVE');
 			if ($_prettify) {
 				$name .= '<span class="label labelObjectHuman">' . $this->getType() . '</span>';
 			} else {

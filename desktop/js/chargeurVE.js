@@ -73,17 +73,11 @@ function editAccount (accountType ,accountId = '') {
 	$('#div_alert').showAlert({message: "{{Type de compte pas défini!}}", level: 'danger'});
 	return;
     }
-    for (a of accountTypes) {
-	if (a.accountType == accountType){
-	    accountType_label = a.label;
-	    break;
-	}
-    }
 
     mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + accountType + 'Account';
     mod_id = 'mod_EditAccountType' + accountType;
     if ($('#' + mod_id).length == 0){
-	$('body').append('<div id="' + mod_id + '" title="{{Compte de type:}} ' + accountType_label + '"/>');
+	$('body').append('<div id="' + mod_id + '" title="{{Compte de type:}} ' + typeLabels[accountType] + '"/>');
 	$('#' + mod_id).dialog({
 	    closeText: '',
 	    autoOpen: false,

@@ -37,23 +37,23 @@ function selectAccountType_actualizeTypes() {
         type: 'POST',
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
-            action: 'chargeurTypes',
+            action: 'typeLabels',
+            onlyEnbled: 1,
         },
         dataType: 'json',
         global: false,
         error: function (request, status, error) {
             handleAjaxError(request, status, error);
         },
-        success: function (data) {
+	success: function (data) {
             if (data.state != 'ok') {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
             types = json_decode(data.result);
             $('#selectAccountType select').empty();
-            for (type of types) {
-                option = '<option value="' + type.type + '">' + type.label + '</option>';
-		console.log(option);
+            for (type in types) {
+                option = '<option value="' + type + '">' + types[type] + '</option>';
                 $('#selectAccountType select').append(option);
             }
         },
