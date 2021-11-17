@@ -118,36 +118,6 @@ function editAccount (accountType ,accountId = '') {
 	    $(this).dialog("close");
 	}
     });
-    if ( accountId != '') {
-	buttons.push( {
-	    text: "{{Supprimer}}",
-	    click: function() {
-		account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
-		$.ajax({
-		    type: 'POST',
-		    url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
-		    data: {
-			action: 'remove',
-			account: account
-		    },
-		    dataType: 'json',
-		    global: false,
-		    error: function (request, status, error) {
-			handleAjaxError(request, status, error);
-			loadAccountCards();
-		    },
-		    success: function (data) {
-			if (data.state != 'ok') {
-			    $('#div_alert').showAlert({message: data.result, level: 'danger'});
-			    return;
-			}
-			$('#' + mod_id).dialog("close");
-			loadAccountCards();
-		    }
-		})
-	    }
-	});
-    };
     buttons.push( {
 	text: "{{Sauvegarder}}",
 	click: function () {
@@ -176,7 +146,39 @@ function editAccount (accountType ,accountId = '') {
 	    });
 	}
     });
+    if ( accountId != '') {
+	buttons.push( {
+	    text: "{{Supprimer}}",
+	    class: 'delete',
+	    click: function() {
+		account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
+		$.ajax({
+		    type: 'POST',
+		    url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		    data: {
+			action: 'remove',
+			account: account
+		    },
+		    dataType: 'json',
+		    global: false,
+		    error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+			loadAccountCards();
+		    },
+		    success: function (data) {
+			if (data.state != 'ok') {
+			    $('#div_alert').showAlert({message: data.result, level: 'danger'});
+			    return;
+			}
+			$('#' + mod_id).dialog("close");
+			loadAccountCards();
+		    }
+		})
+	    }
+	});
+    };
     $('#' + mod_id).dialog('option', 'buttons', buttons);
+    $('.delete').attr('style','background-color:var(--al-danger-color) !important');
     $('#' + mod_id).dialog('open');
 }
 
@@ -310,7 +312,6 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 });
 
 $('#selectChargeurImg').on('change',function(){
-    console.log("XXX " + $(this).value());
     $('[name=icon_visu]').attr('src', "plugins/chargeurVE/desktop/img/" + $(this).value());
 });
 

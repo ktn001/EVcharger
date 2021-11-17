@@ -75,6 +75,10 @@ class type {
 		return $labels;
 	}
 
+	public static function byName ( $type ) {
+		return self::all()[$type];
+	}
+
 
     /*     * **********************Getteur Setteur*************************** */
 

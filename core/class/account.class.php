@@ -108,29 +108,6 @@ class account {
 		return $accounts;
 	}
 
-	/*
-	 * Retoune la liste de tous les types d'account connus
-	 */
-	public static function accountTypes() {
-		$dir = __DIR__ . '/account';
-		$accountTypes = array();
-		try {
-			$dh = opendir($dir);
-			while (($file = readdir($dh)) !== false) {
-				if (substr_compare($file, '.class.php', -10, 10) === 0) {
-					$accountType = substr_replace($file,'',-10);
-					$accountClass = $accountType . 'Account';
-					$account = new $accountClass();
-					$label = $account->getTypeLabel();
-					$accountTypes[] = array('accountType' => $accountType, "label" => $label); 
-				}
-			}
-		} catch (Exception $e) {
-			return false;
-		}
-		return $accountTypes;
-	}
-	
     /*     * *********************Methodes d'instance************************ */
 
 	/*
@@ -199,9 +176,14 @@ class account {
 
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
+		$type = type::byName($this->getType());
 		if ($_tag) {
 			if ($_prettify) {
-				$name .= '<span class="label labelObjectHuman">' . $this->getType() . '</span>';
+				if ($type['customColor'] == 1) {
+					$name .= '<span class="label" style="background-color:' . $type['tagColor'] . ';color:' . $type['tagTextColor'] . '">' . $type['label'] . '</span>';
+				} else {
+					$name .= '<span class="label labelObjectHuman">' . $type['label'] . '</span>';
+				}
 			} else {
 				$name .= $this->getType();
 			}

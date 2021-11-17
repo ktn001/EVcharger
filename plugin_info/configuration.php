@@ -33,7 +33,7 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
       <div class='col-sm-6'>
         <legend>{{Démon}}:</legend>
         <label class="col-sm-2 control-label">{{Port}}</label>
-	<input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"></input>
+        <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"/>
       </div>
       <div class='col-sm-6'>
         <legend>{{Les types de chargeurs}}:</legend>
@@ -42,26 +42,28 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
             <tr>
               <th>{{Type}}</th>
               <th style='text-align:center'>{{Activer}}</th>
-              <th style="text-align:center">{{Couleur du tag}}</th>
-              <th style="text-align:center">{{Couleur du texte du tag}}</th>
+              <th style='text-align:center'>{{Couleurs personnalisées}}</th>
+              <th style='text-align:center'>{{Couleur du tag}}</th>
+              <th style='text-align:center'>{{Couleur du texte du tag}}</th>
             </tr>
           </thead>
           <tbody>
             <?php
-            foreach ($chargeurVETypes as $type) {
-	      $config = config::byKey('type::' . $type['type'],'chargeurVE');
-	      if ($config == '') {
-		      $cfg['tagColor'] = $defaultTagColor;
-		      $cfg['tagTextColor'] = $defaultTextTagColor;
-		      config::save('type::' . $type['type'],$cfg,'chargeurVE');
-	      }
+            foreach (type::all(false) as $type) {
+              $config = config::byKey('type::' . $type['type'],'chargeurVE');
+              if ($config == '') {
+                      $cfg['tagColor'] = $defaultTagColor;
+                      $cfg['tagTextColor'] = $defaultTextTagColor;
+                      config::save('type::' . $type['type'],$cfg,'chargeurVE');
+              }
               echo '<tr>';
-	      echo '<td>' . $type['label'] . '</td>';
-	      echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="enable"/></td>';
+              echo '<td>' . $type['label'] . '</td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="enable"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="customColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
               echo '</tr>';
-	    }
+            }
             ?>
           </tbody>
         </table>
