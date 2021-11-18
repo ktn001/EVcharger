@@ -22,6 +22,7 @@ if (!isConnect()) {
   die();
 }
 include_file('core', 'chargeurVE', 'class', 'chargeurVE');
+sendVarToJS('usedTypes',type::allUsed());
 $chargeurVETypes = chargeurVE::types(false);
 $defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
 $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
@@ -71,3 +72,17 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
     </div>
   </fieldset>
 </form>
+
+<script>
+$(".configKey[data-l1key^='type::'][data-l2key='enable']").on('change',function(){
+	if ($(this).value() == 1) {
+		return;
+	}
+	type = $(this).attr('data-l1key').slice(6);
+	if (usedTypes.indexOf(type) != -1) {
+		$(this).value(1);
+		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{ Il existe au moins un compte de ce type.}}"});
+	}
+
+});
+</script>

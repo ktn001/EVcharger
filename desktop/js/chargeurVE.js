@@ -47,7 +47,7 @@ function loadAccountCards() {
 	    $('.accountThumbnailContainer').empty();
 	    for (account of accounts) {
 		opacity = (account.isEnable == 1) ? '' : 'disableCard';
-		html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.accountType + '">';
+		html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
 		html += '<img src="' + account.image + '"/>';
 		html += '<br/>';
 		html += '<span class="name">' + account.humanName + '</span>';
@@ -66,18 +66,47 @@ $('.accountThumbnailContainer').packery();
 loadAccountCards();
 
 /*
+ * Suppression d'un compte
+ */
+function deleteAccount (accountId) { 
+    console.log("Suppression de " + accountId);
+    $.ajax({
+	type: 'POST',
+	url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+	data: {
+    	    action: 'remove',
+    	    accountId: accountId,
+	},
+	dataType: 'json',
+	global: false,
+	error: function (request, status, error) {
+    	    handleAjaxError(request, status, error);
+    	    loadAccountCards();
+	},
+	success: function (data) {
+    	    if (data.state != 'ok') {
+    		$('#div_alert').showAlert({message: data.result, level: 'danger'});
+    		return;
+    	    }
+    	    $('#' + mod_id).dialog("close");
+    	    loadAccountCards();
+	}
+    })
+}
+
+/*
  * Edition d'un account
  */
-function editAccount (accountType ,accountId = '') {
-    if (accountType === undefined) {
+function editAccount (type ,accountId = '') {
+    if (type === undefined) {
 	$('#div_alert').showAlert({message: "{{Type de compte pas défini!}}", level: 'danger'});
 	return;
     }
 
-    mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + accountType + 'Account';
-    mod_id = 'mod_EditAccountType' + accountType;
+    mod_url = 'index.php?v=d&plugin=chargeurVE&modal=edit_' + type + 'Account';
+    mod_id = 'mod_EditAccountType' + type;
     if ($('#' + mod_id).length == 0){
-	$('body').append('<div id="' + mod_id + '" title="{{Compte de type:}} ' + typeLabels[accountType] + '"/>');
+	$('body').append('<div id="' + mod_id + '" title="{{Compte de type:}} ' + typeLabels[type] + '"/>');
 	$('#' + mod_id).dialog({
 	    closeText: '',
 	    autoOpen: false,
@@ -95,7 +124,7 @@ function editAccount (accountType ,accountId = '') {
 	data: {
 	    action: 'byId',
 	    id: accountId,
-	    accountType: accountType
+	    type: type
 	},
 	dataType : 'json',
 	global:false,
@@ -151,29 +180,11 @@ function editAccount (accountType ,accountId = '') {
 	    text: "{{Supprimer}}",
 	    class: 'delete',
 	    click: function() {
-		account =  json_encode($('#' + mod_id).getValues('.accountAttr')[0]);
-		$.ajax({
-		    type: 'POST',
-		    url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
-		    data: {
-			action: 'remove',
-			account: account
-		    },
-		    dataType: 'json',
-		    global: false,
-		    error: function (request, status, error) {
-			handleAjaxError(request, status, error);
-			loadAccountCards();
-		    },
-		    success: function (data) {
-			if (data.state != 'ok') {
-			    $('#div_alert').showAlert({message: data.result, level: 'danger'});
-			    return;
+		bootbox.confirm('{{Êtes-vous sûr de vouloir supprimer ce compte ?}}', function(result) {
+			if (result) {
+				deleteAccount($('#' + mod_id + ' .accountAttr[data-l1key="id"]').value());
 			}
-			$('#' + mod_id).dialog("close");
-			loadAccountCards();
-		    }
-		})
+		});
 	    }
 	});
     };
@@ -424,7 +435,7 @@ function loadSelectAccount() {
 	url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
 	data: {
 	    action: 'getAccountToSelect',
-	    accountType: $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value(),
+	    type: $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value(),
 	},
 	dataType : 'json',
 	global:false,

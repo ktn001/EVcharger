@@ -24,10 +24,9 @@ class account {
     /*     * *************************Attributs****************************** */
 
 	protected static $plugin_id = "chargeurVE";
-	public static $typeLabel = "";
 	public static $image = "account.png";
 
-	protected $accountType;
+	protected $type;
 	protected $name = "";
 	protected $id;
 	protected $isEnable;
@@ -47,18 +46,18 @@ class account {
 	 * retourne l'account dont l'id est donné en argument
 	 */
 	public static function byId($id) {
-		return unserialize (config::byKey('account::' . $id, self::$plugin_id));
+		return unserialize (config::byKey('account::' . $id, 'chargeurVE' ));
 	}
 
 	/*
 	 * Recherche d'accounts selon le type
 	 */
-	public static function byType ($accountType) {
+	public static function byType ($type) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
-			if ($account->getType() == $accountType) {
+			if ($account->getType() == $type) {
 				$accounts[] = $account;
 			}
 		}
@@ -68,12 +67,12 @@ class account {
 	/*
 	 * Recherche les objets qui ont le type et le nom donnés en argument
 	 */
-	public static function byTypeAndName ($accountType, $name) {
+	public static function byTypeAndName ($type, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
-			if ($account->getType() == $accountType and $account->getName() == $name) {
+			if ($account->getType() == $type and $account->getName() == $name) {
 				$accounts[] = $account;
 			}
 		}
@@ -91,20 +90,20 @@ class account {
 	/*
 	 * Retounre une liste contenant tous les accounts
 	 */
-	public static function all ( $sortBy="accountType") {
+	public static function all ( $sortBy="type") {
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$accounts[] = unserialize($config['value']);
 		}
-		if (in_array($sortBy, array('name', 'accountType'))) {
-			usort($accounts, function ($a, $b) {
-				//if (($sortBy == "accountType") and ($a->getType() != $b->getType())) {
-				//	return strcmp ($a->getType(), $b->getType());
-				//}
-				return strcmp ($a->getName(), $b->getName());
-			});
-		}
+		//if (in_array($sortBy, array('name', 'type'))) {
+		//	usort($accounts, function ($a, $b) {
+		//		//if (($sortBy == "type") and ($a->getType() != $b->getType())) {
+		//		//	return strcmp ($a->getType(), $b->getType());
+		//		//}
+		//		return strcmp ($a->getName(), $b->getName());
+		//	});
+		//}
 		return $accounts;
 	}
 
@@ -114,7 +113,7 @@ class account {
 	 * Constructeur
 	 */
 	public function __construct() {
-		$this->accountType = substr_replace(get_class($this),'',-7);
+		$this->type = substr_replace(get_class($this),'',-7);
 	}
 
 	/*
@@ -212,10 +211,6 @@ class account {
 		}
 	}
 
-	public function getType() {
-		return substr_replace(get_class($this),'',-7);
-	}
-
     /*     * **********************Getteur Setteur*************************** */
 
 	/** id **/
@@ -251,13 +246,9 @@ class account {
 		return $this;
 	}
 
-	/** get type Label **/
-	public function getTypeLabel() {
-		if ($this::$typeLabel == "") {
-			return get_class($this);
-		} else {
-			return $this::$typeLabel;
-		}
+	/** type **/
+	public function getType() {
+		return $this->type;
 	}
 
 }

@@ -79,6 +79,13 @@ class type {
 		return self::all()[$type];
 	}
 
+	public static function allUsed () {
+		$used = array();
+		foreach (account::all() as $account) {
+			$used[$account->getType()] = 1;
+		}
+		return array_keys($used);
+	}
 
     /*     * **********************Getteur Setteur*************************** */
 

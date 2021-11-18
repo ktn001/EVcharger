@@ -27,32 +27,32 @@ try {
 	}
 
 	if (init('action') == 'byId') {
-		$accountType = init('accountType');
+		$type = init('type');
 		$id = init('id');
-		if ($accountType == ''){
+		if ($type == ''){
 			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
 		if ($id == '') {
-			$classe = $accountType . 'Account';
+			$classe = $type . 'Account';
 			$account = new $classe();
 		} else {
-			$account = account::byId(init('id'));
+			$account = account::byId($id);
 		}
 		if (!is_object($account)) {
-			throw new Exception(__('Compte inconnu: ',__FILE__) . init(id));
+			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
 		}
-		if ($account->getType() != $accountType) {
-			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $accountType . '" (' . $account->getType() . ')');
+		if ($account->getType() != $type) {
+			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
 		}
 		ajax::success(utils::o2a($account));
 	}
 
 	if (init('action') == 'save') {
 		$data = json_decode(init('account'),true);
-		if ($data['accountType'] == ''){
+		if ($data['type'] == ''){
 			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
 		}
-		$classe = $data['accountType'] . 'Account';
+		$classe = $data['type'] . 'Account';
 		if ($data['id'] == '') {
 			$account = new $classe();
 		} else {
@@ -64,12 +64,8 @@ try {
 	}
 
 	if (init('action') == 'remove') {
-		$data = json_decode(init('account'),true);
-		if ($data['id'] == '') {
-			throw new Exception(__("L'id du compte n'est pas défini",__FILE__));
-		}
-		$account = account::byId($data['id']);
-		utils::a2o($account,$data);
+		$id = init('accountId');
+		$account = account::byId($id);
 		$account->remove();
 		ajax::success();
 	}
@@ -80,7 +76,7 @@ try {
 			$data = array(
 				'isEnable' => $account->getIsEnable(),
 				'id' => $account->getId(),
-				'accountType' => $account->getType(),
+				'type' => $account->getType(),
 				'humanName' => $account->getHumanName(true,true),
 				'image' => $account->getImage(),
 			);
@@ -91,7 +87,7 @@ try {
 
 	if (init('action') == 'getAccountToSelect') {
 		$result = array();
-		foreach (account::byType(init('accountType')) as $account) {
+		foreach (account::byType(init('type')) as $account) {
 			$data = array(
 				'id' => $account->getId(),
 				'value' => $account->getHumanName(),

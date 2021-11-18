@@ -265,7 +265,6 @@ class chargeurVE extends eqLogic {
         return $chargeursDefs;
     }
 
-
     /*     * *********************Méthodes d'instance************************* */
 
  // Fonction exécutée automatiquement avant la création de l'équipement
