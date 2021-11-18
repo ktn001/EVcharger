@@ -143,7 +143,7 @@ class account {
 			}
 		}
 		config::save('account::' . $this->id, serialize($this), self::$plugin_id);
-		if (onInsert) {
+		if ($onInsert) {
 			if (method_exists($this, 'postInsert')) {
 				$this->postInsert();
 			}

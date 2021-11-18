@@ -58,33 +58,35 @@ class easeeAccount extends account {
 			],
 			CURLOPT_POSTFIELDS => $post_data,
 		]);
-		$response = curl_exec($curl);
+		$reponse = json_decode(curl_exec($curl),true);
+		$httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
 		$err = curl_error($curl);
 
 		curl_close($curl);
 
 		if ($err) {
-			log::add("chargeurVE","info", "CURL Error : " . $err);
+			log::add("chargeurVE","error", "CURL Error : " . $err);
 			throw new Exception($err);
 		} else {
-			log::add("chargeurVE","debug","Réponse: " . $response);
+			if ($httpCode != '200') {
+				throw new Exception ($httpCode . ": " . $reponse['title']);
+			}
 			if ($save) {
 				if (!is_numeric($this->id)) { 
 					throw new Exception (__("l'id est incorrect",__FILE__));
 				}
-				$tokens = json_decode($response, true);
 				log::add("chargeurVE","debug",print_r($tokens,true));
-				$accessToken = $tokens['accessToken'];
-				$expiresAt = time() + $tokens['expiresIn'];
-				$refreshToken = $tokens['refreshToken'];
+				$accessToken = $reponse['accessToken'];
+				$expiresAt = time() + $reponse['expiresIn'];
+				$refreshToken = $reponse['refreshToken'];
 				$config = array(
-					'token' => $tokens['accessToken'],
+					'token' => $reponse['accessToken'],
 					'expiresAt' => $expiresAt,
-					'refreshToken' => $tokens['refreshToken'],
+					'refreshToken' => $reponse['refreshToken'],
 				);
 				config::save('easeeToken::' . $this->id, json_encode($config), self::$plugin_id);
 				$cache = array(
-					'token' => $tokens['accessToken'],
+					'token' => $reponse['accessToken'],
 					'expiresAt' => $expiresAt,
 				);
 				cache::set('aeseeToken' . $this->id, json_encode($cache), $expiresAt);
