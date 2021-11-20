@@ -23,12 +23,19 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
     
-	public static $typeLabel = "Easee";
-	public static $image = "account_easee.png";
+	//public static $typeLabel = "Easee";
+	//public static $image = "account_easee.png";
 
 	protected $login;
 	protected $password;
 	protected $url;
+
+	public static function paramsToEdit() {
+		return array(
+			'login' => 1,
+			'url' => 1,
+		);
+	}
 
     /*     * *********************Méthodes d'instance************************* */
 

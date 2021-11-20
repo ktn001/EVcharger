@@ -26,27 +26,6 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
-	if (init('action') == 'byId') {
-		$type = init('type');
-		$id = init('id');
-		if ($type == ''){
-			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
-		}
-		if ($id == '') {
-			$classe = $type . 'Account';
-			$account = new $classe();
-		} else {
-			$account = account::byId($id);
-		}
-		if (!is_object($account)) {
-			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
-		}
-		if ($account->getType() != $type) {
-			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
-		}
-		ajax::success(utils::o2a($account));
-	}
-
 	if (init('action') == 'save') {
 		$data = json_decode(init('account'),true);
 		if ($data['type'] == ''){
@@ -97,10 +76,32 @@ try {
 		ajax::success(json_encode($result));
 	}
 
+	if (init('action') == 'byIdToEdit'){
+		$type = init('type');
+		$id = init('id');
+		if ($type == ''){
+			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
+		}
+		if ($id == '') {
+			$classe = $type . 'Account';
+			$account = new $classe();
+		} else {
+			$account = account::byId($id);
+		}
+		if (!is_object($account)) {
+			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
+		}
+		if ($account->getType() != $type) {
+			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
+		}
+		$result['account'] = utils::o2a($account);
+		$result['params'] = ($type . "Account")::paramsToEdit();
+		ajax::success(json_encode($result));
+	}
+
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
 } catch (Exception $e) {
 	ajax::error(displayException($e), $e->getCode());
 }
-

@@ -32,12 +32,23 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
   <fieldset>
     <div class="form-group">
       <div class='col-sm-6'>
-        <legend>{{Démon}}:</legend>
-        <label class="col-sm-2 control-label">{{Port}}</label>
+
+        <legend class='col-sm-12'><i class="fas fa-university"></i> {{Démon}}:</legend>
+	<label class="col-sm-2 control-label">
+          {{Port}}
+          <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
+        </label>
         <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"/>
+        <legend class='col-sm-12'><i class="fas fa-laptop"></i> {{Interface}}</legend>
+	<label class="col-sm-2 control-label">{{Confirme}}</label>
+        <label class='col-sm-10'>
+          <input class="configKey" type="checkbox" data-l1key="confirmDelete"/>
+	  {{Suppressions}}
+          <sup><i class="fas fa-question-circle" title="{{popup de confirmation en cas de suppression d'un élément}}"></i></sup>
+        </label>
       </div>
       <div class='col-sm-6'>
-        <legend>{{Les types de chargeurs}}:</legend>
+        <legend><i class="fas fa-charging-station"></i> {{Les types de chargeurs}}:</legend>
         <table class='table table-bordered'>
           <thead>
             <tr>

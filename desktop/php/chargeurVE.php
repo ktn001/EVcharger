@@ -6,6 +6,7 @@ if (!isConnect('admin')) {
 $plugin = plugin::byId('chargeurVE');
 sendVarToJS('eqType', $plugin->getId());
 sendVarToJS('typeLabels',type::labels(false));
+sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 

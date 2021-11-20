@@ -107,6 +107,18 @@ class account {
 		return $accounts;
 	}
 
+	/*
+	 * Retourne la liste des paramêtres éditables pour la construction
+	 * du modal d'édition
+	 */
+	public static function paramsToEdit() {
+		return array(
+			'login' => 0,
+			'password' => 0,
+			'url' => 0,
+		);
+	}
+
     /*     * *********************Methodes d'instance************************ */
 
 	/*
