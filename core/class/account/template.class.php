@@ -35,7 +35,7 @@ class templateAccount extends account {
 	 * ### Le fichier doit se trouver dans le répertoire "destktop/img" du plugin
 	 * ### */
 
-	 public static $image = "account_template.png";
+	 // public static $image = "account_template.png";
 	
 	/* ###
 	 * ### Ajouter ici les attributs spécifiques aux instances de ce type de compte

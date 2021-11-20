@@ -37,7 +37,9 @@ try {
 		} else {
 			$account = account::byId($data['id']);
 		}
+		log::add("chargeurVE","debug",print_r($data,true));
 		utils::a2o($account,$data);
+		log::add("chargeurVE","debug",print_r($account,true));
 		$account->save();
 		ajax::success();
 	}
@@ -96,6 +98,7 @@ try {
 		}
 		$result['account'] = utils::o2a($account);
 		$result['params'] = ($type . "Account")::paramsToEdit();
+		$result['images'] = account::images($type);
 		ajax::success(json_encode($result));
 	}
 

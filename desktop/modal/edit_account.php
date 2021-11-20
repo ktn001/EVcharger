@@ -31,7 +31,7 @@ if (!isConnect('admin')) {
       </div>
       <div class='form-group'>
         <label class='control-label col-sm-3'>{{Nom}}:</label>
-        <input class='accountAttr col-sm-9' type='text' data-l1key='name' placeholder='{{cwNomLogin}}'></input>
+        <input class='accountAttr col-sm-9' type='text' data-l1key='name' placeholder='{{Nom}}'></input>
       </div>
       <div class='dynamic'>
       </div>
@@ -44,14 +44,23 @@ if (!isConnect('admin')) {
         </div>
       </div>
     </div>
-    <div id='accountImage' class='col-sm-6'>
+    <div class='col-sm-6'>
+      <div class='text-center'>
+        <img id='accountImage' class='text-center' tyle='max-width:160px'><img>
+      </div>
+      <select id='selectAccountImage' class='accountAttr' data-l1key='image' ></select>
     </div>
   </fieldset>
 </form>
 
 <script>
+
+$('#selectAccountImage').change(function() {
+	$('#accountImage').attr('src', $(this).value())
+});
+
 mod_editAccount = {
-	build : function (params) {
+	build : function (params, images) {
 		$('#accountParameters .dynamic').empty();
 		if (params.login == 1) {
 			champ = "<div class='form-group'>"
@@ -73,6 +82,18 @@ mod_editAccount = {
 			      + "<input class='accountAttr col-sm-9' type='text' data-l1key='url' placeholder='{{URL}}'></input>"
 			      + "</div>";
 			$('#accountParameters .dynamic').append(champ);
+		}
+		$('#selectAccountImage').empty();
+		first = true;
+		for (image of images) {
+			splitPath = image.split('/').reverse();
+			if (splitPath[1] != 'img') {
+				display = splitPath[1] + "/" + splitPath[0];
+			} else {
+				display = splitPath[0];
+			}
+			option = '<option value="' + image + '">' + display + '</option>';
+			$('#selectAccountImage').append(option);
 		}
 	}
 }

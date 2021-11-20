@@ -24,12 +24,12 @@ class account {
     /*     * *************************Attributs****************************** */
 
 	protected static $plugin_id = "chargeurVE";
-	public static $image = "account.png";
 
 	protected $type;
 	protected $name = "";
 	protected $id;
 	protected $isEnable;
+	protected $image;
     
     /*     * ***********************Methodes static************************** */
 
@@ -119,6 +119,29 @@ class account {
 		);
 	}
 
+	/*
+	 * Retourne la liste des images d'account  pour le type de plugin
+	 */
+	public static function images( $type) {
+		$images = array();
+		$path = realpath(__DIR__ . "/../../desktop/img/". $type);
+		log::add('chargeurVE','debug',"111 " . __CLASS__ . " 2222 " . $path);
+		if($dir = opendir($path)) {
+			while (($fileName = readdir($dir)) !== false){
+				log::add('chargeurVE','debug',$fileName);
+				if (preg_match('/^account.*\.png$/',$fileName)){
+					$images[] = '/plugins/chargeurVE/desktop/img/' . $type . '/' . $fileName;
+				}
+			}
+			closedir($dir);
+		}
+		if (count($images) == 0){
+			$images[] = "/plugins/chargeurVE/desktop/img/account.png";
+		}
+		log::add('chargeurVE','debug',print_r($images,true));
+		return $images;
+	}
+
     /*     * *********************Methodes d'instance************************ */
 
 	/*
@@ -126,6 +149,7 @@ class account {
 	 */
 	public function __construct() {
 		$this->type = substr_replace(get_class($this),'',-7);
+		$this->image = self::images($this->type)[0];
 	}
 
 	/*
@@ -215,14 +239,6 @@ class account {
 		return $name;
 	}
 
-	public function getImage() {
-		if (strpos($this::$image, "/") === false) {
-			return "plugins/" . self::$plugin_id . "/desktop/img/" . $this::$image;
-		} else {
-			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
-		}
-	}
-
     /*     * **********************Getteur Setteur*************************** */
 
 	/** id **/
@@ -245,6 +261,19 @@ class account {
 
 	public function setIsEnable($_isEnable) {
 		$this->isEnable = $_isEnable;
+		return $this;
+	}
+
+	/** image **/
+	public function getImage() {
+		if ($this->image == "") {
+			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
+		}
+		return $this->image;
+	}
+
+	public function setImage($_image) {
+		$this->image = $_image;
 		return $this;
 	}
 

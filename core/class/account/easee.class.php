@@ -24,7 +24,7 @@ class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
     
 	//public static $typeLabel = "Easee";
-	//public static $image = "account_easee.png";
+	protected $image;
 
 	protected $login;
 	protected $password;
@@ -82,7 +82,6 @@ class easeeAccount extends account {
 				if (!is_numeric($this->id)) { 
 					throw new Exception (__("l'id est incorrect",__FILE__));
 				}
-				log::add("chargeurVE","debug",print_r($tokens,true));
 				$accessToken = $reponse['accessToken'];
 				$expiresAt = time() + $reponse['expiresIn'];
 				$refreshToken = $reponse['refreshToken'];
