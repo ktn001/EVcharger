@@ -44,7 +44,7 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
         <label class='col-sm-10'>
           <input class="configKey" type="checkbox" data-l1key="confirmDelete"/>
 	  {{Suppressions}}
-          <sup><i class="fas fa-question-circle" title="{{popup de confirmation en cas de suppression d'un élément}}"></i></sup>
+          <sup><i class="fas fa-question-circle" title="{{Demande de confirmation en cas de suppression d'un élément}}"></i></sup>
         </label>
       </div>
       <div class='col-sm-6'>
