@@ -27,7 +27,6 @@ class easeeAccount extends account {
 	protected $image;
 
 	protected $login;
-	protected $password;
 	protected $url;
 
 	public static function paramsToEdit() {
@@ -91,18 +90,48 @@ class easeeAccount extends account {
 					'refreshToken' => $reponse['refreshToken'],
 				);
 				config::save('easeeToken::' . $this->id, json_encode($config), self::$plugin_id);
-				$cache = array(
-					'token' => $reponse['accessToken'],
-					'expiresAt' => $expiresAt,
-				);
-				cache::set('aeseeToken' . $this->id, json_encode($cache), $expiresAt);
 			}
 		}
 	}
 
 	private function deleteApiToken() {
-		cache::delete('easeeToken' . $this->id);
 		config::remove('easeeToken::' . $this->id, self::$plugin_id);
+	}
+
+	private	function getApiToken() {
+		if ($this->id == ''){
+			return null;
+		}
+		return config::byKey('easeeToken::' . $this->id,'chargeurVE');
+	}
+
+	public function needPasswordToSave() {
+		if ($this->getIsEnable() == 0) {
+			return false;
+		}
+		$token = $this->getApiToken();
+		if (! is_array($token)) {
+			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Un nouveau token doit être créé.",__FILE__));
+			return true;
+		}
+		if (time() > $token['expiresAt']){
+			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le token a expiré.",__FILE__));
+			return true;
+		}
+		$old = self::byId($this->getId());
+		if (! is_object($old)) {
+			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Nouveau compte",__FILE__));
+			return true;
+		}
+		if ($this->getLogin() != $actuel->getLogin()) {
+			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le login a changé",__FILE__));
+			return true;
+		}
+		if ($this->getUrl() != $actuel->getUrl()) {
+			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("L'URL a changé",__FILE__));
+			return true;
+		}
+		return false;
 	}
 
 	public function preSave() {
@@ -110,42 +139,38 @@ class easeeAccount extends account {
 		if ($this->getLogin() == "") {
 			throw new Exception (__("le login n'est pas défini!",__FILE__));
 		}
-		$this->setPassword(trim ($this->getPassword()));
-		if ($this->getPassword() == "") {
-			throw new Exception (__("le password n'est pas défini!",__FILE__));
-		}
 		$this->setUrl(trim ($this->getUrl()));
 		if ($this->getUrl() == "") {
 			throw new Exception (__("l'url n'est pas définie!",__FILE__));
 		}
 	}
 
-	public function preInsert () {
+	public function preInsert() {
 		if ($this->isEnable) {
-			$key = $this->setApiToken(false);
+			// $key = $this->setApiToken(false);
 		}
 	}
 
-	public function preUpdate () {
+	public function preUpdate() {
 		if ($this->isEnable) {
-			$key = $this->setApiToken();
+			// $key = $this->setApiToken();
 		}
 	}
 		
 	public function postInsert() {
 		if ($this->isEnable) {
-			$key = $this->setApiToken();
+			// $key = $this->setApiToken();
 		}
 	}
 
 	public function postSave() {
 		if (!$this->isEnable) {
-			$this->deleteApiToken();
+			// $this->deleteApiToken();
 		}
 	}
 
 	public function postRemove() {
-		$this->deleteApiToken();
+		// $this->deleteApiToken();
 	}
 
     /*     * **********************Getteur Setteur*************************** */
@@ -158,16 +183,6 @@ class easeeAccount extends account {
 
 	public function getLogin() {
 		return $this->login;
-	}
-
-	/* password */
-	public function setPassword($password) {
-		$this->password = $password;
-		return $this;
-	}
-
-	public function getPassword() {
-		return $this->password;
 	}
 
 	/* url */

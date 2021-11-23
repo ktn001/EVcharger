@@ -27,21 +27,33 @@ try {
 	}
 
 	if (init('action') == 'save') {
-		$data = json_decode(init('account'),true);
-		if ($data['type'] == ''){
-			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
+		try {
+			$data = json_decode(init('account'),true);
+			$password = init('password');
+			if ($data['type'] == ''){
+				throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
+			}
+			if ($data['id'] == '') {
+				$classe = $data['type'] . 'Account';
+				$account = new $classe();
+			} else {
+				$account = account::byId($data['id']);
+			}
+			utils::a2o($account,$data);
+			if ($password == '' and $account->needPasswordToSave()) {
+				throw new chargeurVEException(__('Un password doit être fournis!',__FILE__),1);
+			}
+			$account->save(init('password'));
+			ajax::success();
+		} catch (chargeurVEException $e) {
+			$result['account'] = init('account');
+			$result['exception'] = array(
+				type => 'chargeurVEException',
+				code => $e->getCode(),
+				message => $e->getMessage(),
+			);
+			ajax::error(json_encode($result), $e->getCode());
 		}
-		$classe = $data['type'] . 'Account';
-		if ($data['id'] == '') {
-			$account = new $classe();
-		} else {
-			$account = account::byId($data['id']);
-		}
-		log::add("chargeurVE","debug",print_r($data,true));
-		utils::a2o($account,$data);
-		log::add("chargeurVE","debug",print_r($account,true));
-		$account->save();
-		ajax::success();
 	}
 
 	if (init('action') == 'remove') {

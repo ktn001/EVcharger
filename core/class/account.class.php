@@ -125,10 +125,8 @@ class account {
 	public static function images( $type) {
 		$images = array();
 		$path = realpath(__DIR__ . "/../../desktop/img/". $type);
-		log::add('chargeurVE','debug',"111 " . __CLASS__ . " 2222 " . $path);
 		if($dir = opendir($path)) {
 			while (($fileName = readdir($dir)) !== false){
-				log::add('chargeurVE','debug',$fileName);
 				if (preg_match('/^account.*\.png$/',$fileName)){
 					$images[] = '/plugins/chargeurVE/desktop/img/' . $type . '/' . $fileName;
 				}
@@ -138,7 +136,6 @@ class account {
 		if (count($images) == 0){
 			$images[] = "/plugins/chargeurVE/desktop/img/account.png";
 		}
-		log::add('chargeurVE','debug',print_r($images,true));
 		return $images;
 	}
 
@@ -153,17 +150,24 @@ class account {
 	}
 
 	/*
+	 * Vérifie si un password est nécessaire pour l'enregistrement
+	 */
+	public function needPasswordToSave() {
+		return false;
+	}
+
+	/*
 	 * Enregistrement de la définition de l'account
 	 */
 	public function save() {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
+		$accounts = self::byTypeAndName($this->getType(),$this->name);
+		$onInsert = false;
 		if (method_exists($this, 'preSave')) {
 			$this->preSave();
 		}
-		$accounts = self::byTypeAndName($this->getType(),$this->name);
-		$onInsert = false;
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
@@ -188,7 +192,7 @@ class account {
 				$this->postUpdate();
 			}
 		}
-		if (method_exists($this, 'postInsert')) {
+		if (method_exists($this, 'postsave')) {
 			$this->postSave();
 		}
 	}

@@ -95,6 +95,41 @@ function deleteAccount (accountId) {
 }
 
 /*
+ * Enregistrement d'un account avec saie de password
+ */
+function saveWithPassword(account) {
+	bootbox.prompt("{{Password:}}", function(password){
+		if ( ! password) {
+			return;
+		}
+		$.ajax({
+			type: 'POST',
+			url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+			data: {
+				action: 'save',
+				account: account,
+				password: password,
+			},
+			dataType: 'json',
+			global: false,
+			error: function (request, status, error) {
+				handleAjaxError(request, status, error);
+				loadAccountCards();
+			},
+			success: function (data) {
+				if (data.state != 'ok') {
+ 					$('#div_alert').showAlert({message: "XXXXXXX " + data.result, level: 'danger'});
+					return;
+				}
+ 				$('#div_alert').showAlert({message: '{{Sauvegarde réussie}}', level: 'success'});
+ 				$('#mod_editAccount').dialog("close");
+ 				loadAccountCards();
+			}
+		});
+	});
+}
+
+/*
  * Edition d'un account
  */
 function editAccount (type, accountId ='') {
@@ -165,11 +200,19 @@ function editAccount (type, accountId ='') {
  					handleAjaxError(request, status, error);
  					loadAccountCards();
  				},
- 				success: function (data) {
- 					if (data.state != 'ok') {
- 						$('#div_alert').showAlert({message: data.result, level: 'danger'});
- 						return;
+ 				success: function (retour) {
+ 					if (retour.state != 'ok') {
+						if ( data = json_decode(retour.result)) {
+							if (data.exception.type == 'chargeurVEException' && data.exception.code == 1) {
+								saveWithPassword(account);
+								return;
+							}
+						} else {
+ 							$('#div_alert').showAlert({message: retour.result, level: 'danger'});
+ 							return;
+						}
  					}
+ 					$('#div_alert').showAlert({message: '{{Sauvegarde réussie}}', level: 'success'});
  					$('#mod_editAccount').dialog("close");
  					loadAccountCards();
  				}
