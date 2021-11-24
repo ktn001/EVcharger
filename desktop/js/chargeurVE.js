@@ -202,11 +202,9 @@ function editAccount (type, accountId ='') {
  				},
  				success: function (retour) {
  					if (retour.state != 'ok') {
-						if ( data = json_decode(retour.result)) {
-							if (data.exception.type == 'chargeurVEException' && data.exception.code == 1) {
-								saveWithPassword(account);
-								return;
-							}
+						if (retour.code == 1) {
+							saveWithPassword(retour.result);
+							return;
 						} else {
  							$('#div_alert').showAlert({message: retour.result, level: 'danger'});
  							return;
@@ -280,47 +278,6 @@ $('.accountThumbnailContainer').off('click').on('click','.accountDisplayCard', f
 });
 
 /*
- * Sauvegarde des accounts
- */
-$('#bt_saveAccounts').on('click',function() {
-	accounts = json_encode($(this).closest('table').find('tr.account').getValues('.accountAttr'));
-	$.ajax({
-		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
-		data: {
-			action: 'saveAccounts',
-			accounts: accounts
-		},
-		dataType : 'json',
-		global:false,
-		error: function (request, status, error) {
-			handleAjaxError(request, status, error);
-		},
-		success: function (data) {
-			if (data.state != 'ok') {
-				$('#div_alert').showAlert({message: data.result, level: 'danger'});
-				return;
-			}
-			$('#table_account tbody').empty();
-			accounts =  json_decode(data.result);
-			for (i in json_decode(data.result)){
-				addAccount(accounts[i]);
-			}
-			$('#bt_saveAccounts').addClass('disabled');
-			modifyWithoutSave = false;
-		}
-	});
-});
-
-/*
- *
- */
-$('#table_account').on('change','.accountAttr',function() {
-	$('#bt_saveAccounts').removeClass('disabled');
-	modifyWithoutSave = true;
-});
-
-/*
  * Action du bouton d'ajout d'un chargeur
  */
 $('.chargeurAction[data-action=add').off('click').on('click',function () {
@@ -373,41 +330,6 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 $('#selectChargeurImg').on('change',function(){
 	$('[name=icon_visu]').attr('src', "plugins/chargeurVE/desktop/img/" + $(this).value());
 });
-
-/*
- * Fonction permettant l'affichage des accounts
- */
-function addAccount(_account) {
-	if(!isset(_account)) {
-		var _account = {};
-	}
-	var tr = '<tr class="account" data-account_id="' + init(_account.id) + '">';
-	tr += '<td>';
-	tr += '<span class="accountAttr" data-l1key="id"></span>';
-	tr += '</td>';
-	tr += '<td>';
-	tr += '<input class="accountAttr form-control input-sm" data-l1key="name" placeholder="{{Nom du compte}}">';
-	tr += '</td>';
-	tr += '<td>';
-	tr += '<input class="accountAttr tooltips form-control input-sm" data-l1key="login" placeholder="{{login}}" title="{{N° de tel. ou email du compte Easee}}"/>';
-	tr += '</td>';
-	tr += '<td>';
-	tr += '<input class="accountAttr form-control input-sm" data-l1key="url" value="https://api.easee.cloud"/>';
-	tr += '</td>';
-	tr += '<td>';
-	tr += '<span class="accountKeyStatus label label-danger">KO</span>';
-	tr += '<a class="btn btn-success btn-xs accountAction" data-action="getApiKey" style="position:relative;top:-1px;margin-left:5px">{{Renouveler}}</a>';
-	tr += '</td>';
-	tr += '<td>';
-	tr += '</td>';
-	tr += '</tr>';
-	$('#table_account tbody').append(tr);
-	var tr = $('#table_account tbody tr').last();
-	tr.setValues(_account, '.accountAttr');
-	if (init(_account.id) == "") {
-		tr.find('.accountAction[data-action=getApiKey]').addClass('disabled');
-	}
-}
 
 /*
 * Fonction permettant l'affichage des commandes dans l'équipement

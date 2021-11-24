@@ -29,6 +29,7 @@ try {
 	if (init('action') == 'save') {
 		try {
 			$data = json_decode(init('account'),true);
+			log::add("chargeurVE",'debug',"XXXX " . init('account'));
 			$password = init('password');
 			if ($data['type'] == ''){
 				throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
@@ -41,7 +42,7 @@ try {
 			}
 			utils::a2o($account,$data);
 			if ($password == '' and $account->needPasswordToSave()) {
-				throw new chargeurVEException(__('Un password doit être fournis!',__FILE__),1);
+				ajax::error(init('account'), 1);
 			}
 			$account->save(init('password'));
 			ajax::success();
