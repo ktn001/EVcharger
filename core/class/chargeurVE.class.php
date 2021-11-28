@@ -197,10 +197,9 @@ class chargeurVE extends eqLogic {
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-     */
     public static function cron5() {
-	account::cronHourly();
     }
+     */
 
     /*
      * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom

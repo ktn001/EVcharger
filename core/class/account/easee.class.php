@@ -86,7 +86,18 @@ class easeeAccount extends account {
 		if ($this->getIsEnable() == 0) {
 			return;
 		}
-		log::add("chargeurVE","debug","Renew: " . $this->getName());
+		$data = array(
+			'accessToken' => $this->token['token'],
+			'refreshToken' => $this->token['refreshToken']
+		);
+		$reponse = $this->sendRequest('/api/accounts/refresh_token', $data);
+		$this->token = array(
+			'token' => $reponse['accessToken'],
+			'expiresAt' => time() + $reponse['expiresIn'],
+			'refreshToken' => $reponse['refreshToken'],
+		);
+		log::add("chargeurVE","info","Account " . $this->getHumanName(false) . ": " . __('token renouvelé.',__FILE__));
+		$this->save();
 	}
  
 	private function setApiToken($password = '') {
@@ -134,11 +145,11 @@ class easeeAccount extends account {
 				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Nouveau compte",__FILE__));
 				throw new Exception  (__("Nouveau compte",__FILE__),1);
 			}
-			if ($this->getLogin() != $actuel->getLogin()) {
+			if ($this->getLogin() != $old->getLogin()) {
 				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le login a changé",__FILE__));
 				throw new Exception  (__("Le login a changé",__FILE__),1);
 			}
-			if ($this->getUrl() != $actuel->getUrl()) {
+			if ($this->getUrl() != $old->getUrl()) {
 				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("L'URL a changé",__FILE__));
 				throw new Exception  (__("L'URL a changé",__FILE__),1);
 			}
