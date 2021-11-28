@@ -69,7 +69,6 @@ loadAccountCards();
  * Suppression d'un compte
  */
 function deleteAccount (accountId) { 
-	console.log("Suppression de " + accountId);
 	$.ajax({
 		type: 'POST',
 		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
@@ -98,34 +97,38 @@ function deleteAccount (accountId) {
  * Enregistrement d'un account avec saie de password
  */
 function saveWithPassword(account) {
-	bootbox.prompt("{{Password:}}", function(password){
-		if ( ! password) {
-			return;
-		}
-		$.ajax({
-			type: 'POST',
-			url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
-			data: {
-				action: 'save',
-				account: account,
-				password: password,
-			},
-			dataType: 'json',
-			global: false,
-			error: function (request, status, error) {
-				handleAjaxError(request, status, error);
-				loadAccountCards();
-			},
-			success: function (data) {
-				if (data.state != 'ok') {
- 					$('#div_alert').showAlert({message: "XXXXXXX " + data.result, level: 'danger'});
-					return;
-				}
- 				$('#div_alert').showAlert({message: '{{Sauvegarde réussie}}', level: 'success'});
- 				$('#mod_editAccount').dialog("close");
- 				loadAccountCards();
+	bootbox.prompt({
+		title: "{{Password:}}",
+		inputType: "password",
+		callback: function(password){
+			if ( password === null) {
+				return;
 			}
-		});
+			$.ajax({
+				type: 'POST',
+				url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+				data: {
+					action: 'save',
+					account: account,
+					options: json_encode({password : password})
+				},
+				dataType: 'json',
+				global: false,
+				error: function (request, status, error) {
+					handleAjaxError(request, status, error);
+					loadAccountCards();
+				},
+				success: function (data) {
+					if (data.state != 'ok') {
+ 						$('#div_alert').showAlert({message: data.result, level: 'danger'});
+						return;
+					}
+ 					$('#div_alert').showAlert({message: '{{Sauvegarde réussie}}', level: 'success'});
+ 					$('#mod_editAccount').dialog("close");
+ 					loadAccountCards();
+				}
+			});
+		}
 	});
 }
 
@@ -203,7 +206,9 @@ function editAccount (type, accountId ='') {
  				success: function (retour) {
  					if (retour.state != 'ok') {
 						if (retour.code == 1) {
-							saveWithPassword(retour.result);
+							response = json_decode(retour.result);
+							saveWithPassword(response.account);
+ 							$('#div_alert').showAlert({message: response.message, level: 'warning'});
 							return;
 						} else {
  							$('#div_alert').showAlert({message: retour.result, level: 'danger'});

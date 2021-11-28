@@ -122,7 +122,7 @@ class account {
 	/*
 	 * Retourne la liste des images d'account  pour le type de plugin
 	 */
-	public static function images( $type) {
+	public static function images($type) {
 		$images = array();
 		$path = realpath(__DIR__ . "/../../desktop/img/". $type);
 		if($dir = opendir($path)) {
@@ -139,6 +139,10 @@ class account {
 		return $images;
 	}
 
+	public static function cronHourly() {
+		easeeAccount::cronHourly();
+	}
+
     /*     * *********************Methodes d'instance************************ */
 
 	/*
@@ -150,50 +154,43 @@ class account {
 	}
 
 	/*
-	 * Vérifie si un password est nécessaire pour l'enregistrement
-	 */
-	public function needPasswordToSave() {
-		return false;
-	}
-
-	/*
 	 * Enregistrement de la définition de l'account
 	 */
-	public function save() {
+	public function save($options = null) {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
 		$accounts = self::byTypeAndName($this->getType(),$this->name);
 		$onInsert = false;
 		if (method_exists($this, 'preSave')) {
-			$this->preSave();
+			$this->preSave($options);
 		}
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
-				throw new Exception (__("Il y a déjà un compte nommé ",__FILE__) . $this->name);
+				throw new Exception (__("Il y a déjà un compte de ce type nommé ",__FILE__) . $this->name);
 			}
 			if (method_exists($this, 'preInsert')) {
-				$this->preInsert();
+				$this->preInsert($options);
 			}
 			$onInsert = true;
 			$this->id = self::nextId();
 		} else {
 			if (method_exists($this, 'preUpdate')) {
-				$this->preUpdate();
+				$this->preUpdate($options);
 			}
 		}
 		config::save('account::' . $this->id, serialize($this), self::$plugin_id);
 		if ($onInsert) {
 			if (method_exists($this, 'postInsert')) {
-				$this->postInsert();
+				$this->postInsert($options);
 			}
 		} else {
 			if (method_exists($this, 'postUpdate')) {
-				$this->postUpdate();
+				$this->postUpdate($options);
 			}
 		}
 		if (method_exists($this, 'postsave')) {
-			$this->postSave();
+			$this->postSave($options);
 		}
 	}
 

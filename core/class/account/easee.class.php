@@ -23,9 +23,8 @@ require_once dirname(__FILE__) . '/../account.class.php';
 class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
     
-	//public static $typeLabel = "Easee";
+	private $token;
 	protected $image;
-
 	protected $login;
 	protected $url;
 
@@ -36,6 +35,12 @@ class easeeAccount extends account {
 		);
 	}
 
+	public static function cronHourly() {
+		foreach (self::byType('easee') as $account) {
+			$account->renewApiToken();
+		}
+	}
+
     /*     * *********************Méthodes d'instance************************* */
 
 	function __construct () {
@@ -43,15 +48,13 @@ class easeeAccount extends account {
 		$this->url = "https://api.easee.cloud";
 	}
 
-	private function setApiToken($save = true) {
+	private function sendRequest($path, $data) {
+		if (is_array($data)) {
+			$data = json_encode($data);
+		}
 		$curl = curl_init();
-		$data = array(
-			'userName' => $this->getLogin(),
-			'password' => $this->getPassword()
-		);
-		$post_data = json_encode($data);
 		curl_setopt_array($curl, [
-			CURLOPT_URL => $this->getUrl() . '/api/accounts/token',
+			CURLOPT_URL => $this->getUrl() . $path,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => "",
 			CURLOPT_MAXREDIRS => 10,
@@ -62,79 +65,52 @@ class easeeAccount extends account {
 				"Accept: application/json",
 				"Content-Type: application/*+json"
 			],
-			CURLOPT_POSTFIELDS => $post_data,
+			CURLOPT_POSTFIELDS => $data,
 		]);
 		$reponse = json_decode(curl_exec($curl),true);
 		$httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
 		$err = curl_error($curl);
-
 		curl_close($curl);
-
 		if ($err) {
 			log::add("chargeurVE","error", "CURL Error : " . $err);
 			throw new Exception($err);
-		} else {
-			if ($httpCode != '200') {
-				throw new Exception ($httpCode . ": " . $reponse['title']);
-			}
-			if ($save) {
-				if (!is_numeric($this->id)) { 
-					throw new Exception (__("l'id est incorrect",__FILE__));
-				}
-				$accessToken = $reponse['accessToken'];
-				$expiresAt = time() + $reponse['expiresIn'];
-				$refreshToken = $reponse['refreshToken'];
-				$config = array(
-					'token' => $reponse['accessToken'],
-					'expiresAt' => $expiresAt,
-					'refreshToken' => $reponse['refreshToken'],
-				);
-				config::save('easeeToken::' . $this->id, json_encode($config), self::$plugin_id);
-			}
 		}
+		if ($httpCode != '200') {
+			log::add ("chargeurVE","warning", $httpCode . ": " . $reponse['title']);
+			throw new Exception ($reponse['title']);
+		}
+		return $reponse;
+	}
+
+	private function renewApiToken() {
+		if ($this->getIsEnable() == 0) {
+			return;
+		}
+		log::add("chargeurVE","debug","Renew: " . $this->getName());
+	}
+ 
+	private function setApiToken($password = '') {
+		$data = array(
+			'userName' => $this->getLogin(),
+			'password' => $password
+		);
+		$reponse = $this->sendRequest('/api/accounts/token', $data);
+		$this->token = array(
+			'token' => $reponse['accessToken'],
+			'expiresAt' => time() + $reponse['expiresIn'],
+			'refreshToken' => $reponse['refreshToken'],
+		);
 	}
 
 	private function deleteApiToken() {
-		config::remove('easeeToken::' . $this->id, self::$plugin_id);
+		$this->token = null;
 	}
 
-	private	function getApiToken() {
-		if ($this->id == ''){
-			return null;
+	public function preSave($options) {
+		$password = null;
+		if (is_array($options) and array_key_exists('password',$options)){
+			$password = $options['password'];
 		}
-		return config::byKey('easeeToken::' . $this->id,'chargeurVE');
-	}
-
-	public function needPasswordToSave() {
-		if ($this->getIsEnable() == 0) {
-			return false;
-		}
-		$token = $this->getApiToken();
-		if (! is_array($token)) {
-			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Un nouveau token doit être créé.",__FILE__));
-			return true;
-		}
-		if (time() > $token['expiresAt']){
-			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le token a expiré.",__FILE__));
-			return true;
-		}
-		$old = self::byId($this->getId());
-		if (! is_object($old)) {
-			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Nouveau compte",__FILE__));
-			return true;
-		}
-		if ($this->getLogin() != $actuel->getLogin()) {
-			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le login a changé",__FILE__));
-			return true;
-		}
-		if ($this->getUrl() != $actuel->getUrl()) {
-			log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("L'URL a changé",__FILE__));
-			return true;
-		}
-		return false;
-	}
-
-	public function preSave() {
 		$this->setLogin(trim ($this->getLogin()));
 		if ($this->getLogin() == "") {
 			throw new Exception (__("le login n'est pas défini!",__FILE__));
@@ -143,34 +119,35 @@ class easeeAccount extends account {
 		if ($this->getUrl() == "") {
 			throw new Exception (__("l'url n'est pas définie!",__FILE__));
 		}
-	}
 
-	public function preInsert() {
-		if ($this->isEnable) {
-			// $key = $this->setApiToken(false);
+		if ($this->getIsEnable() == 1 and $password == null ) {
+			if (! is_array($this->token)) {
+				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Un nouveau token doit être créé.",__FILE__));
+				throw new Exception  (__("Un nouveau token doit être créé.",__FILE__),1);
+			}
+			if (time() > $this->token['expiresAt']){
+				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le token a expiré.",__FILE__));
+				throw new Exception  (__("Le token a expiré.",__FILE__),1);
+			}
+			$old = self::byId($this->getId());
+			if (! is_object($old)) {
+				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Nouveau compte",__FILE__));
+				throw new Exception  (__("Nouveau compte",__FILE__),1);
+			}
+			if ($this->getLogin() != $actuel->getLogin()) {
+				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le login a changé",__FILE__));
+				throw new Exception  (__("Le login a changé",__FILE__),1);
+			}
+			if ($this->getUrl() != $actuel->getUrl()) {
+				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("L'URL a changé",__FILE__));
+				throw new Exception  (__("L'URL a changé",__FILE__),1);
+			}
+		} elseif ($this->getIsEnable() == 1 ) {
+			$this->setApiToken($password);
+		} else {
+			$this->deleteApiToken();
 		}
-	}
 
-	public function preUpdate() {
-		if ($this->isEnable) {
-			// $key = $this->setApiToken();
-		}
-	}
-		
-	public function postInsert() {
-		if ($this->isEnable) {
-			// $key = $this->setApiToken();
-		}
-	}
-
-	public function postSave() {
-		if (!$this->isEnable) {
-			// $this->deleteApiToken();
-		}
-	}
-
-	public function postRemove() {
-		// $this->deleteApiToken();
 	}
 
     /*     * **********************Getteur Setteur*************************** */
