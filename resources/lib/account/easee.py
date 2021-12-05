@@ -1,4 +1,5 @@
+from account.account import account
 
-class account_easee():
+class easee(account):
     def toto ():
         return 1

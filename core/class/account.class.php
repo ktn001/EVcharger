@@ -30,7 +30,7 @@ class account {
 	protected $id;
 	protected $isEnable;
 	protected $image;
-    
+
     /*     * ***********************Methodes static************************** */
 
 	/*
@@ -76,15 +76,7 @@ class account {
 				$accounts[] = $account;
 			}
 		}
-		switch (count($accounts)) {
-		case 0:
-			return NULL;
-			break;
-		case 1:
-			return $accounts[0];
-		default:
-			return $accounts;
-		}
+		return $accounts;
 	}
 
 	/*
@@ -96,14 +88,6 @@ class account {
 		foreach ($configs as $config) {
 			$accounts[] = unserialize($config['value']);
 		}
-		//if (in_array($sortBy, array('name', 'type'))) {
-		//	usort($accounts, function ($a, $b) {
-		//		//if (($sortBy == "type") and ($a->getType() != $b->getType())) {
-		//		//	return strcmp ($a->getType(), $b->getType());
-		//		//}
-		//		return strcmp ($a->getName(), $b->getName());
-		//	});
-		//}
 		return $accounts;
 	}
 
@@ -120,7 +104,7 @@ class account {
 	}
 
 	/*
-	 * Retourne la liste des images d'account  pour le type de plugin
+	 * Retourne la liste des images d'account pour le type de plugin
 	 */
 	public static function images($type) {
 		$images = array();
@@ -154,7 +138,7 @@ class account {
 	}
 
 	/*
-	 * Enregistrement de la définition de l'account
+	 * Enregistrement de l'account
 	 */
 	public function save($options = null) {
 		if (trim($this->name) == "") {
@@ -192,6 +176,11 @@ class account {
 		if (method_exists($this, 'postsave')) {
 			$this->postSave($options);
 		}
+		if ($this->isEnable){
+			$this->startDeamondThread();
+		} else {
+			$this->stopDeamondThread();
+		}
 	}
 
 	/*
@@ -210,6 +199,33 @@ class account {
 		}
 	}
 
+	public function send2deamond($message) {
+		log::add('chargeurVE','debug','send2deamond: ' . $message);
+		$deamonInfo = chargeurVE::deamon_info();
+		if ($deamonInfo['state'] != 'ok'){
+			throw new Exception("Le démon n'est pas démarré!");
+		}
+		$params['apikey'] = jeedom::getApiKey('chargeurVE');
+		$params['type'] = $this->getType();
+		$params['id'] = $this->getId();
+		$params['message'] = $message;
+		$payLoad = json_encode($params);
+		$socket = socket_create(AF_INET, SOCK_STREAM,0);
+		socket_connect($socket,'127.0.0.1', config::byKey('daemon::port','chargeurVE'));
+		socket_write($socket, $payLoad, strlen($payLoad));
+		socket_close($socket);
+	}
+
+	public function startDeamondThread() {
+		$message['cmd'] = 'start';
+		$this->send2Deamond($message);
+	}
+
+	public function stopDeamondThread() {
+		$message['cmd'] = 'stop';
+		$this->send2Deamond($message);
+	}
+
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
 		$type = type::byName($this->getType());
@@ -224,7 +240,7 @@ class account {
 				$name .= $this->getType();
 			}
 		} else {
-			$name .= '['.$this->getType().']'; 
+			$name .= '['.$this->getType().']';
 		}
 		if ($_prettify) {
 			$name .= '<br/><strong>';

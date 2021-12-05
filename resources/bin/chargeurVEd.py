@@ -24,12 +24,61 @@ from optparse import OptionParser
 import json
 import argparse
 import importlib
+import asyncio
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
 sys.path.append (libDir)
 
 from jeedom.jeedom import *
 import account
+
+_logLevel = "error"
+_socketPort = -1
+_socketHost = 'localhost'
+_pidfile = '/tmp/jeedom/chargeurVE/daemond.pid'
+_apiKey = ''
+_callback = ''
+
+#===============================================================================
+# Options
+#...............................................................................
+# Prise en compte des options de la ligne de commande
+#===============================================================================
+def options():
+    global _logLevel
+    global _callback
+    global _apiKey
+    global _pidfile
+    global _socketPort
+
+    parser = argparse.ArgumentParser( description='chargeurVE Daemon for Jeedom plugin')
+    parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
+    parser.add_argument("--callback", help="Callback", type=str)
+    parser.add_argument("--apikey", help="Apikey", type=str)
+    parser.add_argument("--pid", help="Pid file", type=str)
+    parser.add_argument("--socketport", help="Port pour réception des commandes du plugin", type=int)
+    args = parser.parse_args()
+
+    if args.loglevel:
+        _logLevel = args.loglevel
+    if args.callback:
+        _callback = args.callback
+    if args.apikey:
+        _apiKey = args.apikey
+    if args.pid:
+        _pidfile = args.pid
+    if args.socketport:
+        _socketPort = int(args.socketport)
+
+
+    jeedom_utils.set_logLevel(_logLevel)
+
+    logging.info('Start demond')
+    logging.info('Log level : '+str(_logLevel))
+    logging.debug('Apikey : '+str(_apiKey))
+    logging.info('Socket port : '+str(_socketPort))
+    logging.info('Socket host : '+str(_socketHost))
+    logging.info('PID file : '+str(_pidfile))
 
 # -------- Lecture du socket ------------------------------------------------
 
@@ -38,8 +87,7 @@ def read_socket():
     if not JEEDOM_SOCKET_MESSAGE.empty():
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
         message = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
-        print ('message........')
-        if message['apikey'] != _apikey:
+        if message['apikey'] != _apiKey:
             logging.error("Invalid apikey from socket : " + str(message))
             return
         try:
@@ -48,7 +96,7 @@ def read_socket():
         except Exception as e:
             logging.error('Send command to demon error : '+str(e))
 
-def listen():
+async def listen_jeedom():
     jeedom_socket.open()
     try:
         while 1:
@@ -57,7 +105,9 @@ def listen():
     except KeyboardInterrupt:
         shutdown()
 
-# ----------- procédureis d'arrêt -------------------------------------------
+async def start_chargeurVE():
+    asyncio.create_task(listen_jeedom())
+# ----------- procédures d'arrêt -------------------------------------------
 
 def handler(signum=None, frame=None):
     logging.debug("Signal %i caught, exiting..." % int(signum))
@@ -78,62 +128,27 @@ def shutdown():
     sys.stdout.flush()
     os._exit(0)
 
-# ---------------- MAIN -----------------------------------------------------
+  ###########################
+ #                           #
+#  #    #    ##    #  #    #  #
+#  ##  ##   #  #   #  ##   #  #
+#  # ## #  #    #  #  # #  #  #
+#  #    #  ######  #  #  # #  #
+#  #    #  #    #  #  #   ##  #
+#  #    #  #    #  #  #    #  #
+ #                           #
+  ###########################
 
-_log_level = "error"
-_socket_port = 34739
-_socket_host = 'localhost'
-_device = 'auto'
-_pidfile = '/tmp/jeedom/chargeurVE/daemond.pid'
-_apikey = ''
-_callback = ''
-_cycle = 0.3
-
-parser = argparse.ArgumentParser(
-    description='chargeurVE Daemon for Jeedom plugin')
-parser.add_argument("--device", help="Device", type=str)
-parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
-parser.add_argument("--callback", help="Callback", type=str)
-parser.add_argument("--apikey", help="Apikey", type=str)
-parser.add_argument("--cycle", help="Cycle to send event", type=str)
-parser.add_argument("--pid", help="Pid file", type=str)
-parser.add_argument("--socketport", help="Port pour réception des commandes du plugin", type=str)
-args = parser.parse_args()
-
-if args.device:
-    _device = args.device
-if args.loglevel:
-    _log_level = args.loglevel
-if args.callback:
-    _callback = args.callback
-if args.apikey:
-    _apikey = args.apikey
-if args.pid:
-    _pidfile = args.pid
-if args.cycle:
-    _cycle = float(args.cycle)
-if args.socketport:
-    _socketport = args.socketport
-
-_socket_port = int(_socketport)
-
-jeedom_utils.set_log_level(_log_level)
-
-logging.info('Start demond')
-logging.info('Log level : '+str(_log_level))
-logging.info('Socket port : '+str(_socket_port))
-logging.info('Socket host : '+str(_socket_host))
-logging.info('PID file : '+str(_pidfile))
-logging.info('Apikey : '+str(_apikey))
-logging.info('Device : '+str(_device))
+options()
 
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
 
 try:
     jeedom_utils.write_pid(str(_pidfile))
-    jeedom_socket = jeedom_socket(port=_socket_port,address=_socket_host)
-    listen()
+    jeedom_socket = jeedom_socket(port=_socketPort,address=_socketHost)
+    asyncio.run(start_chargeurVE())
+#    listen()
 except Exception as e:
     logging.error('Fatal error : '+str(e))
     logging.info(traceback.format_exc())

@@ -38,6 +38,9 @@ class easeeAccount extends account {
 	public static function cronHourly() {
 		foreach (self::byType('easee') as $account) {
 			$account->renewApiToken();
+			$message['action'] = "newKey";
+			$message['key'] = $account->token['token'];
+			$account->send2deamond($message);
 		}
 	}
 

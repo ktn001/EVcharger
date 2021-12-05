@@ -155,7 +155,7 @@ class jeedom_utils():
 		return LEVELS.get(level, logging.CRITICAL)
 
 	@staticmethod
-	def set_log_level(level = 'error'):
+	def set_logLevel(level = 'error'):
 		FORMAT = '[%(asctime)-15s][%(levelname)s] : %(message)s'
 		logging.basicConfig(level=jeedom_utils.convert_log_level(level),format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
@@ -222,7 +222,7 @@ class jeedom_socket_handler(StreamRequestHandler):
 
 class jeedom_socket():
 
-	def __init__(self,address='localhost', port=55000):
+	def __init__(self,address='localhost', port=-1):
 		self.address = address
 		self.port = port
 		socketserver.TCPServer.allow_reuse_address = True

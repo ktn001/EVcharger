@@ -158,42 +158,6 @@ class chargeurVE extends eqLogic {
         socket_write($socket, $payLoad, strlen($payLoad));
         socket_close($socket);
     }
-//        $curl = curl_init();
-//
-//                   // 'userName' => '+41797491023'
-//        $data = array (
-//             'userName' => 'christian@ockolly.ch',
-//             'password' => 'EMobile&1e'
-//        );
-//
-//        $post_data = json_encode($data);
-//
-//        curl_setopt_array($curl, [
-//            CURLOPT_URL => "https://api.easee.cloud/api/accounts/token",
-//            CURLOPT_RETURNTRANSFER => true,
-//            CURLOPT_ENCODING => "",
-//            CURLOPT_MAXREDIRS => 10,
-//            CURLOPT_TIMEOUT => 30,
-//            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-//            CURLOPT_CUSTOMREQUEST => "POST",
-//            CURLOPT_HTTPHEADER => [
-//                  "Accept: application/json",
-//                  "Content-Type: application/*+json"
-//            ],
-//            CURLOPT_POSTFIELDS => $post_data,
-//        ]);
-//        $response = curl_exec($curl);
-//        $err = curl_error($curl);
-//
-//        curl_close($curl);
-//
-//        if ($err) {
-//            log::add("chargeurVE","debug", "cURL Error #:" . $err);
-//        } else {
-//            log::add("chargeurVE","debug", "XXX " . $response);
-//        }
-//        log::add("chargeurVE","debug","Fin du Cron");
-//    }
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
