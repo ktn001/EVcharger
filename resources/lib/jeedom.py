@@ -156,7 +156,7 @@ class jeedom_utils():
 
 	@staticmethod
 	def set_logLevel(level = 'error'):
-		FORMAT = '[%(asctime)-15s][%(levelname)s] : %(message)s'
+		FORMAT = '[%(asctime)-15s][%(levelname)-5s] : %(message)s'
 		logging.basicConfig(level=jeedom_utils.convert_log_level(level),format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
 	@staticmethod
@@ -195,7 +195,9 @@ class jeedom_utils():
 	def write_pid(path):
 		pid = str(os.getpid())
 		logging.debug("Writing PID " + pid + " to " + str(path))
-		open(path, 'w').write("%s\n" % pid)
+		fh = open(path, 'w')
+		fh.write("%s\n" % pid)
+		fh.close()
 
 	@staticmethod
 	def remove_accents(input_str):

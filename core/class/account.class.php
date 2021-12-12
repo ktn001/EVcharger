@@ -82,11 +82,14 @@ class account {
 	/*
 	 * Retounre une liste contenant tous les accounts
 	 */
-	public static function all ( $sortBy="type") {
+	public static function all ( $enabled=false ) {
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
-			$accounts[] = unserialize($config['value']);
+			$account = unserialize($config['value']);
+			if ( ! $enabled or $account->isEnabled()){
+				$accounts[] = $account;
+			}
 		}
 		return $accounts;
 	}
@@ -274,6 +277,13 @@ class account {
 			return 0;
 		}
 		return $this->isEnable;
+	}
+
+	public function isEnabled() {
+		if ($this->getIsEnable() == 0) {
+			return false;
+		}
+		return true;
 	}
 
 	public function setIsEnable($_isEnable) {

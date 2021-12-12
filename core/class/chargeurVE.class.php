@@ -47,7 +47,7 @@ class chargeurVE extends eqLogic {
         $return['state'] = 'nok';
         $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
         if (file_exists($pid_file)) {
-            if (@posix_getsid(trim(file_get_contents($pid_file)))) {
+            if (posix_getsid(trim(file_get_contents($pid_file)))) {
                 $return['state'] = 'ok';
             } else {
                 shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
@@ -91,6 +91,9 @@ class chargeurVE extends eqLogic {
             return false;
         }
         message::removeAll(__CLASS__, 'unableStartDeamon');
+        foreach (account::all(true) as $account) {
+            $account->startDeamondThread();
+        }
         return true;
     }
 
@@ -98,13 +101,18 @@ class chargeurVE extends eqLogic {
      * Arret de daemon
      */
     public static function deamon_stop() {
-        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid'; // ne pas modifier
+        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
         if (file_exists($pid_file)) {
+            foreach (account::all(true) as $account) {
+                $account->stopDeamondThread();
+            }
+            sleep (5);
             $pid = intval(trim(file_get_contents($pid_file)));
+            log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
             system::kill($pid);
+            sleep(1);
+            return;
         }
-        system::kill('chargeurVEd.py'); // nom du démon à modifier
-        sleep(1);
     }
 
     /*
@@ -141,23 +149,9 @@ class chargeurVE extends eqLogic {
 
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
-     */
     public static function cron() {
-    log::add("chargeurVE","debug","Lancement du Cron");
-        $daemon_info = self::deamon_info();
-        if ($daemon_info['state'] != 'ok') {
-            throw new Exception("Le démon n'est pas démarré");
-        }
-        $params['apikey'] = jeedom::getApiKey(__CLASS__);
-        $params['message'] = "Ceci est un message";
-        $payLoad = json_encode($params);
-        log::add(__CLASS__,"info",$payLoad);
-        log::add(__CLASS__,"info",config::byKey('daemon::port', __CLASS__));
-        $socket = socket_create(AF_INET, SOCK_STREAM, 0);
-        socket_connect($socket,'127.0.0.1', config::byKey('daemon::port', __CLASS__));
-        socket_write($socket, $payLoad, strlen($payLoad));
-        socket_close($socket);
     }
+     */
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
@@ -187,7 +181,7 @@ class chargeurVE extends eqLogic {
      * Fonction exécutée automatiquement toutes les heures par Jeedom
      */
     public static function cronHourly() {
-	account::cronHourly();
+        account::cronHourly();
     }
 
     /*
@@ -208,7 +202,6 @@ class chargeurVE extends eqLogic {
                 if ( (! self::isTypeEnable($matches['type'])) and $onlyActif) {
                     continue;
                 }
-		$config = 
                 $filePath = $dirPath . '/' . $fileName;
                 $file = fopen( $filePath, 'r');
                 if ($firstFile) {

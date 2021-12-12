@@ -29,7 +29,7 @@ import asyncio
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
 sys.path.append (libDir)
 
-from jeedom.jeedom import *
+from jeedom import *
 import account
 
 _logLevel = "error"
@@ -38,6 +38,7 @@ _socketHost = 'localhost'
 _pidfile = '/tmp/jeedom/chargeurVE/daemond.pid'
 _apiKey = ''
 _callback = ''
+accounts = {}
 
 #===============================================================================
 # Options
@@ -84,15 +85,35 @@ def options():
 
 def read_socket():
     global JEEDOM_SOCKET_MESSAGE
+    global accounts
+
     if not JEEDOM_SOCKET_MESSAGE.empty():
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
-        message = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
-        if message['apikey'] != _apiKey:
-            logging.error("Invalid apikey from socket : " + str(message))
+        payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
+        if payload['apikey'] != _apiKey:
+            logging.error("Invalid apikey from socket : " + str(payload))
             return
         try:
-            logging.info ('read')
-            print ('read')
+            accountType = payload['type']
+            accountId = payload['id']
+            if 'message' in payload:
+                message = payload['message']
+                if message['cmd'] == 'start':
+                    logging.debug(f'start: id={accountId} type: {accountType}')
+                    if not accountId in accounts:
+                        logging.info(f"Création d'un account <{accountType}> id:{accountId}")
+                        queue = Queue()
+                        account = eval("account." + accountType)(accountId, accountType, queue)
+                        accounts[accountId] = {
+                                'type' : accountType,
+                                'queue' : queue,
+                                'account' : account
+                                }
+                    accounts[accountId]['account'].run()
+                accounts[accountId]['queue'].put(json.dumps(message))
+                if message['cmd'] == 'stop':
+                    del accounts[accountId]
+
         except Exception as e:
             logging.error('Send command to demon error : '+str(e))
 
@@ -147,8 +168,7 @@ signal.signal(signal.SIGTERM, handler)
 try:
     jeedom_utils.write_pid(str(_pidfile))
     jeedom_socket = jeedom_socket(port=_socketPort,address=_socketHost)
-    asyncio.run(start_chargeurVE())
-#    listen()
+    asyncio.run(start_chargeurVE(), debug=True)
 except Exception as e:
     logging.error('Fatal error : '+str(e))
     logging.info(traceback.format_exc())
