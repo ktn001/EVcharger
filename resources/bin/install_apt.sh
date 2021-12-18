@@ -38,5 +38,5 @@ echo "***********************************"
 echo 100 > $PROGRESS_FILE
 date
 
-# rm $PROGRESS_FILE
+rm $PROGRESS_FILE
 exit 0
