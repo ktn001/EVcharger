@@ -121,7 +121,7 @@ class chargeurVE extends eqLogic {
     public static function dependancy_install() {
         # log::remove(__CLASS__ . '_update');
         return array(
-            'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency',
+            'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependance',
             'log' => log::getPathToLog(__CLASS__ . '_update')
         );
     }
@@ -132,8 +132,8 @@ class chargeurVE extends eqLogic {
     public static function dependancy_info(){
         $return = array();
         $return ['log'] = log::getPathToLog(__CLASS__ . '_update');
-        $return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . 'dependency';
-        if (file_exists(jeedom::getTmpFolder(__CLASS__) . 'dependency')) {
+        $return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependance';
+        if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependance')) {
             $return['state'] = 'in_progress';
         } else {
             if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {

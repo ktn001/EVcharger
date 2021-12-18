@@ -23,7 +23,6 @@ if (!isConnect()) {
 }
 include_file('core', 'chargeurVE', 'class', 'chargeurVE');
 sendVarToJS('usedTypes',type::allUsed());
-$chargeurVETypes = chargeurVE::types(false);
 $defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
 $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
 ?>

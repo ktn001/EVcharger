@@ -1,5 +1,5 @@
 
-if [ -z $1 ]
+if [ -n $1 ]
 then
 	PROGRESS_FILE=$1
 fi
@@ -7,7 +7,7 @@ fi
 if [ -z $PROGRESS_FILE ]
 then
 	exit 1
-	fi
+fi
 
 echo 0 > $PROGRESS_FILE
 echo "***********************************"
