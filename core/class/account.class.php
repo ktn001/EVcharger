@@ -80,7 +80,7 @@ class account {
 	}
 
 	/*
-	 * Retounre une liste contenant tous les accounts
+	 * Retourne une liste contenant tous les accounts
 	 */
 	public static function all ( $enabled=false ) {
 		$configs = config::searchKey("account::", self::$plugin_id);
@@ -141,27 +141,42 @@ class account {
 	}
 
 	/*
+	 * Wrapper pour les logs
+	 */
+	protected function log ($level, $message){
+		log::add('chargeurVE',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
+	}
+
+	/*
 	 * Enregistrement de l'account
 	 */
 	public function save($options = null) {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
-		$accounts = self::byTypeAndName($this->getType(),$this->name);
-		$onInsert = false;
 		if (method_exists($this, 'preSave')) {
 			$this->preSave($options);
 		}
+		$accounts = self::byTypeAndName($this->getType(),$this->name);
+		if (count($accounts) > 1) {
+			throw new Exception (__("Il exsite plusieurs compte de ce type nmmés ",__FILE__) . $this->name);
+		}
+		$onInsert = false;
+		$wasEnabled = false;
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte de ce type nommé ",__FILE__) . $this->name);
 			}
+			$onInsert = true;
+			$this->id = self::nextId();
 			if (method_exists($this, 'preInsert')) {
 				$this->preInsert($options);
 			}
-			$onInsert = true;
-			$this->id = self::nextId();
 		} else {
+			if ( ! $accounts ) {
+				throw new Exception (__("La version précédente est introuvable",__FILE__));
+			}
+			$wasEnabled = $accounts[0]->isEnabled();
 			if (method_exists($this, 'preUpdate')) {
 				$this->preUpdate($options);
 			}
@@ -179,10 +194,12 @@ class account {
 		if (method_exists($this, 'postsave')) {
 			$this->postSave($options);
 		}
-		if ($this->isEnable){
-			$this->startDeamondThread();
-		} else {
-			$this->stopDeamondThread();
+		if ($wasEnabled xor $this->isEnabled()) {
+			if ($this->isEnable){
+				$this->startDeamondThread();
+			} else {
+				$this->stopDeamondThread();
+			}
 		}
 	}
 
@@ -203,10 +220,10 @@ class account {
 	}
 
 	public function send2deamond($message) {
-		log::add('chargeurVE','debug','send2deamond: ' . $message);
-		$deamonInfo = chargeurVE::deamon_info();
-		if ($deamonInfo['state'] != 'ok'){
-			throw new Exception("Le démon n'est pas démarré!");
+		$this->log('debug','send2deamond: ' . print_r($message,true));
+		if (chargeurVE::deamon_info()['state'] != 'ok'){
+			$this->log('error', __("Le démon n'est pas démarré!",__FILE__));
+			throw new Exception(__("Le démon n'est pas démarré!",__FILE__));
 		}
 		$params['apikey'] = jeedom::getApiKey('chargeurVE');
 		$params['type'] = $this->getType();

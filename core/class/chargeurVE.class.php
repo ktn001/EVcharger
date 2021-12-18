@@ -192,37 +192,6 @@ class chargeurVE extends eqLogic {
 
     /*     * ********************Methode static ************************** */
 
-    public static function types($onlyActif = true) {
-        $dirPath = __DIR__ . "/../../data";
-        $dir = opendir($dirPath);
-        $chargeursDefs_json = '[';
-        $firstFile = true;
-        while (($fileName = readdir($dir)) !== false) {
-            if (preg_match('/^chargeur_(?P<type>.*)\.json$/',$fileName,$matches)) {
-                if ( (! self::isTypeEnable($matches['type'])) and $onlyActif) {
-                    continue;
-                }
-                $filePath = $dirPath . '/' . $fileName;
-                $file = fopen( $filePath, 'r');
-                if ($firstFile) {
-                    $firstFile = false;
-                } else {
-                    $chargeursDefs_json .= ",";
-                }
-                $chargeursDefs_json .= fread($file, fileSize($filePath));
-                fclose($file);
-            }
-        }
-        closedir($dir);
-        $chargeursDefs_json .= ']';
-        $chargeursDefs = json_decode($chargeursDefs_json,true);
-        function cmpDefs ($a, $b) {
-            return strcasecmp($a['label'],$b['label']);
-        }
-        usort($chargeursDefs,'cmpDefs');
-        return $chargeursDefs;
-    }
-
     /*     * *********************Méthodes d'instance************************* */
 
  // Fonction exécutée automatiquement avant la création de l'équipement

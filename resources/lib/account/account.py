@@ -22,9 +22,8 @@ from jeedom import *
 import logging
 import json
 
-jeedom_utils.set_logLevel(level = "debug")
-
 class account():
+    """Class de base pour les differents types d'account"""
 
     def __init__(self, id, type, queue):
         self._id = id
@@ -43,7 +42,7 @@ class account():
             if (hasattr(self, commande)):
                 function = eval(f"self.{commande}")
                 if callable(function):
-                    function(msg)
+                    function(message)
 
     def listen_jeedom(self):
         self._stop = False

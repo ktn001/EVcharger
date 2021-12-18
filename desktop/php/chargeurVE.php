@@ -10,8 +10,6 @@ sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
-$chargeursDefs = chargeurVE::types();
-sendVarToJS('chargeursDefs',$chargeursDefs);
 ?>
 
 <div class="row row-overflow">

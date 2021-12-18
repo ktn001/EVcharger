@@ -109,7 +109,9 @@ def read_socket():
                                 'queue' : queue,
                                 'account' : account
                                 }
+                    accounts[accountId]['queue'].put(json.dumps(message))
                     accounts[accountId]['account'].run()
+                    return
                 accounts[accountId]['queue'].put(json.dumps(message))
                 if message['cmd'] == 'stop':
                     del accounts[accountId]
@@ -128,6 +130,7 @@ async def listen_jeedom():
 
 async def start_chargeurVE():
     asyncio.create_task(listen_jeedom())
+
 # ----------- procédures d'arrêt -------------------------------------------
 
 def handler(signum=None, frame=None):

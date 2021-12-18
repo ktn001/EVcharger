@@ -75,11 +75,11 @@ class easeeAccount extends account {
 		$err = curl_error($curl);
 		curl_close($curl);
 		if ($err) {
-			log::add("chargeurVE","error", "CURL Error : " . $err);
+			$this->log("error", "CURL Error : " . $err);
 			throw new Exception($err);
 		}
 		if ($httpCode != '200') {
-			log::add ("chargeurVE","warning", $httpCode . ": " . $reponse['title']);
+			$this->log("warning", $httpCode . ": " . $reponse['title']);
 			throw new Exception ($reponse['title']);
 		}
 		return $reponse;
@@ -99,7 +99,7 @@ class easeeAccount extends account {
 			'expiresAt' => time() + $reponse['expiresIn'],
 			'refreshToken' => $reponse['refreshToken'],
 		);
-		log::add("chargeurVE","info","Account " . $this->getHumanName(false) . ": " . __('token renouvelé.',__FILE__));
+		$this->log("info","Account " . $this->getHumanName(false) . ": " . __('token renouvelé.',__FILE__));
 		$this->save();
 	}
  
@@ -136,24 +136,24 @@ class easeeAccount extends account {
 
 		if ($this->getIsEnable() == 1 and $password == null ) {
 			if (! is_array($this->token)) {
-				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Un nouveau token doit être créé.",__FILE__));
+				$this->log('chargeurVE','debug', __("Un nouveau token doit être créé.",__FILE__));
 				throw new Exception  (__("Un nouveau token doit être créé.",__FILE__),1);
 			}
 			if (time() > $this->token['expiresAt']){
-				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le token a expiré.",__FILE__));
+				$this->log('chargeurVE','debug', __("Le token a expiré.",__FILE__));
 				throw new Exception  (__("Le token a expiré.",__FILE__),1);
 			}
 			$old = self::byId($this->getId());
 			if (! is_object($old)) {
-				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Nouveau compte",__FILE__));
+				$this->log('chargeurVE','debug', __("Nouveau compte",__FILE__));
 				throw new Exception  (__("Nouveau compte",__FILE__),1);
 			}
 			if ($this->getLogin() != $old->getLogin()) {
-				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("Le login a changé",__FILE__));
+				$this->log('chargeurVE','debug', __("Le login a changé",__FILE__));
 				throw new Exception  (__("Le login a changé",__FILE__),1);
 			}
 			if ($this->getUrl() != $old->getUrl()) {
-				log::add('chargeurVE','debug',__CLASS__ . '::Presave: ' . __("L'URL a changé",__FILE__));
+				$this->log('chargeurVE','debug', __("L'URL a changé",__FILE__));
 				throw new Exception  (__("L'URL a changé",__FILE__),1);
 			}
 		} elseif ($this->getIsEnable() == 1 ) {
@@ -162,6 +162,12 @@ class easeeAccount extends account {
 			$this->deleteApiToken();
 		}
 
+	}
+
+	public function startDeamondThread() {
+		$message['cmd'] = 'start';
+		$message['token'] = $this->token['token'];
+		$this->send2Deamond($message);
 	}
 
     /*     * **********************Getteur Setteur*************************** */
