@@ -86,7 +86,7 @@ class easeeAccount extends account {
 	}
 
 	private function renewApiToken() {
-		if ($this->getIsEnable() == 0) {
+		if ($this->IsEnabled() == 0) {
 			return;
 		}
 		$data = array(
@@ -134,7 +134,7 @@ class easeeAccount extends account {
 			throw new Exception (__("l'url n'est pas définie!",__FILE__));
 		}
 
-		if ($this->getIsEnable() == 1 and $password == null ) {
+		if ($this->IsEnabled() == 1 and $password == null ) {
 			if (! is_array($this->token)) {
 				$this->log('chargeurVE','debug', __("Un nouveau token doit être créé.",__FILE__));
 				throw new Exception  (__("Un nouveau token doit être créé.",__FILE__),1);
@@ -156,7 +156,7 @@ class easeeAccount extends account {
 				$this->log('chargeurVE','debug', __("L'URL a changé",__FILE__));
 				throw new Exception  (__("L'URL a changé",__FILE__),1);
 			}
-		} elseif ($this->getIsEnable() == 1 ) {
+		} elseif ($this->IsEnabled() == 1 ) {
 			$this->setApiToken($password);
 		} else {
 			$this->deleteApiToken();
@@ -173,8 +173,11 @@ class easeeAccount extends account {
     /*     * **********************Getteur Setteur*************************** */
 
 	/* login */
-	public function setLogin($login) {
-		$this->login = $login;
+	public function setLogin($_login) {
+		if ($_login != $this->login) {
+			$this->setModified('login');
+		}
+		$this->login = $_login;
 		return $this;
 	}
 
@@ -183,8 +186,11 @@ class easeeAccount extends account {
 	}
 
 	/* url */
-	public function setUrl($url) {
-		$this->url = $url;
+	public function setUrl($_url) {
+		if ($_url != $this->url) {
+			$this->setModified('url');
+		}
+		$this->url = $_url;
 		return $this;
 	}
 

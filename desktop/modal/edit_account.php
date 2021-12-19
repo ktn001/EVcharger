@@ -39,7 +39,7 @@ if (!isConnect('admin')) {
         <label class='control-label col-sm-3'>{{Options}}:</label>
         <div class='col-sm-9'>
 	  <label class='checkbox-inline'>
-            <input class='accountAttr' type='checkbox' data-l1key='isEnable'>{{Activer}}</input>
+            <input class='accountAttr' type='checkbox' data-l1key='enabled'>{{Activer}}</input>
           </label>
         </div>
       </div>

@@ -46,7 +46,7 @@ function loadAccountCards() {
 			accounts = json_decode(data.result);
 			$('.accountThumbnailContainer').empty();
 			for (account of accounts) {
-				opacity = (account.isEnable == 1) ? '' : 'disableCard';
+				opacity = (account.enabled == 1) ? '' : 'disableCard';
 				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
 				html += '<img src="' + account.image + '"/>';
 				html += '<br/>';

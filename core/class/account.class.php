@@ -28,8 +28,9 @@ class account {
 	protected $type;
 	protected $name = "";
 	protected $id;
-	protected $isEnable;
+	private $enabled;
 	protected $image;
+	protected $modified = array();
 
     /*     * ***********************Methodes static************************** */
 
@@ -46,7 +47,9 @@ class account {
 	 * retourne l'account dont l'id est donné en argument
 	 */
 	public static function byId($id) {
-		return unserialize (config::byKey('account::' . $id, 'chargeurVE' ));
+		$account =  unserialize (config::byKey('account::' . $id, 'chargeurVE' ));
+		$account->resetModified();
+		return $account;
 	}
 
 	/*
@@ -57,6 +60,7 @@ class account {
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
+			$account->resetModified();
 			if ($account->getType() == $type) {
 				$accounts[] = $account;
 			}
@@ -72,6 +76,7 @@ class account {
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
+			$account->resetModified();
 			if ($account->getType() == $type and $account->getName() == $name) {
 				$accounts[] = $account;
 			}
@@ -87,6 +92,7 @@ class account {
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize($config['value']);
+			$account->resetModified();
 			if ( ! $enabled or $account->isEnabled()){
 				$accounts[] = $account;
 			}
@@ -148,6 +154,37 @@ class account {
 	}
 
 	/*
+	 * Retient qu'une propriété a été modififée mais pas sauvegardée
+	 */
+	protected function setModified($name){
+		if (! in_array($name, $this->modified)) {
+			$this->modified[] = $name;
+		}
+	}
+
+	/*
+	 * Indique si une propriérét a été modifiée depuis la derinère sauvegarde
+	 */
+	protected function isModified($name){
+		if (is_array($name)){
+			foreach ($name as $n){
+				if ($this->isModified($n)){
+					return true;
+				}
+			}
+			return false;
+		}
+		return in_array($name, $this->modified);
+	}
+
+	/*
+	 * Remet à zéro la liste de propriététs modifiées
+	 */
+	protected function resetModified(){
+		$this->modified = array();
+	}
+
+	/*
 	 * Enregistrement de l'account
 	 */
 	public function save($options = null) {
@@ -162,7 +199,6 @@ class account {
 			throw new Exception (__("Il exsite plusieurs compte de ce type nmmés ",__FILE__) . $this->name);
 		}
 		$onInsert = false;
-		$wasEnabled = false;
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
 				throw new Exception (__("Il y a déjà un compte de ce type nommé ",__FILE__) . $this->name);
@@ -176,7 +212,6 @@ class account {
 			if ( ! $accounts ) {
 				throw new Exception (__("La version précédente est introuvable",__FILE__));
 			}
-			$wasEnabled = $accounts[0]->isEnabled();
 			if (method_exists($this, 'preUpdate')) {
 				$this->preUpdate($options);
 			}
@@ -194,13 +229,14 @@ class account {
 		if (method_exists($this, 'postsave')) {
 			$this->postSave($options);
 		}
-		if ($wasEnabled xor $this->isEnabled()) {
-			if ($this->isEnable){
+		if ($this->isModified('enabled')) {
+			if ($this->enabled){
 				$this->startDeamondThread();
 			} else {
 				$this->stopDeamondThread();
 			}
 		}
+		$this->resetModified();
 	}
 
 	/*
@@ -288,23 +324,26 @@ class account {
 		return $this;
 	}
 
-	/** isEnable **/
-	public function getIsEnable() {
-		if ($this->isEnable == '' || !is_numeric($this->isEnable)){
+	/** enabled **/
+	public function getEnabled() {
+		if ($this->enabled == '' || !is_numeric($this->enabled)){
 			return 0;
 		}
-		return $this->isEnable;
+		return $this->enabled;
 	}
 
 	public function isEnabled() {
-		if ($this->getIsEnable() == 0) {
+		if ($this->getEnabled() == 0) {
 			return false;
 		}
 		return true;
 	}
 
-	public function setIsEnable($_isEnable) {
-		$this->isEnable = $_isEnable;
+	public function setEnabled($_enabled) {
+		if ($_enabled != $this->enabled) {
+			$this->setModified('enabled');
+		}
+		$this->enabled = $_enabled;
 		return $this;
 	}
 
@@ -317,6 +356,9 @@ class account {
 	}
 
 	public function setImage($_image) {
+		if ($_image != $this->image){
+			$this->setModified('image');
+		}
 		$this->image = $_image;
 		return $this;
 	}
@@ -327,6 +369,9 @@ class account {
 	}
 
 	public function setName($_name) {
+		if ($_name != $this->name){
+			$this->setModified('name');
+		}
 		$this->name = $_name;
 		return $this;
 	}

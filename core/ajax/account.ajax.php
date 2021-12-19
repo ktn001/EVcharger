@@ -29,7 +29,7 @@ try {
 	if (init('action') == 'save') {
 		try {
 			$data = json_decode(init('account'),true);
-			log::add("chargeurVE",'debug',init('account'));
+			log::add("chargeurVE",'debug',"Ajax: save: " . init('account'));
 			$options = json_decode(init('options'),true);
 			if ($data['type'] == ''){
 				throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
@@ -65,7 +65,7 @@ try {
 		$cards = array ();
 		foreach (account::all() as $account) {
 			$data = array(
-				'isEnable' => $account->getIsEnable(),
+				'enabled' => $account->IsEnabled(),
 				'id' => $account->getId(),
 				'type' => $account->getType(),
 				'humanName' => $account->getHumanName(true,true),

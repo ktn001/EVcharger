@@ -67,7 +67,7 @@ $accounts = account::all();
 	<div class="eqLogicThumbnailContainer">
 	    <?php
 	    foreach ($eqLogics as $eqLogic) {
-		$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
+		$opacity = ($eqLogic->getIsEnable) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 		echo '<img src="' . $eqLogic->getPathImg() . '"/>';
 		echo '<br>';
@@ -145,7 +145,7 @@ $accounts = account::all();
 			    <div class="form-group">
 				<label class="col-sm-3 control-label">{{Options}}</label>
 				<div class="col-sm-7">
-				    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
+				    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="enabled" checked/>{{Activer}}</label>
 				    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
 				</div>
 			    </div>
