@@ -164,6 +164,16 @@ class easeeAccount extends account {
 
 	}
 
+	public function postSave($options) {
+		if ($this->Modified(array('login','url'))){
+			if ( ! $this->Modified('enabled')){
+				$message['cmd'] = 'newToken';
+				$message['token'] = $this->token['token'];
+				$this->send2Deamond($message);
+			}
+		}
+	}
+
 	public function startDeamondThread() {
 		$message['cmd'] = 'start';
 		$message['token'] = $this->token['token'];
