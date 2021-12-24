@@ -33,16 +33,16 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
       <div class='col-sm-6'>
 
         <legend class='col-sm-12'><i class="fas fa-university"></i> {{Démon}}:</legend>
-	<label class="col-sm-2 control-label">
+        <label class="col-sm-2 control-label">
           {{Port}}
           <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
         </label>
         <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"/>
         <legend class='col-sm-12'><i class="fas fa-laptop"></i> {{Interface}}</legend>
-	<label class="col-sm-2 control-label">{{Confirme}}</label>
+        <label class="col-sm-2 control-label">{{Confirme}}</label>
         <label class='col-sm-10'>
           <input class="configKey" type="checkbox" data-l1key="confirmDelete"/>
-	  {{Suppressions}}
+          {{Suppressions}}
           <sup><i class="fas fa-question-circle" title="{{Demande de confirmation en cas de suppression d'un élément}}"></i></sup>
         </label>
       </div>
@@ -61,15 +61,18 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
           <tbody>
             <?php
             foreach (type::all(false) as $type) {
+              if ($type['type'][0] == '_') {
+                continue;
+              }
               $config = config::byKey('type::' . $type['type'],'chargeurVE');
               if ($config == '') {
-                      $cfg['tagColor'] = $defaultTagColor;
-                      $cfg['tagTextColor'] = $defaultTextTagColor;
-                      config::save('type::' . $type['type'],$cfg,'chargeurVE');
+                $cfg['tagColor'] = $defaultTagColor;
+                $cfg['tagTextColor'] = $defaultTextTagColor;
+                config::save('type::' . $type['type'],$cfg,'chargeurVE');
               }
               echo '<tr>';
               echo '<td>' . $type['label'] . '</td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="enable"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="enabled"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="customColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
@@ -84,7 +87,7 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
 </form>
 
 <script>
-$(".configKey[data-l1key^='type::'][data-l2key='enable']").on('change',function(){
+$(".configKey[data-l1key^='type::'][data-l2key='enabled']").on('change',function(){
 	if ($(this).value() == 1) {
 		return;
 	}

@@ -121,7 +121,7 @@ class account {
 		if($dir = opendir($path)) {
 			while (($fileName = readdir($dir)) !== false){
 				if (preg_match('/^account.*\.png$/',$fileName)){
-					$images[] = '/plugins/chargeurVE/desktop/img/' . $type . '/' . $fileName;
+					$images[] = strchr($path . '/' . $fileName, '/plugins/');
 				}
 			}
 			closedir($dir);
@@ -158,6 +158,7 @@ class account {
 	 */
 	protected function setModified($name){
 		if (! in_array($name, $this->modified)) {
+			log::add("chargeurVE","debug", $this->getHumanName() . " " . $name . __(" est modifié.",__FILE__));
 			$this->modified[] = $name;
 		}
 	}

@@ -50,10 +50,10 @@ function selectAccountType_actualizeTypes() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            types = json_decode(data.result);
             $('#selectAccountType select').empty();
-            for (type in types) {
-                option = '<option value="' + type + '">' + types[type] + '</option>';
+            labels = json_decode(data.result);
+            for (type in labels) {
+                option = '<option value="' + type + '">' + labels[type] + '</option>';
                 $('#selectAccountType select').append(option);
             }
         },

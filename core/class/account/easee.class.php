@@ -38,9 +38,7 @@ class easeeAccount extends account {
 	public static function cronHourly() {
 		foreach (self::byType('easee') as $account) {
 			$account->renewApiToken();
-			$message['action'] = "newKey";
-			$message['key'] = $account->token['token'];
-			$account->send2deamond($message);
+			$account->save();
 		}
 	}
 
@@ -93,27 +91,18 @@ class easeeAccount extends account {
 			'accessToken' => $this->token['token'],
 			'refreshToken' => $this->token['refreshToken']
 		);
-		$reponse = $this->sendRequest('/api/accounts/refresh_token', $data);
-		$this->token = array(
-			'token' => $reponse['accessToken'],
-			'expiresAt' => time() + $reponse['expiresIn'],
-			'refreshToken' => $reponse['refreshToken'],
-		);
-		$this->log("info","Account " . $this->getHumanName(false) . ": " . __('token renouvelé.',__FILE__));
-		$this->save();
+		$response = $this->sendRequest('/api/accounts/refresh_token', $data);
+		$this->setToken($response);
+		$this->log("info", __('token renouvelé.',__FILE__));
 	}
  
-	private function setApiToken($password = '') {
+	private function retreiveToken($password = '') {
 		$data = array(
 			'userName' => $this->getLogin(),
 			'password' => $password
 		);
-		$reponse = $this->sendRequest('/api/accounts/token', $data);
-		$this->token = array(
-			'token' => $reponse['accessToken'],
-			'expiresAt' => time() + $reponse['expiresIn'],
-			'refreshToken' => $reponse['refreshToken'],
-		);
+		$response = $this->sendRequest('/api/accounts/token', $data);
+		$this->setToken($response);
 	}
 
 	private function deleteApiToken() {
@@ -136,37 +125,36 @@ class easeeAccount extends account {
 
 		if ($this->IsEnabled() == 1 and $password == null ) {
 			if (! is_array($this->token)) {
-				$this->log('chargeurVE','debug', __("Un nouveau token doit être créé.",__FILE__));
+				$this->log('debug', __("Un nouveau token doit être créé.",__FILE__));
 				throw new Exception  (__("Un nouveau token doit être créé.",__FILE__),1);
 			}
 			if (time() > $this->token['expiresAt']){
-				$this->log('chargeurVE','debug', __("Le token a expiré.",__FILE__));
+				$this->log('debug', __("Le token a expiré.",__FILE__));
 				throw new Exception  (__("Le token a expiré.",__FILE__),1);
 			}
 			$old = self::byId($this->getId());
 			if (! is_object($old)) {
-				$this->log('chargeurVE','debug', __("Nouveau compte",__FILE__));
+				$this->log('debug', __("Nouveau compte",__FILE__));
 				throw new Exception  (__("Nouveau compte",__FILE__),1);
 			}
 			if ($this->getLogin() != $old->getLogin()) {
-				$this->log('chargeurVE','debug', __("Le login a changé",__FILE__));
+				$this->log('debug', __("Le login a changé",__FILE__));
 				throw new Exception  (__("Le login a changé",__FILE__),1);
 			}
 			if ($this->getUrl() != $old->getUrl()) {
-				$this->log('chargeurVE','debug', __("L'URL a changé",__FILE__));
+				$this->log('debug', __("L'URL a changé",__FILE__));
 				throw new Exception  (__("L'URL a changé",__FILE__),1);
 			}
 		} elseif ($this->IsEnabled() == 1 ) {
-			$this->setApiToken($password);
+			$this->retreiveToken($password);
 		} else {
 			$this->deleteApiToken();
 		}
-
 	}
 
 	public function postSave($options) {
-		if ($this->Modified(array('login','url'))){
-			if ( ! $this->Modified('enabled')){
+		if ($this->isModified(array('token'))){
+			if ( ! $this->isModified('enabled')){
 				$message['cmd'] = 'newToken';
 				$message['token'] = $this->token['token'];
 				$this->send2Deamond($message);
@@ -206,5 +194,19 @@ class easeeAccount extends account {
 
 	public function getUrl() {
 		return $this->url;
+	}
+
+	/* ApiToken */
+
+	public function setToken($_token) {
+		$this->log("debug",print_r($_token,true));
+		if ($_token['token'] != $this->token['token']) {
+			$this->setModified('token');
+		}
+		$this->token = array(
+			'token' => $_token['accessToken'],
+			'expiresAt' => time() + $_token['expiresIn'],
+			'refreshToken' => $_token['refreshToken'],
+		);
 	}
 }

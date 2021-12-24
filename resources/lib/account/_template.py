@@ -1,4 +1,4 @@
 from account.account import account
 
-class template(account):
+class _template(account):
     pass

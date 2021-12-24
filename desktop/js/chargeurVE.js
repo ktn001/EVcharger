@@ -422,9 +422,10 @@ function loadSelectAccount() {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
-				selectedId = $('#selectAccount select').value();
-				$('#selectAccount').empty();
-			datas = json_decode(data.result,true);
+			selectedId = $('#selectAccount select').value();
+			$('#selectAccount').empty();
+			datas = json_decode(data.result);
+			console.log(data.result);
 			content = '<select class="eqLogicAttr" data-l1key="configuration" data-l2key="account">';
 			for (data of datas) {
 				selected = data.id == selectedId ? "selected" : "";
@@ -455,10 +456,9 @@ function printEqLogic (data) {
 	if ($('.eqLogicAttr[data-l1key=logicalId]').value() == "chargeur"){
 		$('.carParams').remove();
 		loadSelectAccount();
-		loadSelectImg();
+		//loadSelectImg();
 	}
 	if ($('.eqLogicAttr[data-l1key=logicalId]').value() == "car"){
 		$('.chargeurParams').remove();
 	}
-
 }

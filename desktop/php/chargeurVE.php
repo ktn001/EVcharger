@@ -5,8 +5,8 @@ if (!isConnect('admin')) {
 // Déclaration des variables obligatoires
 $plugin = plugin::byId('chargeurVE');
 sendVarToJS('eqType', $plugin->getId());
-sendVarToJS('typeLabels',type::labels(false));
 sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
+sendVarToJS('typeLabels',type::labels());
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
@@ -158,13 +158,8 @@ $accounts = account::all();
 			    <div class='chargeurParams form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
 				<div id="selectAccount" class="col-sm-7">
-					<select class="eqLogicAttr" data-l1key="configuration" data-l2key="account">
-					<?php
-					foreach (account::all() as $account){
-					    echo '<option value="' . $account->getId() . '">' . $account->getHumanName() . '</option>';
-					}
-					?>
-					</select>
+				    <select class="eqLogicAttr" data-l1key="configuration" data-l2key="account">
+				    </select>
 				</div>
 			    </div>
 			    <!--
@@ -189,13 +184,6 @@ $accounts = account::all();
 				<div class="text-center">
 				    <img name="icon_visu" src="<?= $plugin->getPathImgIcon(); ?>" style="max-width:160px;"/>
 				    <select id="selectChargeurImg" class="eqLogicAttr" data-l1key="configuration" data-l2key="image">
-				    <?php
-					foreach ($chargeursDefs as $def) {
-					    foreach ($def['images'] as $image) {
-						echo "<option value='" . $image . "'>" . $image . "</option>";
-					    }
-					}
-				    ?>
 				    </select>
 				</div>
 			    </div>

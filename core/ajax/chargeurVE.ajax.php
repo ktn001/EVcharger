@@ -27,8 +27,7 @@ try {
 	}
 
 	if (init('action') == 'typeLabels') {
-		$json = json_encode(type::labels());
-		ajax::success($json);
+		ajax::success(json_encode(type::labels()));
 	}
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));

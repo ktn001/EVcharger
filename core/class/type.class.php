@@ -41,8 +41,13 @@ class type {
 					throw new Exception ($message);
 				}	
 				$type['label'] = translate::exec($type['label'],__FILE__);
-				$type = array_merge($type, config::byKey('type::' . $type['type'],'chargeurVE'));
-				if (($onlyEnabled == false) or ($type['enable'] == 1)) {
+				$config = config::byKey('type::' . $type['type'],'chargeurVE');
+				if (is_array($config)) {
+					$type = array_merge($type, $config);
+				} else {
+					$type['enabled'] = 0;
+				}
+				if (($onlyEnabled == false) or ($type['enabled'] == 1)) {
 					$types[$type['type']] = $type;
 				}
 			}

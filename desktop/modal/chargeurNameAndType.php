@@ -39,12 +39,12 @@ if (!isConnect('admin')) {
 </div>
 
 <script>
-function mod_cargeurNameAndType_actualizeTypes() {
+function mod_chargeurNameAndType_actualizeTypes() {
     $.ajax({
         type: 'POST',
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
-            action: 'chargeurTypes',
+            action: 'typeLabels',
         },
         dataType: 'json',
         global: false,
@@ -56,8 +56,8 @@ function mod_cargeurNameAndType_actualizeTypes() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            types = json_decode(data.result);
             $('#mod_chargeurNameAndType select').empty();
+            types = json_decode(data.result);
             for (type of types) {
                 option = '<option value="' + type.type + '">' + type.label + '</option>';
                 $('#mod_chargeurNameAndType select').append(option);
@@ -74,7 +74,7 @@ function mod_chargeurNameAndType(action) {
 
 $('#mod_chargeurNameAndType').dialog({
     focus: function (event, ui) {
-        mod_cargeurNameAndType_actualizeTypes();
+	    mod_chargeurNameAndType_actualizeTypes();
     }
 })
 
