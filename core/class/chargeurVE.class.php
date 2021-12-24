@@ -197,15 +197,20 @@ class chargeurVE extends eqLogic {
      * retourne la liste des images de chargeur pour un type
      */
     public static function images($type) {
-	$image = array();
-	$path = realpath(__DIR__ . "/../../desktop/img" . $type);
-	if($dir = opendir($path)){
-	    while (($fileName = readdir($dir)) !== false){
-		if (preg_matc('/^chargeur.*\.png$/',$fileName)){
-		    $images[] = $path . "/" . $type . "/" . $fileName;
-		}
-	    }
-	}
+        $image = array();
+        $path = realpath(__DIR__ . "/../../desktop/img" . $type);
+        if($dir = opendir($path)){
+            while (($fileName = readdir($dir)) !== false){
+                if (preg_matc('/^chargeur.*\.png$/',$fileName)){
+                    $images[] = strchr($path . "/" . $type . "/" . $fileName, '/plugins/');
+                }
+            }
+            closedir($dir);
+        }
+        if (count($images) == 0){
+            $images[] = realpath(__DIR__ . '/../../desktop/img/chargeur.png';
+        }
+        return $images;
     }
 
     /*     * *********************Méthodes d'instance************************* */
