@@ -217,14 +217,21 @@ class chargeurVE extends eqLogic {
 
  // Fonction exécutée automatiquement avant la création de l'équipement
     public function preInsert() {
+	    $this->setConfiguration('image',$this->images($this->getConfiguration('type'))[0]);
     }
 
  // Fonction exécutée automatiquement après la création de l'équipement
     public function postInsert() {
-	$configPath = __DIR__ . "/../config";
-	log::add("chargeurVE","info","configPath " . print_r($configPath, true));
-	$defaultCmdConfig = parse_ini_file ($configPath . '/cmd.config.ini', true);
-	log::add("chargeurVE","info","PostInsert " . print_r($defaultCmdConfig, true));
+        foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
+	    log::add("chargeurVE","debug","88 " . print_r($config,true));
+            $cmd = new chargeurVECMD();
+            $cmd->setEqLogic_id($this->getId());
+            $cmd->setName(__($config['name'],__FILE__));
+            $cmd->setLogicalId($logicalId);
+            $cmd->setType($config['type']);
+            $cmd->setSubType($config['subType']);
+            $cmd->save();
+        }
     }
 
  // Fonction exécutée automatiquement avant la mise à jour de l'équipement
@@ -270,7 +277,7 @@ class chargeurVE extends eqLogic {
     }
      */
 
-    public function getPathImg () {
+    public function getPathImg() {
         $image = $this->getConfiguration('image');
         if ($image == '') {
             return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";

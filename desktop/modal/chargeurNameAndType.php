@@ -75,6 +75,7 @@ function mod_chargeurNameAndType(action) {
 
 $('#mod_chargeurNameAndType').dialog({
     focus: function (event, ui) {
+	    $('.eqLogicAttr[data-l1key=name]').val("");
 	    mod_chargeurNameAndType_actualizeTypes();
     }
 })

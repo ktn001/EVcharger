@@ -75,6 +75,23 @@ class type {
 		return array_keys($used);
 	}
 
+	public static function commands($type, $mandatoryOnly = false) {
+		$configPath = __DIR__ . '/../config';
+		$configFile = 'cmd.config.ini';
+		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true);
+		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true);
+		$return = array();
+		foreach ($defaultCommands as $logicalId => $cmdConfig) {
+			if (array_key_exists($logicalId, $typeCommands)) {
+				$cmdConfig = array_merge($cmdConfig, $typeCommands[$logicalId]);
+			}
+			if ( ! $mandatoryOnly or $cmdConfig['mandatory']) {
+				$return[] = $cmdConfig;
+			}
+		}
+		return $return;
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 }
