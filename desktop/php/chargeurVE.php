@@ -67,7 +67,7 @@ $accounts = account::all();
 	<div class="eqLogicThumbnailContainer">
 	    <?php
 	    foreach ($eqLogics as $eqLogic) {
-		$opacity = ($eqLogic->getIsEnable) ? '' : 'disableCard';
+		$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
 		echo '<img src="' . $eqLogic->getPathImg() . '"/>';
 		echo '<br>';
@@ -157,8 +157,14 @@ $accounts = account::all();
 			    -->
 			    <div class='chargeurParams form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
+				<!--
 				<div id="selectAccount" class="col-sm-7">
 				    <select class="eqLogicAttr" data-l1key="configuration" data-l2key="account">
+				    </select>
+				</div>
+			    	-->
+				<div class="col-sm-7">
+				    <select id="selectAccount" class="eqLogicAttr" data-l1key="configuration" data-l2key="account">
 				    </select>
 				</div>
 			    </div>

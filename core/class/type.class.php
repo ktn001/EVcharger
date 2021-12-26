@@ -25,63 +25,46 @@ class type {
 
     /*     * ***********************Methodes static************************** */
 	public static function all( $onlyEnabled = true ) {
-		try{
-			$dirPath = __DIR__ . "/../../data";
-			$dir = opendir($dirPath);
-		} catch (Exceptionn $e) {
-			log::add('chargeurVE','error',$e->getMessage() . ' File: ' . $e->getFile . ' Line: ' . $e->getLine());
+		$typesFile = __DIR__ . "/../config/types.ini";
+		$types = parse_ini_file($typesFile,true);
+		if ($types == false) {
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$typesFile);
+			log::add("chargeurVE",error,$message);
+			throw new Exception($message);
 		}
-		$types = array();
-		while ($file = readdir($dir)){
-			if (substr_compare($file, '.type.ini', -9) == 0){
-				$type = parse_ini_file ($dirPath . '/' . $file);
-				if ($type === false) {
-					$message = __(sprintf('Erreur lors de la lecture de %s', $file),__FILE__);
-					log::add('chargeurVE','error',$message);
-					throw new Exception ($message);
-				}	
-				$type['label'] = translate::exec($type['label'],__FILE__);
-				$config = config::byKey('type::' . $type['type'],'chargeurVE');
-				if (is_array($config)) {
-					$type = array_merge($type, $config);
-				} else {
-					$type['enabled'] = 0;
-				}
-				if (($onlyEnabled == false) or ($type['enabled'] == 1)) {
-					$types[$type['type']] = $type;
-				}
+		$result = array();
+		foreach ($types as $typeName => $config){
+			$config['label'] = translate::exec($config['label'],__FILE__);
+			$type = config::byKey('type::' . $typeName, 'chargeurVE');
+			if (is_array($type)){
+				$type = array_merge($config, $type);
+			} else {
+				$type = $config;
+				$type['enabled'] = 0;
+			}
+			if ($onlyEnabled == false or $type['enabled'] == 1) {
+				$result[$typeName] = $type;
 			}
 		}
-		closedir($dir);
-		return $types;
+		return $result;
 	}
 
 	public static function types() {
-		try{
-			$dir = opendir("../../data");
-		} catch (Exceptionn $e) {
-			log::add('chargeurVE','error',$e->getMessage() . ' File: ' . $e->getFile . ' Line: ' . $e->getLine());
-		}
-		$types = array();
-		while ($file = readdir($dir)){
-			if (substr_compare($file, '.type.ini', -9) == 0){
-				$types[] = substr_replace($file,"",-9);
-			}
-		}
-		closedir($dir);
-		return $types;
+		$typesFile = __DIR__ . "/../config/types.ini";
+		$types = parse_ini_file($typesFile,true);
+		return array_keys($types);
 	}
 
 	public static function labels ( $onlyEnabled = true) {
 		$labels = array();
-		foreach (type::all($onlyEnabled) as $type) {
-			$labels[$type['type']] = $type['label'];
+		foreach (type::all($onlyEnabled) as $typeName => $type) {
+			$labels[$typeName] = $type['label'];
 		}
 		return $labels;
 	}
 
-	public static function byName ( $type ) {
-		return self::all()[$type];
+	public static function byName ( $typeName ) {
+		return self::all()[$typeName];
 	}
 
 	public static function allUsed () {

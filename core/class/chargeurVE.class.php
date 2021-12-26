@@ -198,17 +198,17 @@ class chargeurVE extends eqLogic {
      */
     public static function images($type) {
         $image = array();
-        $path = realpath(__DIR__ . "/../../desktop/img" . $type);
+        $path = realpath(__DIR__ . "/../../desktop/img/" . $type);
         if($dir = opendir($path)){
             while (($fileName = readdir($dir)) !== false){
-                if (preg_matc('/^chargeur.*\.png$/',$fileName)){
-                    $images[] = strchr($path . "/" . $type . "/" . $fileName, '/plugins/');
+                if (preg_match('/^chargeur.*\.png$/',$fileName)){
+                    $images[] = strchr($path . "/" . $fileName, '/plugins/');
                 }
             }
             closedir($dir);
         }
         if (count($images) == 0){
-            $images[] = realpath(__DIR__ . '/../../desktop/img/chargeur.png';
+            $images[] = strchr(realpath(__DIR__ . '/../../desktop/img/chargeur.png'),'/plugins/');
         }
         return $images;
     }
@@ -221,6 +221,10 @@ class chargeurVE extends eqLogic {
 
  // Fonction exécutée automatiquement après la création de l'équipement
     public function postInsert() {
+	$configPath = __DIR__ . "/../config";
+	log::add("chargeurVE","info","configPath " . print_r($configPath, true));
+	$defaultCmdConfig = parse_ini_file ($configPath . '/cmd.config.ini', true);
+	log::add("chargeurVE","info","PostInsert " . print_r($defaultCmdConfig, true));
     }
 
  // Fonction exécutée automatiquement avant la mise à jour de l'équipement
@@ -269,9 +273,9 @@ class chargeurVE extends eqLogic {
     public function getPathImg () {
         $image = $this->getConfiguration('image');
         if ($image == '') {
-            return "plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+            return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
         }
-        return "plugins/chargeurVE/desktop/img/" . $image;
+        return $image;
     }
 
     /*     * **********************Getteur Setteur*************************** */

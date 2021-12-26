@@ -333,7 +333,7 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 });
 
 $('#selectChargeurImg').on('change',function(){
-	$('[name=icon_visu]').attr('src', "plugins/chargeurVE/desktop/img/" + $(this).value());
+	$('[name=icon_visu]').attr('src', $(this).value());
 });
 
 /*
@@ -404,7 +404,7 @@ function addCmdToTable(_cmd) {
 /*
  * Chargement de la liste des choix des accounts
  */
-function loadSelectAccount() {
+function loadSelectAccount(defaut) {
 	$.ajax({
 		type: 'POST',
 		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
@@ -422,43 +422,53 @@ function loadSelectAccount() {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
-			selectedId = $('#selectAccount select').value();
 			$('#selectAccount').empty();
 			datas = json_decode(data.result);
-			console.log(data.result);
-			content = '<select class="eqLogicAttr" data-l1key="configuration" data-l2key="account">';
+			content = "";
 			for (data of datas) {
-				selected = data.id == selectedId ? "selected" : "";
-				content += '<option value="' + data.id + '" ' + selected + '>' + data.value + '</option>';
+				content += '<option value="' + data.id + '">' + data.value + '</option>';
 			}
-			content += '</select>';
-			$('#selectAccount').append(content);
+			$('#selectAccount').append(content).val(defaut).trigger('change');
 		}
 	});
 }
 
-function loadSelectImg() {
-	chargeurType = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
-	selectedImg = $('#selectChargeurImg').value();
-	content = "";
-	for (defs of chargeursDefs) {
-		if (defs.type == chargeurType) {
-			for (img of defs.images) {
-				selected =  img == selectedImg ? "selected" : "";
-				content += '<option value="' + img + '" ' + selected + '>' + img + '</option>';
+function loadSelectImg(defaut) {
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		data: {
+			action: 'images',
+			type: $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value(),
+		},
+		dataType : 'json',
+		global:false,
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
 			}
+			$('#selectChargeurImg').empty();
+			images = json_decode(data.result);
+			options = "";
+			for (image of images) {
+				splitPath = image.split('/').reverse();
+				if (splitPath[1] != 'img') {
+					display = splitPath[1] + '/' + splitPath[0];
+				} else {
+					display = splitPath[0];
+				}
+				options += '<option value="' + image + '">' + display + '</option>';
+			}
+			$('#selectChargeurImg').append(options).val(defaut).trigger('change');
 		}
-	}
-	$('#selectChargeurImg').empty().append(content).trigger('change');
+	})
 }
 
 function printEqLogic (data) {
-	if ($('.eqLogicAttr[data-l1key=logicalId]').value() == "chargeur"){
-		$('.carParams').remove();
-		loadSelectAccount();
-		//loadSelectImg();
-	}
-	if ($('.eqLogicAttr[data-l1key=logicalId]').value() == "car"){
-		$('.chargeurParams').remove();
-	}
+	loadSelectAccount(data.configuration.account);
+	loadSelectImg(data.configuration.image);
 }

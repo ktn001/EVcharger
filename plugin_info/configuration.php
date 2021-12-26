@@ -25,6 +25,7 @@ include_file('core', 'chargeurVE', 'class', 'chargeurVE');
 sendVarToJS('usedTypes',type::allUsed());
 $defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
 $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
+$defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'];
 ?>
 
 <form class="form-horizontal">
@@ -37,7 +38,7 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
           {{Port}}
           <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
         </label>
-        <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'] ?>"/>
+        <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo $defaultPort ?>"/>
         <legend class='col-sm-12'><i class="fas fa-laptop"></i> {{Interface}}</legend>
         <label class="col-sm-2 control-label">{{Confirme}}</label>
         <label class='col-sm-10'>
@@ -60,11 +61,11 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
           </thead>
           <tbody>
             <?php
-            foreach (type::all(false) as $type) {
-              if ($type['type'][0] == '_') {
+            foreach (type::all(false) as $typeName => $type) {
+              if ($typeName[0] == '_') {
                 continue;
               }
-              $config = config::byKey('type::' . $type['type'],'chargeurVE');
+              $config = config::byKey('type::' . $typeName,'chargeurVE');
               if ($config == '') {
                 $cfg['tagColor'] = $defaultTagColor;
                 $cfg['tagTextColor'] = $defaultTextTagColor;
@@ -72,10 +73,10 @@ $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE
               }
               echo '<tr>';
               echo '<td>' . $type['label'] . '</td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="enabled"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $type['type'] . '" data-l2key="customColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $type['type'] . '" data-l2key="tagTextColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $typeName . '" data-l2key="enabled"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $typeName . '" data-l2key="customColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $typeName . '" data-l2key="tagColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $typeName . '" data-l2key="tagTextColor"/></td>';
               echo '</tr>';
             }
             ?>

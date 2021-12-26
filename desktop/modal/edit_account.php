@@ -87,7 +87,6 @@ mod_editAccount = {
 		for (image of images) {
 			console.log(image)
 			splitPath = image.split('/').reverse();
-			console.log(splitPath)
 			if (splitPath[1] != 'img') {
 				display = splitPath[1] + "/" + splitPath[0];
 			} else {

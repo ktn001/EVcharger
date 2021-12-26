@@ -38,7 +38,7 @@ function selectAccountType_actualizeTypes() {
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
             action: 'typeLabels',
-            onlyEnbled: 1,
+            onlyEnabled: 1,
         },
         dataType: 'json',
         global: false,

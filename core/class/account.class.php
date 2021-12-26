@@ -28,7 +28,7 @@ class account {
 	protected $type;
 	protected $name = "";
 	protected $id;
-	private $enabled;
+	protected $enabled;
 	protected $image;
 	protected $modified = array();
 
@@ -327,7 +327,7 @@ class account {
 
 	/** enabled **/
 	public function getEnabled() {
-		if ($this->enabled == '' || !is_numeric($this->enabled)){
+		if ($this->enabled == ''){
 			return 0;
 		}
 		return $this->enabled;

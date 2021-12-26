@@ -45,6 +45,7 @@ function mod_chargeurNameAndType_actualizeTypes() {
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
             action: 'typeLabels',
+	    onlyEnable: 1,
         },
         dataType: 'json',
         global: false,
@@ -57,9 +58,9 @@ function mod_chargeurNameAndType_actualizeTypes() {
                 return;
             }
             $('#mod_chargeurNameAndType select').empty();
-            types = json_decode(data.result);
-            for (type of types) {
-                option = '<option value="' + type.type + '">' + type.label + '</option>';
+            labels = json_decode(data.result);
+            for (type in labels) {
+                option = '<option value="' + type + '">' + labels[type] + '</option>';
                 $('#mod_chargeurNameAndType select').append(option);
             }
         },

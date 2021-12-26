@@ -30,6 +30,14 @@ try {
 		ajax::success(json_encode(type::labels()));
 	}
 
+	if (init('action') == 'images') {
+		$type = init('type');
+		if ($type == '') {
+			throw new Exception(__("Le type de chargeur n'est pas indiqué",__FILE__));
+		}
+		ajax::success(json_encode(chargeurVE::images($type)));
+	}
+
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
