@@ -108,7 +108,7 @@ try {
 		}
 		$result['account'] = utils::o2a($account);
 		$result['params'] = ($type . "Account")::paramsToEdit();
-		$result['images'] = account::images($type);
+		$result['images'] = type::images($type, 'account');
 		ajax::success(json_encode($result));
 	}
 

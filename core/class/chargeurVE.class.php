@@ -193,31 +193,11 @@ class chargeurVE extends eqLogic {
 
     /*     * ********************Methode static ************************** */
 
-    /*
-     * retourne la liste des images de chargeur pour un type
-     */
-    public static function images($type) {
-        $image = array();
-        $path = realpath(__DIR__ . "/../../desktop/img/" . $type);
-        if($dir = opendir($path)){
-            while (($fileName = readdir($dir)) !== false){
-                if (preg_match('/^chargeur.*\.png$/',$fileName)){
-                    $images[] = strchr($path . "/" . $fileName, '/plugins/');
-                }
-            }
-            closedir($dir);
-        }
-        if (count($images) == 0){
-            $images[] = strchr(realpath(__DIR__ . '/../../desktop/img/chargeur.png'),'/plugins/');
-        }
-        return $images;
-    }
-
     /*     * *********************Méthodes d'instance************************* */
 
  // Fonction exécutée automatiquement avant la création de l'équipement
     public function preInsert() {
-	    $this->setConfiguration('image',$this->images($this->getConfiguration('type'))[0]);
+	    $this->setConfiguration('image',type::images($this->getConfiguration('type'),'chargeur')[0]);
     }
 
  // Fonction exécutée automatiquement après la création de l'équipement

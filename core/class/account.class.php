@@ -112,26 +112,6 @@ class account {
 		);
 	}
 
-	/*
-	 * Retourne la liste des images d'account pour le type de plugin
-	 */
-	public static function images($type) {
-		$images = array();
-		$path = realpath(__DIR__ . "/../../desktop/img/". $type);
-		if($dir = opendir($path)) {
-			while (($fileName = readdir($dir)) !== false){
-				if (preg_match('/^account.*\.png$/',$fileName)){
-					$images[] = strchr($path . '/' . $fileName, '/plugins/');
-				}
-			}
-			closedir($dir);
-		}
-		if (count($images) == 0){
-			$images[] = "/plugins/chargeurVE/desktop/img/account.png";
-		}
-		return $images;
-	}
-
 	public static function cronHourly() {
 		easeeAccount::cronHourly();
 	}

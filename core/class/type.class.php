@@ -21,10 +21,8 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__ . '/../php/chargeurVE.inc.php';
 
 class type {
-    /*     * *************************Attributs****************************** */
-
     /*     * ***********************Methodes static************************** */
-	public static function all( $onlyEnabled = true ) {
+	public static function all($onlyEnabled = true ) {
 		$typesFile = __DIR__ . "/../config/types.ini";
 		$types = parse_ini_file($typesFile,true);
 		if ($types == false) {
@@ -55,7 +53,7 @@ class type {
 		return array_keys($types);
 	}
 
-	public static function labels ( $onlyEnabled = true) {
+	public static function labels($onlyEnabled = true) {
 		$labels = array();
 		foreach (type::all($onlyEnabled) as $typeName => $type) {
 			$labels[$typeName] = $type['label'];
@@ -63,16 +61,35 @@ class type {
 		return $labels;
 	}
 
-	public static function byName ( $typeName ) {
+	public static function byName($typeName ) {
 		return self::all()[$typeName];
 	}
 
-	public static function allUsed () {
+	public static function allUsed() {
 		$used = array();
 		foreach (account::all() as $account) {
 			$used[$account->getType()] = 1;
 		}
 		return array_keys($used);
+	}
+
+	public static function images($type, $objet) {
+		$images = array();
+		$path = realpath(__DIR__ . '/../../desktop/img/' . $type);
+		if ($dir = opendir($path)){
+			log::add("chargeurVE","debug","path : " . $path);
+			log::add("chargeurVE","debug","objet : " . $objet);
+			while (($fileName = readdir($dir)) !== false){
+				log::add("chargeurVE","debug","file : " . $fileName);
+				if (preg_match('/^' . $objet . '.*\.png$/', $fileName)){
+					$images[] = strchr($path.'/'.$fileName, '/plugins/');
+				}
+			}
+		}
+		if (count($images) == 0){
+			$images[] = strchr(realpath(__DIR__.'/../../desktop/img/'.$objet.'.png'),'/plugins/');
+		}
+		return $images;
 	}
 
 	public static function commands($type, $mandatoryOnly = false) {
@@ -86,7 +103,7 @@ class type {
 				$cmdConfig = array_merge($cmdConfig, $typeCommands[$logicalId]);
 			}
 			if ( ! $mandatoryOnly or $cmdConfig['mandatory']) {
-				$return[] = $cmdConfig;
+				$return[$logicalId] = $cmdConfig;
 			}
 		}
 		return $return;
