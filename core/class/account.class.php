@@ -123,7 +123,7 @@ class account {
 	 */
 	public function __construct() {
 		$this->type = substr_replace(get_class($this),'',-7);
-		$this->image = self::images($this->type)[0];
+		$this->image = type::images($this->type,'account')[0];
 	}
 
 	/*
@@ -224,6 +224,9 @@ class account {
 	 * suppression de l'account
 	 */
 	public function remove() {
+		if (chargeurVE::byAccountId($this->id)) {
+			throw new Exception (__("Au moins un chargeur est liée à l'account",__FILE__));
+		}
 		if (method_exists($this, 'preRemove')) {
 			$this->preRemove();
 		}

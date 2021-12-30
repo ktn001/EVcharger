@@ -21,7 +21,9 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__ . '/../php/chargeurVE.inc.php';
 
 class type {
+
     /*     * ***********************Methodes static************************** */
+
 	public static function all($onlyEnabled = true ) {
 		$typesFile = __DIR__ . "/../config/types.ini";
 		$types = parse_ini_file($typesFile,true);

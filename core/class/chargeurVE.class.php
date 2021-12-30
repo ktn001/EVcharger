@@ -23,19 +23,6 @@ require_once __DIR__  . '/account.class.php';
 class chargeurVE extends eqLogic {
     /*     * *************************Attributs****************************** */
 
-    /*     * ***********************Methode static*************************** */
-
-    public static function isTypeEnable($type) {
-        $config = config::bykey('chargeurVE::' . $type, 'chargeurVE');
-        $enabled = false;
-        if (is_Array($config) and array_key_exists('enable',$config)) {
-            if ($config['enable'] == 1){
-                $enabled = true;
-            }
-        }
-        return $enabled;
-    }
-
     /*     * **********************Gestion du daemon************************* */
 
     /*
@@ -145,6 +132,11 @@ class chargeurVE extends eqLogic {
         return $return;
     }
 
+    /*     * ***********************Methode static*************************** */
+    public static function byAccountId($accountId) {
+	    return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
+    }
+
     /*     * ************************Les crons**************************** */
 
     /*
@@ -191,7 +183,6 @@ class chargeurVE extends eqLogic {
     }
      */
 
-    /*     * ********************Methode static ************************** */
 
     /*     * *********************Méthodes d'instance************************* */
 
