@@ -13,10 +13,14 @@ $accounts = account::all();
 ?>
 
 <div class="row row-overflow">
+    <!-- ======================== -->
     <!-- Page d'accueil du plugin -->
+    <!-- ======================== -->
     <div class="col-xs-12 eqLogicThumbnailDisplay">
-	<legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
+
 	<!-- Boutons de gestion du plugin -->
+	<!-- ============================ -->
+	<legend><i class="fas fa-cog"></i>  {{Gestion}}</legend>
 	<div class="eqLogicThumbnailContainer">
 	    <div class="cursor accountAction logoPrimary" data-action="add">
 		<i class="fas fa-user-plus"></i>
@@ -38,32 +42,34 @@ $accounts = account::all();
 		<br>
 		<span>{{Configuration}}</span>
 	    </div>
-	</div>
+	</div> <!-- Boutons de gestion du plugin -->
 
 	<!-- Les accounts -->
+	<!-- ============ -->
 	<legend><i class="fas fa-user"></i> {{Mes comptes}}</legend>
 	<!-- Champs de recherche des accounts -->
-	<div class="input-group" style="margin:5px;">
+	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchAccount"/>
 	    <div class="input-group-btn">
 		<a id="bt_resetAccountSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 	    </div>
-	</div>
+	</div> <!-- Champs de recherche des accounts -->
 	<!-- Liste des accounts -->
-	<!-- <div class="accountThumbnailContainer"> -->
 	<div class="accountThumbnailContainer">
-	</div>
+	</div> <!-- Liste des accounts -->
+	<!-- Les accounts -->
 
 	<!-- Les chargeurs -->
+	<!-- ============= -->
 	<legend><i class="fas fa-charging-station"></i> {{Mes chargeurs}}</legend>
 	<!-- Champ de recherche des chargeur -->
-	<div class="input-group" style="margin:5px;">
+	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic"/>
 	    <div class="input-group-btn">
 		<a id="bt_resetSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 	    </div>
-	</div>
-	<!-- Liste des chargeurs  -->
+	</div> <!-- Champ de recherche des chargeur -->
+	<!-- Liste des chargeurs -->
 	<div class="eqLogicThumbnailContainer">
 	    <?php
 	    foreach ($eqLogics as $eqLogic) {
@@ -75,23 +81,29 @@ $accounts = account::all();
 		echo '</div>';
 	    }
 	    ?>
-	</div>
+	</div> <!-- Liste des chargeurs -->
     </div> <!-- Page d'accueil du plugin -->
 
-    <!-- Page de présentation de l'équipement -->
+    <!-- =================================== -->
+    <!-- Page de configuration d'un chargeur -->
+    <!-- =================================== -->
     <div class="col-xs-12 eqLogic" style="display: none;">
+
 	<!-- barre de gestion de l'équipement -->
+	<!-- ================================ -->
 	<div class="input-group pull-right" style="display:inline-flex;">
 	    <span class="input-group-btn">
 		<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
 		<a class="btn btn-sm btn-default eqLogicAction roundedLeft" data-action="configure"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Configuration avancée}}</span>
-		</a><a class="btn btn-sm btn-default eqLogicAction" data-action="copy"><i class="fas fa-copy"></i><span class="hidden-xs">  {{Dupliquer}}</span>
+		</a><a class="btn btn-sm btn-default eqLogicAction" data-action="copy"><i class="fas fa-copy"></i><span class="hidden-xs"> {{Dupliquer}}</span>
 		</a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}
 		</a><a class="btn btn-sm btn-danger eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}
 		</a>
 	    </span>
-	</div>
-	<!-- Onglets -->
+	</div> <!-- barre de gestion de l'équipement -->
+
+	<!-- Les onglets des chargeurs -->
+	<!-- ========================= -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
 	    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i><span class="hidden-xs"> {{Équipement}}</span></a></li>
@@ -99,6 +111,7 @@ $accounts = account::all();
 	</ul>
 	<div class="tab-content">
 	    <!-- Onglet de configuration de l'équipement -->
+	    <!-- ======================================= -->
 	    <div role="tabpanel" class="tab-pane active" id="eqlogictab">
 		<!-- Partie gauche de l'onglet "Equipements" -->
 		<!-- Paramètres généraux de l'équipement -->
@@ -152,23 +165,11 @@ $accounts = account::all();
 			    <br>
 
 			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
-			    <!--
-			    ---- Paramètres des chargeurs
-			    -->
 			    <div class='chargeurParams form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
 				<div class="col-sm-7">
 				    <select id="selectAccount" class="eqLogicAttr" data-l1key="configuration" data-l2key="accountId">
 				    </select>
-				</div>
-			    </div>
-			    <!--
-			    ---- Paramètres des véhicules
-			    -->
-			    <div class='carParams form-group'>
-				<label class="col-sm-3 control-label">{{param}}</label>
-				<div class="col-sm-7 selectAccount">
-				    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="param1" placeholder="{{Paramètre n°1}}"/>
 				</div>
 			    </div>
 			</div>
@@ -190,10 +191,10 @@ $accounts = account::all();
 			</div>
 		    </fieldset>
 		</form>
-		<hr>
-	    </div><!-- /.tabpanel #eqlogictab-->
+	    </div> <!-- Onglet de configuration de l'équipement -->
 
 	    <!-- Onglet des commandes de l'équipement -->
+	    <!-- ==================================== -->
 	    <div role="tabpanel" class="tab-pane" id="commandtab">
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
 		<br/><br/>
@@ -213,10 +214,10 @@ $accounts = account::all();
 			</tbody>
 		    </table>
 		</div>
-	    </div><!-- /.tabpanel #commandtab-->
+	    </div> <!-- Onglet des commandes de l'équipement -->
 
-	</div><!-- /.tab-content -->
-    </div><!-- /.eqLogic -->
+	</div> <!-- Les onglets des chargeurs -->
+    </div> <!-- Page de configuration d'un chargeur -->
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
