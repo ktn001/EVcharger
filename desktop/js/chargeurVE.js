@@ -175,7 +175,7 @@ function editAccount (type, accountId ='') {
 			mod_editAccount.build(result.params, result.images);
  			$('#mod_editAccount .accountAttr').value('');
  			$('#mod_editAccount').setValues(result.account,'.accountAttr');
-			$('#mod_editAccount').dialog('option','title','{{Compte de type: }}' + typeLabels[result.account.type]);
+			$('#mod_editAccount').dialog('option','title','{{Compte de type:}} ' + typeLabels[result.account.type]);
  		}
  	});
  	buttons = []
