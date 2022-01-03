@@ -23,6 +23,12 @@ require_once __DIR__  . '/account.class.php';
 class chargeurVE extends eqLogic {
     /*     * *************************Attributs****************************** */
 
+    /*     * ***********************Methode static*************************** */
+
+    public static function byAccountId($accountId) {
+	    return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
+    }
+
     /*     * **********************Gestion du daemon************************* */
 
     /*
@@ -130,11 +136,6 @@ class chargeurVE extends eqLogic {
             }
         }
         return $return;
-    }
-
-    /*     * ***********************Methode static*************************** */
-    public static function byAccountId($accountId) {
-	    return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
     }
 
     /*     * ************************Les crons**************************** */
@@ -257,6 +258,28 @@ class chargeurVE extends eqLogic {
     }
 
     /*     * **********************Getteur Setteur*************************** */
+
+    public function getAccounId() {
+	return $this->getConfiguration('accountId');
+    }
+
+    public function setAccounId($_accountId§) {
+	$this->setConfiguration('accountId',$_accountId);
+	return $this;
+    }
+
+    public function getImage() {
+        $image = $this->getConfiguration('image');
+        if ($image == '') {
+            return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+        }
+        return $image;
+    }
+
+    public function setImage($_image) {
+	$this->setConfiguration('image',$_image);
+	return $this;
+    }
 }
 
 class chargeurVECmd extends cmd {
@@ -280,7 +303,9 @@ class chargeurVECmd extends cmd {
 
   // Exécution d'une commande
      public function execute($_options = array()) {
-
+	$account = account::byId($this->getEqLogic()->getAccountId());
+	if ($this->getType == 'action') {
+	}
      }
 
     /*     * **********************Getteur Setteur*************************** */

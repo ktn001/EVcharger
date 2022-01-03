@@ -44,7 +44,7 @@ function loadAccountCards() {
 				return;
 			}
 			accounts = json_decode(data.result);
-			$('.accountThumbnailContainer').empty();
+			$('#accounts-div.eqLogicThumbnailContainer').empty();
 			for (account of accounts) {
 				opacity = (account.enabled == 1) ? '' : 'disableCard';
 				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
@@ -52,8 +52,8 @@ function loadAccountCards() {
 				html += '<br/>';
 				html += '<span class="name">' + account.humanName + '</span>';
 				html += '</div>';
-				$('.accountThumbnailContainer').append(html);
-				$('.accountThumbnailContainer').packery('reloadItems').packery();
+				$('#accounts-div.eqLogicThumbnailContainer').append(html);
+				$('#accounts-div.eqLogicThumbnailContainer').packery('reloadItems').packery();
 			}
 		}
 	});
@@ -62,7 +62,6 @@ function loadAccountCards() {
 /*
  * Chargement initial des accounts
  */
-$('.accountThumbnailContainer').packery();
 loadAccountCards();
 
 /*
@@ -94,7 +93,7 @@ function deleteAccount (accountId) {
 }
 
 /*
- * Enregistrement d'un account avec saie de password
+ * Enregistrement d'un account avec saisie de password
  */
 function saveWithPassword(account) {
 	bootbox.prompt({
@@ -276,7 +275,7 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 /*
  * Action click sur account Display card
  */
-$('.accountThumbnailContainer').off('click').on('click','.accountDisplayCard', function () {
+$('#accounts-div.eqLogicThumbnailContainer').off('click').on('click','.accountDisplayCard', function () {
 	account_id = $(this).attr("data-account_id");
 	account_type = $(this).attr("data-account_type");
 	editAccount(account_type, account_id);
@@ -469,6 +468,6 @@ function loadSelectImg(defaut) {
 }
 
 function printEqLogic (data) {
-	loadSelectAccount(data.configuration.account);
+	loadSelectAccount(data.configuration.accountId);
 	loadSelectImg(data.configuration.image);
 }

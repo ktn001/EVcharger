@@ -55,7 +55,7 @@ $accounts = account::all();
 	    </div>
 	</div> <!-- Champs de recherche des accounts -->
 	<!-- Liste des accounts -->
-	<div class="accountThumbnailContainer">
+	<div id="accounts-div" class="eqLogicThumbnailContainer">
 	</div> <!-- Liste des accounts -->
 	<!-- Les accounts -->
 
@@ -82,6 +82,8 @@ $accounts = account::all();
 	    }
 	    ?>
 	</div> <!-- Liste des chargeurs -->
+	<!-- Les chargeurs -->
+
     </div> <!-- Page d'accueil du plugin -->
 
     <!-- =================================== -->
@@ -89,8 +91,8 @@ $accounts = account::all();
     <!-- =================================== -->
     <div class="col-xs-12 eqLogic" style="display: none;">
 
-	<!-- barre de gestion de l'équipement -->
-	<!-- ================================ -->
+	<!-- barre de gestion du chargeur -->
+	<!-- ============================ -->
 	<div class="input-group pull-right" style="display:inline-flex;">
 	    <span class="input-group-btn">
 		<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
@@ -100,7 +102,7 @@ $accounts = account::all();
 		</a><a class="btn btn-sm btn-danger eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}
 		</a>
 	    </span>
-	</div> <!-- barre de gestion de l'équipement -->
+	</div> <!-- barre de gestion du chargeur -->
 
 	<!-- Les onglets des chargeurs -->
 	<!-- ========================= -->
@@ -110,13 +112,14 @@ $accounts = account::all();
 	    <li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
 	<div class="tab-content">
-	    <!-- Onglet de configuration de l'équipement -->
-	    <!-- ======================================= -->
+	    <!-- Onglet de configuration du chargeur -->
+	    <!-- =================================== -->
 	    <div role="tabpanel" class="tab-pane active" id="eqlogictab">
-		<!-- Partie gauche de l'onglet "Equipements" -->
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
 		    <fieldset>
+
+			<!-- Partie gauche de l'onglet "Equipements" -->
 			<div class="col-lg-6">
 			    <legend><i class="fas fa-wrench"></i> {{Général}}</legend>
 			    <div class="form-group">
@@ -172,10 +175,9 @@ $accounts = account::all();
 				    </select>
 				</div>
 			    </div>
-			</div>
+			</div> <!-- Partie gauche de l'onglet "Equipements" -->
 
 			<!-- Partie droite de l'onglet "Équipement" -->
-			<!-- Affiche l'icône du plugin par défaut mais vous pouvez y afficher les informations de votre choix -->
 			<div class="col-lg-6">
 			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
 			    <!--
@@ -188,13 +190,14 @@ $accounts = account::all();
 				    </select>
 				</div>
 			    </div>
-			</div>
+			</div> <!-- Partie droite de l'onglet "Équipement" -->
+
 		    </fieldset>
 		</form>
-	    </div> <!-- Onglet de configuration de l'équipement -->
+	    </div> <!-- Onglet de configuration du chargeur -->
 
-	    <!-- Onglet des commandes de l'équipement -->
-	    <!-- ==================================== -->
+	    <!-- Onglet des commandes du chargeur -->
+	    <!-- ================================ -->
 	    <div role="tabpanel" class="tab-pane" id="commandtab">
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
 		<br/><br/>
@@ -214,7 +217,7 @@ $accounts = account::all();
 			</tbody>
 		    </table>
 		</div>
-	    </div> <!-- Onglet des commandes de l'équipement -->
+	    </div> <!-- Onglet des commandes du chargeur -->
 
 	</div> <!-- Les onglets des chargeurs -->
     </div> <!-- Page de configuration d'un chargeur -->
