@@ -259,11 +259,11 @@ class chargeurVE extends eqLogic {
 
     /*     * **********************Getteur Setteur*************************** */
 
-    public function getAccounId() {
+    public function getAccountId() {
 	return $this->getConfiguration('accountId');
     }
 
-    public function setAccounId($_accountId§) {
+    public function setAccountId($_accountId§) {
 	$this->setConfiguration('accountId',$_accountId);
 	return $this;
     }
@@ -304,8 +304,7 @@ class chargeurVECmd extends cmd {
   // Exécution d'une commande
      public function execute($_options = array()) {
 	$account = account::byId($this->getEqLogic()->getAccountId());
-	if ($this->getType == 'action') {
-	}
+	$account->execute($this);
      }
 
     /*     * **********************Getteur Setteur*************************** */

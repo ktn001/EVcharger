@@ -34,7 +34,7 @@ class account {
 
     /*     * ***********************Methodes static************************** */
 
-	/*
+	/**
 	 * Retourne le prochain Id disponible
 	 */
 	private static function nextId() {
@@ -43,7 +43,7 @@ class account {
 		return($id);
 	}
 
-	/*
+	/**
 	 * retourne l'account dont l'id est donné en argument
 	 */
 	public static function byId($id) {
@@ -52,7 +52,7 @@ class account {
 		return $account;
 	}
 
-	/*
+	/**
 	 * Recherche d'accounts selon le type
 	 */
 	public static function byType ($type) {
@@ -68,7 +68,7 @@ class account {
 		return $accounts;
 	}
 
-	/*
+	/**
 	 * Recherche les objets qui ont le type et le nom donnés en argument
 	 */
 	public static function byTypeAndName ($type, $name) {
@@ -84,7 +84,7 @@ class account {
 		return $accounts;
 	}
 
-	/*
+	/**
 	 * Retourne une liste contenant tous les accounts
 	 */
 	public static function all ( $enabled=false ) {
@@ -100,8 +100,8 @@ class account {
 		return $accounts;
 	}
 
-	/*
-	 * Retourne la liste des paramêtres éditables pour la construction
+	/**
+	 * Retourne la liste des paramètres éditables pour la construction
 	 * du modal d'édition
 	 */
 	public static function paramsToEdit() {
@@ -112,13 +112,16 @@ class account {
 		);
 	}
 
+	/**
+	 * Method appelée chaque heure via le cron du plugin
+	 */
 	public static function cronHourly() {
 		easeeAccount::cronHourly();
 	}
 
     /*     * *********************Methodes d'instance************************ */
 
-	/*
+	/**
 	 * Constructeur
 	 */
 	public function __construct() {
@@ -126,14 +129,14 @@ class account {
 		$this->image = type::images($this->type,'account')[0];
 	}
 
-	/*
+	/**
 	 * Wrapper pour les logs
 	 */
 	protected function log ($level, $message){
 		log::add('chargeurVE',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
 	}
 
-	/*
+	/**
 	 * Retient qu'une propriété a été modififée mais pas sauvegardée
 	 */
 	protected function setModified($name){
@@ -143,8 +146,8 @@ class account {
 		}
 	}
 
-	/*
-	 * Indique si une propriérét a été modifiée depuis la derinère sauvegarde
+	/**
+	 * Indique si une propriéré a été modifiée depuis la derinère sauvegarde
 	 */
 	protected function isModified($name){
 		if (is_array($name)){
@@ -158,14 +161,14 @@ class account {
 		return in_array($name, $this->modified);
 	}
 
-	/*
-	 * Remet à zéro la liste de propriététs modifiées
+	/**
+	 * Remet à zéro la liste de propriétés modifiées
 	 */
 	protected function resetModified(){
 		$this->modified = array();
 	}
 
-	/*
+	/**
 	 * Enregistrement de l'account
 	 */
 	public function save($options = null) {
@@ -220,7 +223,7 @@ class account {
 		$this->resetModified();
 	}
 
-	/*
+	/**
 	 * suppression de l'account
 	 */
 	public function remove() {
@@ -239,6 +242,9 @@ class account {
 		}
 	}
 
+	/**
+	 * Envoi d'un message au démon
+	 */
 	public function send2deamond($message) {
 		$this->log('debug','send2deamond: ' . print_r($message,true));
 		if (chargeurVE::deamon_info()['state'] != 'ok'){
@@ -256,16 +262,25 @@ class account {
 		socket_close($socket);
 	}
 
+	/**
+	 * lancement d'un thread de démon pour l'account
+	 */
 	public function startDeamondThread() {
 		$message['cmd'] = 'start';
 		$this->send2Deamond($message);
 	}
 
+	/**
+	 * Arrêt du thread dédié à l'account 
+	 */
 	public function stopDeamondThread() {
 		$message['cmd'] = 'stop';
 		$this->send2Deamond($message);
 	}
 
+	/**
+	 * Nom de l'account à afficher dans l'interface utilisateur
+	 */
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
 		$type = type::byName($this->getType());
@@ -296,6 +311,13 @@ class account {
 		return $name;
 	}
 
+	public function execute ($cmd){
+		if (! is_a($cmd, 'chargeurVECMD')){
+			$this->log('error', __("La commande n'est uns de la class ",__FILE__)."chargeurVECMD");
+			return;
+		}
+		$this->log("debug", __("Exécution de ",__FILE__) . $cmd->getLogicalId());
+	}
     /*     * **********************Getteur Setteur*************************** */
 
 	/** id **/

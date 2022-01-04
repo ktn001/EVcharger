@@ -108,7 +108,7 @@ $accounts = account::all();
 	<!-- ========================= -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-	    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i><span class="hidden-xs"> {{Équipement}}</span></a></li>
+	    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
 	    <li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
 	<div class="tab-content">
@@ -123,12 +123,12 @@ $accounts = account::all();
 			<div class="col-lg-6">
 			    <legend><i class="fas fa-wrench"></i> {{Général}}</legend>
 			    <div class="form-group">
-				<label class="col-sm-3 control-label">{{Nom de l'équipement}}</label>
+				<label class="col-sm-3 control-label">{{Nom du chargeur}}</label>
 				<div class="col-sm-7">
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="logicalId" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="type" style="display : none;"/>
-				    <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
+				    <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
 			    </div>
 			    <div class="form-group">
@@ -183,7 +183,7 @@ $accounts = account::all();
 			    <!--
 			    ---- Informations des chargeurs
 			    -->
-			    <div class="chargeurParams form-group">
+			    <div class="form-group">
 				<div class="text-center">
 				    <img name="icon_visu" src="<?= $plugin->getPathImgIcon(); ?>" style="max-width:160px;"/>
 				    <select id="selectChargeurImg" class="eqLogicAttr" data-l1key="configuration" data-l2key="image">
