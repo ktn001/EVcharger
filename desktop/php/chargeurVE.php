@@ -186,7 +186,6 @@ sendVarToJS('typeParams',$typeParams);
 				</div>
 			    </div>
 			    <div id="ChargeurSpecificsParams">
-			      Doit disparaître
 			    </div>
 			</div> <!-- Partie gauche de l'onglet "Equipements" -->
 

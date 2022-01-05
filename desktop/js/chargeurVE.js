@@ -471,7 +471,9 @@ function printEqLogic (data) {
 	loadSelectAccount(data.configuration.accountId);
 	loadSelectImg(data.configuration.image);
 	if (data.configuration.type in typeParams) {
-		$('#ChargeurSpecificsParams').empty().load(typeParams[data.configuration.type]);
+		$('#ChargeurSpecificsParams').empty().load(typeParams[data.configuration.type], function(){;
+			$('#ChargeurSpecificsParams').setValues(data, '.eqLogicAttr');
+		});
 	} else {
 		$('#ChargeurSpecificsParams').empty();
 	}
