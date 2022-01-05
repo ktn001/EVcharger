@@ -95,7 +95,7 @@ $(".configKey[data-l1key^='type::'][data-l2key='enabled']").on('change',function
 	type = $(this).attr('data-l1key').slice(6);
 	if (usedTypes.indexOf(type) != -1) {
 		$(this).value(1);
-		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{ Il existe au moins un compte de ce type.}}"});
+		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte de ce type.}}"});
 	}
 
 });
