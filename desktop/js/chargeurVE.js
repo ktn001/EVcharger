@@ -470,4 +470,9 @@ function loadSelectImg(defaut) {
 function printEqLogic (data) {
 	loadSelectAccount(data.configuration.accountId);
 	loadSelectImg(data.configuration.image);
+	if (data.configuration.type in typeParams) {
+		$('#ChargeurSpecificsParams').empty().load(typeParams[data.configuration.type]);
+	} else {
+		$('#ChargeurSpecificsParams').empty();
+	}
 }
