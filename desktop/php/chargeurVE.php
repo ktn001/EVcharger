@@ -7,19 +7,10 @@ $plugin = plugin::byId('chargeurVE');
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
-$typeParams = array();
-foreach (array_keys(type::all()) as $type) {
-	$file = __DIR__ . "/" . $type . "/chargeur_params.php";
-	if (file_exists($file)) {
-		$typeParams[$type] = substr($file,strpos($file,"/plugins/"));
-	}
-}
-
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
 sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
 sendVarToJS('typeLabels',type::labels());
-sendVarToJS('typeParams',$typeParams);
 ?>
 
 <div class="row row-overflow">

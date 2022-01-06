@@ -168,6 +168,10 @@ class easeeAccount extends account {
 		$this->send2Deamond($message);
 	}
 
+	public function execute_cable_lock($cmd) {
+		$this->log("debug","Je suis là");
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 	/* login */

@@ -34,27 +34,27 @@ class account {
 
     /*     * ***********************Methodes static************************** */
 
-	/**
-	 * Retourne le prochain Id disponible
-	 */
+    /**
+     * Retourne le prochain Id disponible
+     */
 	private static function nextId() {
 		$id = config::byKey ('accountId::next',self::$plugin_id,1,true);
 		config::save('accountId::next',$id+1,self::$plugin_id);
 		return($id);
 	}
 
-	/**
-	 * retourne l'account dont l'id est donné en argument
-	 */
+    /**
+     * retourne l'account dont l'id est donné en argument
+     */
 	public static function byId($id) {
 		$account =  unserialize (config::byKey('account::' . $id, 'chargeurVE' ));
 		$account->resetModified();
 		return $account;
 	}
 
-	/**
-	 * Recherche d'accounts selon le type
-	 */
+    /**
+     * Recherche d'accounts selon le type
+     */
 	public static function byType ($type) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
@@ -68,9 +68,9 @@ class account {
 		return $accounts;
 	}
 
-	/**
-	 * Recherche les objets qui ont le type et le nom donnés en argument
-	 */
+    /**
+     * Recherche les objets qui ont le type et le nom donnés en argument
+     */
 	public static function byTypeAndName ($type, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
@@ -84,9 +84,9 @@ class account {
 		return $accounts;
 	}
 
-	/**
-	 * Retourne une liste contenant tous les accounts
-	 */
+    /**
+     * Retourne une liste contenant tous les accounts
+     */
 	public static function all ( $enabled=false ) {
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
@@ -100,10 +100,10 @@ class account {
 		return $accounts;
 	}
 
-	/**
-	 * Retourne la liste des paramètres éditables pour la construction
-	 * du modal d'édition
-	 */
+    /**
+     * Retourne la liste des paramètres éditables pour la construction
+     * du modal d'édition
+     */
 	public static function paramsToEdit() {
 		return array(
 			'login' => 0,
@@ -112,33 +112,33 @@ class account {
 		);
 	}
 
-	/**
-	 * Method appelée chaque heure via le cron du plugin
-	 */
+    /**
+     * Method appelée chaque heure via le cron du plugin
+     */
 	public static function cronHourly() {
 		easeeAccount::cronHourly();
 	}
 
     /*     * *********************Methodes d'instance************************ */
 
-	/**
-	 * Constructeur
-	 */
+    /**
+     * Constructeur
+     */
 	public function __construct() {
 		$this->type = substr_replace(get_class($this),'',-7);
 		$this->image = type::images($this->type,'account')[0];
 	}
 
-	/**
-	 * Wrapper pour les logs
-	 */
+    /**
+     * Wrapper pour les logs
+     */
 	protected function log ($level, $message){
 		log::add('chargeurVE',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
 	}
 
-	/**
-	 * Retient qu'une propriété a été modififée mais pas sauvegardée
-	 */
+    /**
+     * Retient qu'une propriété a été modififée mais pas sauvegardée
+     */
 	protected function setModified($name){
 		if (! in_array($name, $this->modified)) {
 			log::add("chargeurVE","debug", $this->getHumanName() . " " . $name . __(" est modifié.",__FILE__));
@@ -146,9 +146,9 @@ class account {
 		}
 	}
 
-	/**
-	 * Indique si une propriéré a été modifiée depuis la derinère sauvegarde
-	 */
+    /**
+     * Indique si une propriéré a été modifiée depuis la derinère sauvegarde
+     */
 	protected function isModified($name){
 		if (is_array($name)){
 			foreach ($name as $n){
@@ -161,16 +161,16 @@ class account {
 		return in_array($name, $this->modified);
 	}
 
-	/**
-	 * Remet à zéro la liste de propriétés modifiées
-	 */
+    /**
+     * Remet à zéro la liste de propriétés modifiées
+     */
 	protected function resetModified(){
 		$this->modified = array();
 	}
 
-	/**
-	 * Enregistrement de l'account
-	 */
+    /**
+     * Enregistrement de l'account
+     */
 	public function save($options = null) {
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
@@ -223,9 +223,9 @@ class account {
 		$this->resetModified();
 	}
 
-	/**
-	 * suppression de l'account
-	 */
+    /**
+     * suppression de l'account
+     */
 	public function remove() {
 		if (chargeurVE::byAccountId($this->id)) {
 			throw new Exception (__("Au moins un chargeur est liée à l'account",__FILE__));
@@ -242,9 +242,9 @@ class account {
 		}
 	}
 
-	/**
-	 * Envoi d'un message au démon
-	 */
+    /**
+     * Envoi d'un message au démon
+     */
 	public function send2deamond($message) {
 		$this->log('debug','send2deamond: ' . print_r($message,true));
 		if (chargeurVE::deamon_info()['state'] != 'ok'){
@@ -262,25 +262,25 @@ class account {
 		socket_close($socket);
 	}
 
-	/**
-	 * lancement d'un thread de démon pour l'account
-	 */
+    /**
+     * lancement d'un thread de démon pour l'account
+     */
 	public function startDeamondThread() {
 		$message['cmd'] = 'start';
 		$this->send2Deamond($message);
 	}
 
-	/**
-	 * Arrêt du thread dédié à l'account 
-	 */
+    /**
+     * Arrêt du thread dédié à l'account 
+     */
 	public function stopDeamondThread() {
 		$message['cmd'] = 'stop';
 		$this->send2Deamond($message);
 	}
 
-	/**
-	 * Nom de l'account à afficher dans l'interface utilisateur
-	 */
+    /**
+     * Nom de l'account à afficher dans l'interface utilisateur
+     */
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
 		$type = type::byName($this->getType());
@@ -311,16 +311,25 @@ class account {
 		return $name;
 	}
 
+    /*
+     * Execution d'une commande
+     */
 	public function execute ($cmd){
 		if (! is_a($cmd, 'chargeurVECMD')){
-			$this->log('error', __("La commande n'est uns de la class ",__FILE__)."chargeurVECMD");
+			$this->log('error', sprintf(__("La commande n'est pas de la class %s",__FILE__),"chargeurVECMD"));
 			return;
 		}
 		$this->log("debug", __("Exécution de ",__FILE__) . $cmd->getLogicalId());
+		$method = 'execute_' . $cmd->getLogicalId();
+		if ( ! method_exists($this, $method)){
+			$this->log('error', sprintf(__("La méthode %s n'existe pas dans la classe %s",__FILE__),$method, get_class($this)));
+			return;
+		}
+		$account->$method($cmd);
 	}
     /*     * **********************Getteur Setteur*************************** */
 
-	/** id **/
+    /** id **/
 	public function getId() {
 		return $this->id;
 	}
@@ -330,7 +339,7 @@ class account {
 		return $this;
 	}
 
-	/** enabled **/
+    /** enabled **/
 	public function getEnabled() {
 		if ($this->enabled == ''){
 			return 0;
@@ -353,7 +362,7 @@ class account {
 		return $this;
 	}
 
-	/** image **/
+    /** image **/
 	public function getImage() {
 		if ($this->image == "") {
 			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
@@ -369,7 +378,7 @@ class account {
 		return $this;
 	}
 
-	/** name **/
+    /** name **/
 	public function getName() {
 		return $this->name;
 	}
@@ -382,7 +391,7 @@ class account {
 		return $this;
 	}
 
-	/** type **/
+    /** type **/
 	public function getType() {
 		return $this->type;
 	}

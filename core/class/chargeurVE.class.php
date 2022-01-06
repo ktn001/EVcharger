@@ -25,268 +25,271 @@ class chargeurVE extends eqLogic {
 
     /*     * ***********************Methode static*************************** */
 
-    public static function byAccountId($accountId) {
-	    return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
-    }
+	public static function byAccountId($accountId) {
+		return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
+	}
 
     /*     * **********************Gestion du daemon************************* */
 
     /*
      * Info sur le daemon
      */
-    public static function deamon_info() {
-        $return = array();
-        $return['log'] = __CLASS__;
-        $return['state'] = 'nok';
-        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
-        if (file_exists($pid_file)) {
-            if (posix_getsid(trim(file_get_contents($pid_file)))) {
-                $return['state'] = 'ok';
-            } else {
-                shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
-            }
-        }
-        $return['launchable'] = 'ok';
-        return $return;
-    }
+	public static function deamon_info() {
+		$return = array();
+		$return['log'] = __CLASS__;
+		$return['state'] = 'nok';
+		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
+		if (file_exists($pid_file)) {
+			if (posix_getsid(trim(file_get_contents($pid_file)))) {
+				$return['state'] = 'ok';
+			} else {
+				shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
+			}
+		}
+		$return['launchable'] = 'ok';
+		return $return;
+	}
 
     /*
      * Lancement de daemon
      */
-    public static function deamon_start() {
-        self::deamon_stop();
-        $daemon_info = self::deamon_info();
-        if ($daemon_info['launchable'] != 'ok') {
-            throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
-        }
+	public static function deamon_start() {
+		self::deamon_stop();
+		$daemon_info = self::deamon_info();
+		if ($daemon_info['launchable'] != 'ok') {
+			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
+		}
 
-        $path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
-        $cmd = 'python3 ' . $path . '/chargeurVEd.py';
-        $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-        $cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
-        $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
-        $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
-        $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
-        log::add(__CLASS__, 'info', 'Lancement démon');
-        log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
-        $result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon.out') . ' 2>&1 &');
-        $i = 0;
-        while ($i < 20) {
-            $daemon_info = self::deamon_info();
-            if ($daemon_info['state'] == 'ok') {
-                break;
-            }
-            sleep(1);
-            $i++;
-        }
-        if ($daemon_info['state'] != 'ok') {
-            log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDeamon');
-            return false;
-        }
-        message::removeAll(__CLASS__, 'unableStartDeamon');
-        foreach (account::all(true) as $account) {
-            $account->startDeamondThread();
-        }
-        return true;
-    }
+		$path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
+		$cmd = 'python3 ' . $path . '/chargeurVEd.py';
+		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
+		$cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
+		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
+		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
+		$cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
+		log::add(__CLASS__, 'info', 'Lancement démon');
+		log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
+		$result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon.out') . ' 2>&1 &');
+		$i = 0;
+		while ($i < 20) {
+			$daemon_info = self::deamon_info();
+			if ($daemon_info['state'] == 'ok') {
+				break;
+			}
+			sleep(1);
+			$i++;
+		}
+		if ($daemon_info['state'] != 'ok') {
+			log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDeamon');
+			return false;
+		}
+		message::removeAll(__CLASS__, 'unableStartDeamon');
+		foreach (account::all(true) as $account) {
+			$account->startDeamondThread();
+		}
+		return true;
+	}
 
     /*
      * Arret de daemon
      */
-    public static function deamon_stop() {
-        $pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
-        if (file_exists($pid_file)) {
-            foreach (account::all(true) as $account) {
-                $account->stopDeamondThread();
-            }
-            sleep (5);
-            $pid = intval(trim(file_get_contents($pid_file)));
-            log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
-            system::kill($pid);
-            sleep(1);
-            return;
-        }
-    }
+	public static function deamon_stop() {
+		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
+		if (file_exists($pid_file)) {
+			foreach (account::all(true) as $account) {
+				$account->stopDeamondThread();
+			}
+			sleep (5);
+			$pid = intval(trim(file_get_contents($pid_file)));
+			log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
+			system::kill($pid);
+			sleep(1);
+			return;
+		}
+	}
 
     /*
      * Installation des dépendances
      */
-    public static function dependancy_install() {
-        # log::remove(__CLASS__ . '_update');
-        return array(
-            'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependance',
-            'log' => log::getPathToLog(__CLASS__ . '_update')
-        );
-    }
+	public static function dependancy_install() {
+		# log::remove(__CLASS__ . '_update');
+		return array(
+			'script' => dirname(__FILE__) . '/../../resources/bin/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependance',
+			'log' => log::getPathToLog(__CLASS__ . '_update')
+		);
+	}
 
     /*
      * Etat de dépendances
      */
-    public static function dependancy_info(){
-        $return = array();
-        $return ['log'] = log::getPathToLog(__CLASS__ . '_update');
-        $return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependance';
-        if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependance')) {
-            $return['state'] = 'in_progress';
-        } else {
-            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {
-                $return['state'] = 'nok';
-            } else {
-                $return['state'] = 'ok';
-            }
-        }
-        return $return;
-    }
+	public static function dependancy_info(){
+		$return = array();
+		$return ['log'] = log::getPathToLog(__CLASS__ . '_update');
+		$return ['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependance';
+		if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependance')) {
+			$return['state'] = 'in_progress';
+		} else {
+			if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec python3\-requests') < 1) {
+				$return['state'] = 'nok';
+			} else {
+				$return['state'] = 'ok';
+			}
+		}
+		return $return;
+	}
 
     /*     * ************************Les crons**************************** */
 
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
-    public static function cron() {
-    }
+	public static function cron() {
+	}
      */
 
     /*
      * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-    public static function cron5() {
-        account::cronHourly();
-    }
+	public static function cron5() {
+		account::cronHourly();
+	}
      */
 
     /*
      * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
-    public static function cron10() {
-    }
+	public static function cron10() {
+	}
      */
 
     /*
      * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
-    public static function cron15() {
-    }
+	public static function cron15() {
+	}
      */
 
     /*
      * Fonction exécutée automatiquement toutes les 30 minutes par Jeedom
-    public static function cron30() {
-    }
+	public static function cron30() {
+	}
      */
 
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
      */
-    public static function cronHourly() {
-        account::cronHourly();
-    }
+	public static function cronHourly() {
+		account::cronHourly();
+	}
 
     /*
      * Fonction exécutée automatiquement tous les jours par Jeedom
-    public static function cronDaily() {
-    }
+	public static function cronDaily() {
+	}
      */
 
 
     /*     * *********************Méthodes d'instance************************* */
 
- // Fonction exécutée automatiquement avant la création de l'équipement
-    public function preInsert() {
-	    $this->setConfiguration('image',type::images($this->getConfiguration('type'),'chargeur')[0]);
-    }
+    // Fonction exécutée automatiquement avant la création de l'équipement
+	public function preInsert() {
+		$this->setConfiguration('image',type::images($this->getConfiguration('type'),'chargeur')[0]);
+	}
 
- // Fonction exécutée automatiquement après la création de l'équipement
-    public function postInsert() {
-        foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
-	    log::add("chargeurVE","debug","88 " . print_r($config,true));
-            $cmd = new chargeurVECMD();
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setName(__($config['name'],__FILE__));
-            $cmd->setLogicalId($logicalId);
-            $cmd->setType($config['type']);
-            $cmd->setSubType($config['subType']);
-            $cmd->save();
-        }
-    }
+    // Fonction exécutée automatiquement après la création de l'équipement
+	public function postInsert() {
+		foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
+			log::add("chargeurVE","debug","88 " . print_r($config,true));
+			$cmd = new chargeurVECMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__($config['name'],__FILE__));
+			$cmd->setLogicalId($logicalId);
+			$cmd->setType($config['type']);
+			$cmd->setSubType($config['subType']);
+			$cmd->save();
+		}
+	}
 
- // Fonction exécutée automatiquement avant la mise à jour de l'équipement
-    public function preUpdate() {
-    }
+    // Fonction exécutée automatiquement avant la mise à jour de l'équipement
+	public function preUpdate() {
+	}
 
- // Fonction exécutée automatiquement après la mise à jour de l'équipement
-    public function postUpdate() {
-    }
+    // Fonction exécutée automatiquement après la mise à jour de l'équipement
+	public function postUpdate() {
+	}
 
- // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
-    public function preSave() {
-    }
+    // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
+	public function preSave() {
+	}
 
- // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
-    public function postSave() {
-    }
+    // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
+	public function postSave() {
+	}
 
- // Fonction exécutée automatiquement avant la suppression de l'équipement
-    public function preRemove() {
-    }
+    // Fonction exécutée automatiquement avant la suppression de l'équipement
+	public function preRemove() {
+	}
 
- // Fonction exécutée automatiquement après la suppression de l'équipement
-    public function postRemove() {
-    }
+    // Fonction exécutée automatiquement après la suppression de l'équipement
+	public function postRemove() {
+	}
 
-    /*
-     * Non obligatoire : permet de modifier l'affichage du widget (également utilisable par les commandes)
-      public function toHtml($_version = 'dashboard') {
-
-      }
-     */
+   /*
+    * Non obligatoire : permet de modifier l'affichage du widget (également utilisable par les commandes)
+	public function toHtml($_version = 'dashboard') {
+	}
+    */
 
     /*
      * Non obligatoire : permet de déclencher une action après modification de variable de configuration
-    public static function postConfig_<Variable>() {
-    }
+	public static function postConfig_<Variable>() {
+	}
      */
 
     /*
      * Non obligatoire : permet de déclencher une action avant modification de variable de configuration
-    public static function preConfig_<Variable>() {
-    }
+	public static function preConfig_<Variable>() {
+	}
      */
 
-    public function getPathImg() {
-        $image = $this->getConfiguration('image');
-        if ($image == '') {
-            return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
-        }
-        return $image;
-    }
+	public function getPathImg() {
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+		}
+		return $image;
+	}
+
+	public function getAccount() {
+		return account::byId($this->getAccountId());
+	}
 
     /*     * **********************Getteur Setteur*************************** */
 
-    public function getAccountId() {
-	return $this->getConfiguration('accountId');
-    }
+	public function getAccountId() {
+		return $this->getConfiguration('accountId');
+	}
 
-    public function setAccountId($_accountId§) {
-	$this->setConfiguration('accountId',$_accountId);
-	return $this;
-    }
+	public function setAccountId($_accountId§) {
+		$this->setConfiguration('accountId',$_accountId);
+		return $this;
+	}
 
-    public function getImage() {
-        $image = $this->getConfiguration('image');
-        if ($image == '') {
-            return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
-        }
-        return $image;
-    }
+	public function getImage() {
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+		}
+		return $image;
+	}
 
-    public function setImage($_image) {
-	$this->setConfiguration('image',$_image);
-	return $this;
-    }
+	public function setImage($_image) {
+		$this->setConfiguration('image',$_image);
+		return $this;
+	}
 }
 
 class chargeurVECmd extends cmd {
     /*     * *************************Attributs****************************** */
 
     /*
-      public static $_widgetPossibility = array();
+	public static $_widgetPossibility = array();
     */
 
     /*     * ***********************Methode static*************************** */
@@ -301,11 +304,10 @@ class chargeurVECmd extends cmd {
       }
      */
 
-  // Exécution d'une commande
-     public function execute($_options = array()) {
-	$account = account::byId($this->getEqLogic()->getAccountId());
-	$account->execute($this);
-     }
+    // Exécution d'une commande
+	public function execute($_options = array()) {
+		$this->getEqLogic()->getAccount()->execute($this);
+	}
 
     /*     * **********************Getteur Setteur*************************** */
 }
