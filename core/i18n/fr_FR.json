@@ -41,6 +41,10 @@
     "plugins\/chargeurVE\/core\/class\/type.class.php": {
         "Erreur lors de la lecture de %s": "Erreur lors de la lecture de %s"
     },
+    "plugins\/chargeurVE\/core\/config\/easee\/chargeur_params.php": {
+        "N° de série": "N° de série",
+        "N° du chargeur": "N° du chargeur"
+    },
     "plugins\/chargeurVE\/desktop\/js\/chargeurVE.js": {
         "Afficher": "Afficher",
         "Annuler": "Annuler",
@@ -86,6 +90,9 @@
         "401 - Accès non autorisé": "401 - Accès non autorisé",
         "Type d'account": "Type d'account"
     },
+    "plugins\/chargeurVE\/desktop\/php\/chargeurParams.php": {
+        "Requête du code de saisie des params pour \"%s\"": "Requête du code de saisie des params pour \"%s\""
+    },
     "plugins\/chargeurVE\/desktop\/php\/chargeurVE.php": {
         "401 - Accès non autorisé": "401 - Accès non autorisé",
         "Action": "Action",
@@ -118,9 +125,6 @@
         "Supprimer": "Supprimer",
         "Type": "Type",
         "Visible": "Visible"
-    },
-    "plugins\/chargeurVE\/desktop\/php\/easee\/chargeur_params.php": {
-        "N° du chargeur": "N° du chargeur"
     },
     "plugins\/chargeurVE\/plugin_info\/configuration.php": {
         "Activer": "Activer",
