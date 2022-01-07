@@ -17,8 +17,8 @@
  */
 
 /* * ***************************Includes********************************* */
-require_once dirname(__FILE__) . '/../../../../../core/php/core.inc.php';
-require_once dirname(__FILE__) . '/../account.class.php';
+require_once __DIR__ . '/../../../../../core/php/core.inc.php';
+require_once __DIR__ . '/../account.class.php';
 
 class easeeAccount extends account {
     /*     * *************************Attributs****************************** */
@@ -63,6 +63,7 @@ class easeeAccount extends account {
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
 			CURLOPT_HTTPHEADER => [
+				"Authorization: Bearer " . $this->token['token'],
 				"Accept: application/json",
 				"Content-Type: application/*+json"
 			],
@@ -76,8 +77,9 @@ class easeeAccount extends account {
 			$this->log("error", "CURL Error : " . $err);
 			throw new Exception($err);
 		}
-		if ($httpCode != '200') {
+		if (substr($httpCode,0,1) != '2') {
 			$this->log("warning", $httpCode . ": " . $reponse['title']);
+			$this->log("warning", print_r( $reponse,true));
 			throw new Exception ($reponse['title']);
 		}
 		return $reponse;
@@ -169,7 +171,17 @@ class easeeAccount extends account {
 	}
 
 	public function execute_cable_lock($cmd) {
-		$this->log("debug","Je suis là");
+		$serial =  $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/'. $serial .'/commands/lock_state';
+		$data = array ( 'state' => 'true');
+		$response = $this->sendRequest($path, $data);
+	}
+
+	public function execute_cable_unlock($cmd) {
+		$serial =  $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/'. $serial .'/commands/lock_state';
+		$data = array ( 'state' => 'false');
+		$response = $this->sendRequest($path, $data);
 	}
 
     /*     * **********************Getteur Setteur*************************** */

@@ -325,7 +325,7 @@ class account {
 			$this->log('error', sprintf(__("La méthode %s n'existe pas dans la classe %s",__FILE__),$method, get_class($this)));
 			return;
 		}
-		$account->$method($cmd);
+		$this->$method($cmd);
 	}
     /*     * **********************Getteur Setteur*************************** */
 
