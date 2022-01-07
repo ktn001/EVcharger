@@ -1,146 +1,101 @@
 {
-    "plugins\/chargeurVE\/core\/ajax\/account.ajax.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Aucune méthode correspondante à : ": "No method corresponding to:",
-        "Compte inconnu: ": "Compte inconnu: ",
-        "Le type de compte n'est pas indiqué": "Le type de compte n'est pas indiqué",
-        "Le type du compte n'est pas ": "Le type du compte n'est pas "
-    },
-    "plugins\/chargeurVE\/core\/ajax\/chargeurVE.ajax.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Aucune méthode correspondante à : ": "No method corresponding to:",
-        "Le type de chargeur n'est pas indiqué": "Le type de chargeur n'est pas indiqué"
-    },
-    "plugins\/chargeurVE\/core\/class\/account.class.php": {
-        " est modifié.": " est modifié.",
-        "Au moins un chargeur est liée à l'account": "Au moins un chargeur est liée à l'account",
-        "Exécution de ": "Exécution de ",
-        "Il exsite plusieurs compte de ce type nmmés ": "Il exsite plusieurs compte de ce type nmmés ",
-        "Il y a déjà un compte de ce type nommé ": "Il y a déjà un compte de ce type nommé ",
-        "L'account n'a pas pu être supprimé!": "L'account n'a pas pu être supprimé!",
-        "La commande n'est uns de la class ": "La commande n'est uns de la class ",
-        "La version précédente est introuvable": "La version précédente est introuvable",
-        "Le démon n'est pas démarré!": "Le démon n'est pas démarré!",
-        "Le nom n'est pas défini!": "Le nom n'est pas défini!"
-    },
-    "plugins\/chargeurVE\/core\/class\/account\/easee.class.php": {
-        "L'URL a changé": "L'URL a changé",
-        "Le login a changé": "Le login a changé",
-        "Le token a expiré.": "Le token a expiré.",
-        "Nouveau compte": "Nouveau compte",
-        "Un nouveau token doit être créé.": "Un nouveau token doit être créé.",
-        "l'url n'est pas définie!": "l'url n'est pas définie!",
-        "le login n'est pas défini!": "le login n'est pas défini!",
-        "token renouvelé.": "token renouvelé."
-    },
-    "plugins\/chargeurVE\/core\/class\/chargeurVE.class.php": {
-        "Impossible de lancer le démon, vérifiez le log": "Impossible de lancer le démon, vérifiez le log",
-        "Veuillez vérifier la configuration": "Veuillez vérifier la configuration",
-        "kill process: ": "kill process: "
-    },
-    "plugins\/chargeurVE\/core\/class\/type.class.php": {
-        "Erreur lors de la lecture de %s": "Erreur lors de la lecture de %s"
-    },
-    "plugins\/chargeurVE\/core\/config\/easee\/chargeur_params.php": {
-        "N° de série": "Serial number",
-        "N° du chargeur": "charger ID"
-    },
-    "plugins\/chargeurVE\/desktop\/js\/chargeurVE.js": {
-        "Afficher": "Show",
-        "Annuler": "Cancel",
-        "Aucune": "None",
-        "Commande information liée": "Commande information liée",
-        "Compte de type:": "Account type:",
-        "Historiser": "Historize",
-        "Icône": "Icon",
-        "Inverser": "Invert",
-        "Max.": "Max.",
-        "Min.": "Min.",
-        "Nom de la commande": "Nom de la commande",
-        "Nouveau chargeur:": "Nouveau chargeur:",
-        "Password:": "Password:",
-        "Sauvegarde réussie": "Saved successfully",
-        "Sauvegarder": "Save",
-        "Supprimer": "Delete",
-        "Sélection d\\'un type de compte": "Sélection d\\'un type de compte",
-        "Type de compte pas défini!": "Type de compte pas défini!",
-        "Unité": "Unit",
-        "Valider": "Validate",
-        "Êtes-vous sûr de vouloir supprimer ce compte ?": "Êtes-vous sûr de vouloir supprimer ce compte ?"
-    },
-    "plugins\/chargeurVE\/desktop\/modal\/chargeurNameAndType.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Nom": "Name",
-        "Type": "Type"
-    },
-    "plugins\/chargeurVE\/desktop\/modal\/edit_account.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Activer": "Activate",
-        "Login": "Login",
-        "Nom": "Name",
-        "Options": "Options",
-        "PAssword": "PAssword",
-        "Password": "Password",
-        "URL": "URL"
-    },
-    "plugins\/chargeurVE\/desktop\/modal\/modal.chargeurVE.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access"
-    },
-    "plugins\/chargeurVE\/desktop\/modal\/selectAccountType.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Type d'account": "Type d'account"
-    },
-    "plugins\/chargeurVE\/desktop\/php\/chargeurParams.php": {
-        "Requête du code de saisie des params pour \"%s\"": "Requête du code de saisie des params pour \"%s\""
-    },
-    "plugins\/chargeurVE\/desktop\/php\/chargeurVE.php": {
-        "401 - Accès non autorisé": "401 - Unauthorized access",
-        "Action": "Action",
-        "Activer": "Activate",
-        "Ajouter un chargeur": "Add a charger",
-        "Ajouter un compte": "Add an account",
-        "Ajouter un véhicule": "Add a car",
-        "Ajouter une commande": "Add a command",
-        "Aucun": "None",
-        "Catégorie": "Category",
-        "Chargeur": "Chargeur",
-        "Commandes": "Commands",
-        "Compte": "Account",
-        "Configuration": "Configuration",
-        "Configuration avancée": "Advanced configuration",
-        "Dupliquer": "Duplicate",
-        "Gestion": "Management",
-        "Général": "Main",
-        "Id": "Id",
-        "Informations": "Information",
-        "Mes chargeurs": "My chargers",
-        "Mes comptes": "My accounts",
-        "Nom": "Name",
-        "Nom du chargeur": "Nom du chargeur",
-        "Objet parent": "Parent object",
-        "Options": "Options",
-        "Paramètres": "Settings",
-        "Rechercher": "Search",
-        "Sauvegarder": "Save",
-        "Supprimer": "Delete",
-        "Type": "Type",
-        "Visible": "Visible"
-    },
-    "plugins\/chargeurVE\/plugin_info\/configuration.php": {
-        "Activer": "Activate",
-        "Confirme": "Confirme",
-        "Couleur du tag": "Tag color",
-        "Couleur du texte du tag": "Tag text color",
-        "Couleurs personnalisées": "Custom colors",
-        "Demande de confirmation en cas de suppression d'un élément": "Demande de confirmation en cas de suppression d'un élément",
-        "Démon": "Daemon",
-        "Désactivation impossible.": "Désactivation impossible.",
-        "Il existe au moins un compte de ce type.": "Il existe au moins un compte de ce type.",
-        "Interface": "Interface",
-        "Les types de chargeurs": "Les types de chargeurs",
-        "Port": "Port",
-        "Redémarrer le démon en cas de modification": "Redémarrer le démon en cas de modification",
-        "Suppressions": "Suppressions",
-        "Type": "Type"
-    }
+	"plugins\/chargeurVE\/core\/config\/easee\/chargeur_params.php": {
+		"N° de série": "Serial number",
+		"N° du chargeur": "charger ID"
+	},
+	"plugins\/chargeurVE\/desktop\/js\/chargeurVE.js": {
+		"Afficher": "Show",
+		"Annuler": "Cancel",
+		"Aucune": "None",
+		"Commande information liée": "Commande information liée",
+		"Compte de type:": "Account type:",
+		"Historiser": "Historize",
+		"Icône": "Icon",
+		"Inverser": "Invert",
+		"Max.": "Max.",
+		"Min.": "Min.",
+		"Nom de la commande": "Nom de la commande",
+		"Nouveau chargeur:": "Nouveau chargeur:",
+		"Password:": "Password:",
+		"Sauvegarde réussie": "Saved successfully",
+		"Sauvegarder": "Save",
+		"Supprimer": "Delete",
+		"Sélection d\\'un type de compte": "Sélection d\\'un type de compte",
+		"Type de compte pas défini!": "Type de compte pas défini!",
+		"Unité": "Unit",
+		"Valider": "Validate",
+		"Êtes-vous sûr de vouloir supprimer ce compte ?": "Êtes-vous sûr de vouloir supprimer ce compte ?"
+	},
+	"plugins\/chargeurVE\/desktop\/modal\/chargeurNameAndType.php": {
+		"401 - Accès non autorisé": "401 - Unauthorized access",
+		"Nom": "Name",
+		"Type": "Type"
+	},
+	"plugins\/chargeurVE\/desktop\/modal\/edit_account.php": {
+		"401 - Accès non autorisé": "401 - Unauthorized access",
+		"Activer": "Activate",
+		"Login": "Login",
+		"Nom": "Name",
+		"Options": "Options",
+		"PAssword": "PAssword",
+		"Password": "Password",
+		"URL": "URL"
+	},
+	"plugins\/chargeurVE\/desktop\/modal\/modal.chargeurVE.php": {
+		"401 - Accès non autorisé": "401 - Unauthorized access"
+	},
+	"plugins\/chargeurVE\/desktop\/modal\/selectAccountType.php": {
+		"401 - Accès non autorisé": "401 - Unauthorized access",
+		"Type d'account": "Type d'account"
+	},
+	"plugins\/chargeurVE\/desktop\/php\/chargeurVE.php": {
+		"401 - Accès non autorisé": "401 - Unauthorized access",
+		"Action": "Action",
+		"Activer": "Activate",
+		"Ajouter un chargeur": "Add a charger",
+		"Ajouter un compte": "Add an account",
+		"Ajouter un véhicule": "Add a car",
+		"Ajouter une commande": "Add a command",
+		"Aucun": "None",
+		"Catégorie": "Category",
+		"Chargeur": "Chargeur",
+		"Commandes": "Commands",
+		"Compte": "Account",
+		"Configuration": "Configuration",
+		"Configuration avancée": "Advanced configuration",
+		"Dupliquer": "Duplicate",
+		"Gestion": "Management",
+		"Général": "Main",
+		"Id": "Id",
+		"Informations": "Information",
+		"Mes chargeurs": "My chargers",
+		"Mes comptes": "My accounts",
+		"Nom": "Name",
+		"Nom du chargeur": "Nom du chargeur",
+		"Objet parent": "Parent object",
+		"Options": "Options",
+		"Paramètres": "Settings",
+		"Rechercher": "Search",
+		"Sauvegarder": "Save",
+		"Supprimer": "Delete",
+		"Type": "Type",
+		"Visible": "Visible"
+	},
+	"plugins\/chargeurVE\/plugin_info\/configuration.php": {
+		"Activer": "Activate",
+		"Confirme": "Confirme",
+		"Couleur du tag": "Tag color",
+		"Couleur du texte du tag": "Tag text color",
+		"Couleurs personnalisées": "Custom colors",
+		"Demande de confirmation en cas de suppression d'un élément": "Demande de confirmation en cas de suppression d'un élément",
+		"Démon": "Daemon",
+		"Désactivation impossible.": "Désactivation impossible.",
+		"Il existe au moins un compte de ce type.": "Il existe au moins un compte de ce type.",
+		"Interface": "Interface",
+		"Les types de chargeurs": "Les types de chargeurs",
+		"Port": "Port",
+		"Redémarrer le démon en cas de modification": "Redémarrer le démon en cas de modification",
+		"Suppressions": "Suppressions",
+		"Type": "Type"
+	}
 }

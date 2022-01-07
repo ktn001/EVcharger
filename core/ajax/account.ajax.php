@@ -104,8 +104,9 @@ try {
 			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
 		}
 		if ($account->getType() != $type) {
-			throw new Exception(__("Le type du compte n'est pas ",__FILE__) . '"' . $type . '" (' . $account->getType() . ')');
+			throw new Exception(sprintf(__("Le type du compte n'est pas %s (%s)",__FILE__), $type, $account->getType()));
 		}
+		
 		$result['account'] = utils::o2a($account);
 		$result['params'] = ($type . "Account")::paramsToEdit();
 		$result['images'] = type::images($type, 'account');

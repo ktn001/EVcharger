@@ -467,10 +467,29 @@ function loadSelectImg(defaut) {
 	})
 }
 
-function printEqLogic (data) {
-	loadSelectAccount(data.configuration.accountId);
-	loadSelectImg(data.configuration.image);
-	$('#ChargeurSpecificsParams').empty().load('/plugins/chargeurVE/desktop/php/chargeurParams.php?type=' + data.configuration.type, function(){
-		$('#ChargeurSpecificsParams').setValues(data, '.eqLogicAttr');
+function printEqLogic (configs) {
+	loadSelectAccount(configs.configuration.accountId);
+	loadSelectImg(configs.configuration.image);
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		data: {
+			action: 'chargeurParamsHtml',
+			type: configs.configuration.type
+		},
+		dataType: 'json',
+		global: false,
+		error: function(request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function(data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			}
+			html = data.result;
+			$('#ChargeurSpecificsParams').html(html);
+			$('#ChargeurSpecificsParams').setValues(configs, '.eqLogicAttr');
+		}
 	});
 }

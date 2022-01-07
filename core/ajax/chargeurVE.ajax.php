@@ -38,6 +38,22 @@ try {
 		ajax::success(json_encode(type::images($type, 'chargeur')));
 	}
 
+	if (init('action') == 'chargeurParamsHtml') {
+		$type = init('type');
+		if ($type == '') {
+			throw new Exception(__("Le type de chargeur n'est pas indiqué",__FILE__));
+		}
+		$file = realpath (__DIR__.'/../config/'.$type.'/chargeur_params.php');
+		if (file_exists($file)) {
+			log::add("chargeurVE","debug",$file);
+			ob_start();
+			require_once $file;
+			$content = translate::exec(ob_get_clean(), $file);
+			ajax::success($content);
+		}
+		ajax::success();
+	}
+
 	throw new Exception(__("Aucune méthode correspondante à : ", __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
