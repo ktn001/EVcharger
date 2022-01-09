@@ -260,6 +260,12 @@ class chargeurVE extends eqLogic {
 		return account::byId($this->getAccountId());
 	}
 
+	public function getIdentifiant() {
+		$type = $this->getConfiguration('type');
+		$configName = type::getIdentifiantChargeur($type);
+		return $this->getConfiguration($configName);
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 	public function getAccountId() {

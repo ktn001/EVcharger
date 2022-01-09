@@ -79,10 +79,7 @@ class type {
 		$images = array();
 		$path = realpath(__DIR__ . '/../../desktop/img/' . $type);
 		if ($dir = opendir($path)){
-			log::add("chargeurVE","debug","path : " . $path);
-			log::add("chargeurVE","debug","objet : " . $objet);
 			while (($fileName = readdir($dir)) !== false){
-				log::add("chargeurVE","debug","file : " . $fileName);
 				if (preg_match('/^' . $objet . '.*\.png$/', $fileName)){
 					$images[] = strchr($path.'/'.$fileName, '/plugins/');
 				}
@@ -109,6 +106,14 @@ class type {
 			}
 		}
 		return $return;
+	}
+
+	private static function getConfigs($type) {
+		return parse_ini_file(__DIR__ . '/../config/' . $type . '/config.ini' ,true);
+	}
+
+	public static function getIdentifiantChargeur($type) {
+		return type::getConfigs($type)['chargeur']['identifiant'];
 	}
 
     /*     * **********************Getteur Setteur*************************** */

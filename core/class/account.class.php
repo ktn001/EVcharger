@@ -268,12 +268,30 @@ class account {
 	public function startDeamondThread() {
 		$message['cmd'] = 'start';
 		$this->send2Deamond($message);
+		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
+			if ($chargeur->getIsEnable()) {
+				$message = array(
+					'cmd' => 'start_chargeur',
+					'chargeur' => $chargeur->getIdentifiant(),
+				);
+				$this->send2Deamond($message);
+			}
+		}
 	}
 
     /**
      * Arrêt du thread dédié à l'account 
      */
 	public function stopDeamondThread() {
+		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
+			if ($chargeur->getIsEnable()) {
+				$message = array(
+					'cmd' => 'stop_chargeur',
+					'chargeur' => $chargeur->getIdentifiant(),
+				);
+				$this->send2Deamond($message);
+			}
+		}
 		$message['cmd'] = 'stop';
 		$this->send2Deamond($message);
 	}

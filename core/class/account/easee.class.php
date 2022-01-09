@@ -63,7 +63,7 @@ class easeeAccount extends account {
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => 'POST',
 			CURLOPT_HTTPHEADER => [
-				"Authorization: Bearer " . $this->token['token'],
+				"Authorization: Bearer " . $this->token['accessToken'],
 				"Accept: application/json",
 				"Content-Type: application/*+json"
 			],
@@ -90,7 +90,7 @@ class easeeAccount extends account {
 			return;
 		}
 		$data = array(
-			'accessToken' => $this->token['token'],
+			'accessToken' => $this->token['accessToken'],
 			'refreshToken' => $this->token['refreshToken']
 		);
 		$response = $this->sendRequest('/api/accounts/refresh_token', $data);
@@ -158,7 +158,7 @@ class easeeAccount extends account {
 		if ($this->isModified(array('token'))){
 			if ( ! $this->isModified('enabled')){
 				$message['cmd'] = 'newToken';
-				$message['token'] = $this->token['token'];
+				$message['token'] = $this->token['accessToken'];
 				$this->send2Deamond($message);
 			}
 		}
@@ -166,7 +166,7 @@ class easeeAccount extends account {
 
 	public function startDeamondThread() {
 		$message['cmd'] = 'start';
-		$message['token'] = $this->token['token'];
+		$message['token'] = $this->token['accessToken'];
 		$this->send2Deamond($message);
 	}
 
@@ -216,11 +216,11 @@ class easeeAccount extends account {
 
 	public function setToken($_token) {
 		$this->log("debug",print_r($_token,true));
-		if ($_token['token'] != $this->token['token']) {
+		if ($_token['accessToken'] != $this->token['accessToken']) {
 			$this->setModified('token');
 		}
 		$this->token = array(
-			'token' => $_token['accessToken'],
+			'accessToken' => $_token['accessToken'],
 			'expiresAt' => time() + $_token['expiresIn'],
 			'refreshToken' => $_token['refreshToken'],
 		);
