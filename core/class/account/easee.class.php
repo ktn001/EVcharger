@@ -164,10 +164,9 @@ class easeeAccount extends account {
 		}
 	}
 
-	public function startDeamondThread() {
-		$message['cmd'] = 'start';
+	public function startDeamondThreadParams() {
 		$message['token'] = $this->token['accessToken'];
-		$this->send2Deamond($message);
+		return $message;
 	}
 
 	public function execute_cable_lock($cmd) {

@@ -266,6 +266,9 @@ class account {
      * lancement d'un thread de démon pour l'account
      */
 	public function startDeamondThread() {
+		if (method_exists($this,'startDeamondThreadParams')) {
+			$message = $this->startDeamondThreadParams();
+		}
 		$message['cmd'] = 'start';
 		$this->send2Deamond($message);
 		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
@@ -292,7 +295,9 @@ class account {
 				$this->send2Deamond($message);
 			}
 		}
-		$message['cmd'] = 'stop';
+		$message = array(
+			'cmd' => 'stop',
+		);
 		$this->send2Deamond($message);
 	}
 
