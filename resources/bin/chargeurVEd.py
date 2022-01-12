@@ -81,6 +81,21 @@ def options():
     logging.info('Socket host : '+str(_socketHost))
     logging.info('PID file : '+str(_pidfile))
 
+def start_account(accountType, accountId):
+    global accounts
+    logging.debug(f'start: id={accountId} type: {accountType}')
+    if not accountId in accounts:
+        logging.info(f"Création d'un account <{accountType}> id:{accountId}")
+        queue = Queue()
+        account = eval("account." + accountType)(accountId, accountType, queue)
+        accounts[accountId] = {
+                'type' : accountType,
+                'queue' : queue,
+                'account' : account
+                }
+        accounts[accountId]['account'].run()
+    return
+
 # -------- Lecture du socket ------------------------------------------------
 
 def read_socket():
@@ -99,19 +114,7 @@ def read_socket():
             if 'message' in payload:
                 message = payload['message']
                 if message['cmd'] == 'start':
-                    logging.debug(f'start: id={accountId} type: {accountType}')
-                    if not accountId in accounts:
-                        logging.info(f"Création d'un account <{accountType}> id:{accountId}")
-                        queue = Queue()
-                        account = eval("account." + accountType)(accountId, accountType, queue)
-                        accounts[accountId] = {
-                                'type' : accountType,
-                                'queue' : queue,
-                                'account' : account
-                                }
-                    accounts[accountId]['queue'].put(json.dumps(message))
-                    accounts[accountId]['account'].run()
-                    return
+                    return start_account(accountType, accountId);
                 accounts[accountId]['queue'].put(json.dumps(message))
                 if message['cmd'] == 'stop':
                     del accounts[accountId]
