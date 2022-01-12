@@ -10,7 +10,7 @@ try {
 		echo 'ok';
 		die();
 	}
-	$result = json_decode(file_get_content("php://input"), true);
+	$result = json_decode(file_get_contents("php://input"), true);
 	if (!is_array($result)) {
 		die();
 	}

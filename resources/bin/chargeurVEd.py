@@ -94,6 +94,12 @@ def start_account(accountType, accountId):
                 'account' : account
                 }
         accounts[accountId]['account'].run()
+        jeedom_com.send_change_immediate({
+            'object' : 'account_thread',
+            'info' : 'started',
+            'account_id' : accountId
+        })
+            
     return
 
 # -------- Lecture du socket ------------------------------------------------
@@ -111,10 +117,11 @@ def read_socket():
         try:
             accountType = payload['type']
             accountId = payload['id']
+            logging.debug(str(payload))
             if 'message' in payload:
                 message = payload['message']
                 if message['cmd'] == 'start':
-                    return start_account(accountType, accountId);
+                    start_account(accountType, accountId);
                 accounts[accountId]['queue'].put(json.dumps(message))
                 if message['cmd'] == 'stop':
                     del accounts[accountId]
@@ -173,6 +180,10 @@ signal.signal(signal.SIGTERM, handler)
 
 try:
     jeedom_utils.write_pid(str(_pidfile))
+    jeedom_com = jeedom_com(apikey = _apiKey, url=_callback)
+    if (not jeedom_com.test()):
+        logging.error('Network communication issue. Please fixe your Jeedom network configuration.')
+        shutdown()
     jeedom_socket = jeedom_socket(port=_socketPort,address=_socketHost)
     asyncio.run(start_chargeurVE(), debug=True)
 except Exception as e:

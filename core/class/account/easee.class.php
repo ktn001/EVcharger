@@ -159,14 +159,17 @@ class easeeAccount extends account {
 			if ( ! $this->isModified('enabled')){
 				$message['cmd'] = 'newToken';
 				$message['token'] = $this->token['accessToken'];
-				$this->send2Deamond($message);
+				$this->send2Deamon($message);
 			}
 		}
 	}
 
-	public function startDeamondThreadParams() {
-		$message['token'] = $this->token['accessToken'];
-		return $message;
+	public function startDeamonThread() {
+		$message = array(
+			'cmd' => 'start',
+			'token' => $this->token['accessToken']
+		);
+		$this->send2Deamon($message);
 	}
 
 	public function execute_cable_lock($cmd) {

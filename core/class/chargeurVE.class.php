@@ -85,7 +85,7 @@ class chargeurVE extends eqLogic {
 		}
 		message::removeAll(__CLASS__, 'unableStartDeamon');
 		foreach (account::all(true) as $account) {
-			$account->startDeamondThread();
+			$account->startDeamonThread();
 		}
 		return true;
 	}
@@ -97,7 +97,7 @@ class chargeurVE extends eqLogic {
 		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
 		if (file_exists($pid_file)) {
 			foreach (account::all(true) as $account) {
-				$account->stopDeamondThread();
+				$account->stopDeamonThread();
 			}
 			sleep (5);
 			$pid = intval(trim(file_get_contents($pid_file)));

@@ -215,9 +215,9 @@ class account {
 		}
 		if ($this->isModified('enabled')) {
 			if ($this->enabled){
-				$this->startDeamondThread();
+				$this->startDeamonThread();
 			} else {
-				$this->stopDeamondThread();
+				$this->stopDeamonThread();
 			}
 		}
 		$this->resetModified();
@@ -245,8 +245,8 @@ class account {
     /**
      * Envoi d'un message au démon
      */
-	public function send2deamond($message) {
-		$this->log('debug','send2deamond: ' . print_r($message,true));
+	public function send2Deamon($message) {
+		$this->log('debug','send2Deamon: ' . print_r($message,true));
 		if (chargeurVE::deamon_info()['state'] != 'ok'){
 			$this->log('error', __("Le démon n'est pas démarré!",__FILE__));
 			throw new Exception(__("Le démon n'est pas démarré!",__FILE__));
@@ -265,40 +265,28 @@ class account {
     /**
      * lancement d'un thread de démon pour l'account
      */
-	public function startDeamondThread() {
-		if (method_exists($this,'startDeamondThreadParams')) {
-			$message = $this->startDeamondThreadParams();
-		}
+	public function startDeamonThread() {
 		$message['cmd'] = 'start';
-		$this->send2Deamond($message);
-		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
-			if ($chargeur->getIsEnable()) {
-				$message = array(
-					'cmd' => 'start_chargeur',
-					'chargeur' => $chargeur->getIdentifiant(),
-				);
-				$this->send2Deamond($message);
-			}
-		}
+		$this->send2Deamon($message);
 	}
 
     /**
      * Arrêt du thread dédié à l'account 
      */
-	public function stopDeamondThread() {
+	public function stopDeamonThread() {
 		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
 			if ($chargeur->getIsEnable()) {
 				$message = array(
 					'cmd' => 'stop_chargeur',
 					'chargeur' => $chargeur->getIdentifiant(),
 				);
-				$this->send2Deamond($message);
+				$this->send2Deamon($message);
 			}
 		}
 		$message = array(
 			'cmd' => 'stop',
 		);
-		$this->send2Deamond($message);
+		$this->send2Deamon($message);
 	}
 
     /**
