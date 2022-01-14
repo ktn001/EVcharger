@@ -24,7 +24,7 @@ from optparse import OptionParser
 import json
 import argparse
 import importlib
-import asyncio
+#import asyncio
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
 sys.path.append (libDir)
@@ -84,21 +84,27 @@ def options():
 def start_account(accountType, accountId):
     global accounts
     logging.debug(f'start: id={accountId} type: {accountType}')
-    if not accountId in accounts:
-        logging.info(f"Création d'un account <{accountType}> id:{accountId}")
-        queue = Queue()
-        account = eval("account." + accountType)(accountId, accountType, queue)
-        accounts[accountId] = {
-                'type' : accountType,
-                'queue' : queue,
-                'account' : account
-                }
-        accounts[accountId]['account'].run()
-        jeedom_com.send_change_immediate({
-            'object' : 'account_thread',
-            'info' : 'started',
-            'account_id' : accountId
-        })
+
+    if accountId in accounts:
+        logging.debug("L'account est déjà demarré")
+        return
+
+    logging.info(f"Création d'un account <{accountType}> id:{accountId}")
+    queue = Queue()
+    account = eval("account." + accountType)(accountId, accountType, queue)
+    accounts[accountId] = {
+            'type' : accountType,
+            'queue' : queue,
+            'account' : account
+            }
+    accounts[accountId]['account'].run()
+
+    # On informe Jeedon du démarrage
+    jeedom_com.send_change_immediate({
+        'object' : 'account_deamon',
+        'info' : 'started',
+        'account_id' : accountId
+    })
             
     return
 
@@ -109,28 +115,40 @@ def read_socket():
     global accounts
 
     if not JEEDOM_SOCKET_MESSAGE.empty():
+        # jeedom_socket a reçu un message qu'il a mis en queue que l'on récupère ici
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
         payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
+
+        # Vérification de la clé API
         if payload['apikey'] != _apiKey:
             logging.error("Invalid apikey from socket : " + str(payload))
             return
-        try:
+
+        logging.debug(str(payload))
+        if 'accountType' in payload:
             accountType = payload['type']
+
+            if not 'id' in payload:
+                logging.error(f"Message reçu avec un accountType ({accountType}) mais pas d'accountId")
+                return
             accountId = payload['id']
-            logging.debug(str(payload))
-            if 'message' in payload:
-                message = payload['message']
-                if message['cmd'] == 'start':
-                    start_account(accountType, accountId);
-                accounts[accountId]['queue'].put(json.dumps(message))
-                if message['cmd'] == 'stop':
-                    del accounts[accountId]
 
-        except Exception as e:
-            logging.error('Send command to demon error : '+str(e))
+            if not 'message' in payload:
+                logging.error(f"Message reçu avec un accountType ({accountType}) et un id ({accountId}) mais sans 'message'")
+            message = payload['message']
 
-async def listen_jeedom():
-    jeedom_socket.open()
+            if 'cmd' in message and message['cmd'] == 'start':
+                start_account(accountType, accountId);
+
+            # Envoi du message dans la queue de traitement de l'account
+            accounts[accountId]['queue'].put(json.dumps(message))
+
+            # Si la commande était l'arrêt de l'account...
+            if 'cmd' in message and message['cmd'] == 'stop':
+                # on retire l'account de la liste
+                del accounts[accountId]
+
+def listen_jeedom():
     try:
         while 1:
             time.sleep(0.5)
@@ -138,8 +156,6 @@ async def listen_jeedom():
     except KeyboardInterrupt:
         shutdown()
 
-async def start_chargeurVE():
-    asyncio.create_task(listen_jeedom())
 
 # ----------- procédures d'arrêt -------------------------------------------
 
@@ -185,7 +201,12 @@ try:
         logging.error('Network communication issue. Please fixe your Jeedom network configuration.')
         shutdown()
     jeedom_socket = jeedom_socket(port=_socketPort,address=_socketHost)
-    asyncio.run(start_chargeurVE(), debug=True)
+    jeedom_socket.open()
+    jeedom_com.send_change_immediate({
+        'object' : 'deamon',
+        'info'   : 'started'
+    })
+    listen_jeedom()
 except Exception as e:
     logging.error('Fatal error : '+str(e))
     logging.info(traceback.format_exc())

@@ -84,9 +84,6 @@ class chargeurVE extends eqLogic {
 			return false;
 		}
 		message::removeAll(__CLASS__, 'unableStartDeamon');
-		foreach (account::all(true) as $account) {
-			$account->startDeamonThread();
-		}
 		return true;
 	}
 

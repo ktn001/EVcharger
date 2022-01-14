@@ -113,6 +113,15 @@ class account {
 	}
 
     /**
+     * Lancement de threads du deamon pour cahque account actif
+     */
+	public static function startAllDeamon(){
+		foreach (account::all() as $account) {
+			$account->startDeamonThread();
+		}
+	}
+
+    /**
      * Method appelée chaque heure via le cron du plugin
      */
 	public static function cronHourly() {
@@ -132,7 +141,7 @@ class account {
     /**
      * Wrapper pour les logs
      */
-	protected function log ($level, $message){
+	protected function log($level, $message){
 		log::add('chargeurVE',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
 	}
 
@@ -266,8 +275,10 @@ class account {
      * lancement d'un thread de démon pour l'account
      */
 	public function startDeamonThread() {
-		$message['cmd'] = 'start';
-		$this->send2Deamon($message);
+		if ($this->isEnabled()){
+			$message = array('cmd' => 'start');
+			$this->send2Deamon($message);
+		}
 	}
 
     /**
@@ -277,15 +288,13 @@ class account {
 		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
 			if ($chargeur->getIsEnable()) {
 				$message = array(
-					'cmd' => 'stop_chargeur',
+					'cmd' => 'stop',
 					'chargeur' => $chargeur->getIdentifiant(),
 				);
 				$this->send2Deamon($message);
 			}
 		}
-		$message = array(
-			'cmd' => 'stop',
-		);
+		$message = array('cmd' => 'stop_account');
 		$this->send2Deamon($message);
 	}
 
