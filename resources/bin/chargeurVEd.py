@@ -83,13 +83,13 @@ def options():
 
 def start_account(accountType, accountId):
     global accounts
-    logging.debug(f'start: id={accountId} type: {accountType}')
+    logging.debug(f'starting account thread: id={accountId} type: {accountType}')
 
     if accountId in accounts:
-        logging.debug("L'account est déjà demarré")
+        logging.debug(f"Thread for account {accountId} is already running!")
         return
 
-    logging.info(f"Création d'un account <{accountType}> id:{accountId}")
+    logging.info(f"Creating account <{accountType}> id:{accountId}")
     queue = Queue()
     account = eval("account." + accountType)(accountId, accountType, queue)
     accounts[accountId] = {
@@ -98,10 +98,11 @@ def start_account(accountType, accountId):
             'account' : account
             }
     accounts[accountId]['account'].run()
+    logging.debug(f"Thread for account {accountId} started")
 
     # On informe Jeedon du démarrage
     jeedom_com.send_change_immediate({
-        'object' : 'account_deamon',
+        'object' : 'account_thread',
         'info' : 'started',
         'account_id' : accountId
     })
@@ -124,17 +125,16 @@ def read_socket():
             logging.error("Invalid apikey from socket : " + str(payload))
             return
 
-        logging.debug(str(payload))
-        if 'accountType' in payload:
+        if 'type' in payload:
             accountType = payload['type']
 
             if not 'id' in payload:
-                logging.error(f"Message reçu avec un accountType ({accountType}) mais pas d'accountId")
+                logging.error(f"Message for accountType ({accountType}) but with no 'id'")
                 return
             accountId = payload['id']
 
             if not 'message' in payload:
-                logging.error(f"Message reçu avec un accountType ({accountType}) et un id ({accountId}) mais sans 'message'")
+                logging.error(f"Message for accountType ({accountType}) and id ({accountId}) but with no 'message'")
             message = payload['message']
 
             if 'cmd' in message and message['cmd'] == 'start':

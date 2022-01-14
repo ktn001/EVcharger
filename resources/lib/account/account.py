@@ -54,7 +54,9 @@ class account():
             self.read_jeedom_queue()
 
     def run(self):
+        logging.debug(f'[account][{self._type}][{self._id}] Lancement de thread')
         threading.Thread(target=self.listen_jeedom, args=()).start()
+        logging.info(f'[account][{self._type}][{self._id}] Thread lancé')
 
     def do_stop(self,msg):
         self._stop = True
