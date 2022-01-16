@@ -6,7 +6,7 @@ import sys
 import os
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
-
+sys.path.append(libDir)
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 parser = argparse.ArgumentParser()

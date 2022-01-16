@@ -30,13 +30,25 @@ class account():
         self._type = type
         self._jeedomQueue = queue
 
+    def log_debug(self,txt):
+        logging.debug(f'[account][{self._type}][{self._id}] {txt}')
+
+    def log_info(self,txt):
+        logging.info(f'[account][{self._type}][{self._id}] {txt}')
+
+    def log_warning(self,txt):
+        logging.warning(f'[account][{self._type}][{self._id}] {txt}')
+
+    def log_error(self,txt):
+        logging.error(f'[account][{self._type}][{self._id}] {txt}')
+
     def read_jeedom_queue(self):
         if not self._jeedomQueue.empty():
             message = self._jeedomQueue.get()
-            logging.debug(f'[account][{self._type}][{self._id}] message reçu: {message}')
+            self.log_debug(f'message reçu: {message}')
             msg = json.loads(message)
             if not 'cmd' in msg:
-                logging.error(f'[account][{self._type}][{self._id}] le message "{message}" n\'a pas de commande')
+                self.log_error(f'le message "{message}" n\'a pas de commande')
                 return
             commande = 'do_' + msg['cmd']
             if (hasattr(self, commande)):
@@ -49,14 +61,14 @@ class account():
         while 1:
             time.sleep(0.5)
             if self._stop:
-                logging.info(f'[account][{self._type}][{self._id}] arrêt de thread')
+                self.log_info(f'arrêt de thread')
                 return
             self.read_jeedom_queue()
 
     def run(self):
-        logging.debug(f'[account][{self._type}][{self._id}] Lancement de thread')
+        self.log_debug(f'Lancement de thread')
         threading.Thread(target=self.listen_jeedom, args=()).start()
-        logging.info(f'[account][{self._type}][{self._id}] Thread lancé')
+        self.log_info(f'Thread lancé')
 
     def do_stop(self,msg):
         self._stop = True

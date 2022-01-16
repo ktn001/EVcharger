@@ -167,7 +167,8 @@ class easeeAccount extends account {
 	public function startDeamonThread() {
 		$message = array(
 			'cmd' => 'start',
-			'token' => $this->token['accessToken']
+			'url' => $this->url,
+			'token' => $this->token['accessToken'],
 		);
 		$this->send2Deamon($message);
 	}

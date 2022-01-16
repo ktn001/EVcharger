@@ -10,6 +10,12 @@ try {
 	}
 
 	function process_account_message($message) {
+		if ($message['info'] == 'thread_started'){
+			$accountId = $message['account_id'];
+			foreach(chargeurVE::byAccountId($accountId) as $charger){
+				$charger->startListener();
+			}
+		}
 	}
 
 	function process_chargeur_message($message) {

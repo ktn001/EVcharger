@@ -96,14 +96,48 @@ class type {
 		$configFile = 'cmd.config.ini';
 		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true);
 		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true);
-		$return = array();
+		$configs = array();
 		foreach ($defaultCommands as $logicalId => $cmdConfig) {
 			if (array_key_exists($logicalId, $typeCommands)) {
-				$cmdConfig = array_merge($cmdConfig, $typeCommands[$logicalId]);
+				$configs[$logicalId] = array_merge($cmdConfig, $typeCommands[$logicalId]);
+			} else {
+				$configs[$logicalId] = $cmdConfig;
 			}
-			if ( ! $mandatoryOnly or $cmdConfig['mandatory']) {
-				$return[$logicalId] = $cmdConfig;
+		}
+		foreach ($typeCommands as $logicalId => $cmdConfig) {
+			if (!array_key_exists($logicalId, $configs)) {
+				$configs[$logicalId] = $cmdConfig;
 			}
+		}
+		$commands = array();
+		$groups = array();
+		foreach ($configs as $logicalId => $config) {
+			if (strpos($logicalId, 'group:') === 0) {
+				$group = substr($logicalId,6);
+				$groups[$group] = $config;
+			} else {
+				$commands[$logicalId] = $config;
+			}
+		}
+		foreach (array_keys($commands) as $logicalId){
+			if (array_key_exists('group', $commands[$logicalId])) {
+				$group = $commands[$logicalId]['group'];
+				if (array_key_exists($group, $groups)) {
+					$commands[$logicalId] = array_merge($commands[$logicalId],$groups[$group]);
+				} else {
+					log::add('chargeurVE','error',sprintf(__("La commande %s a le groupe %s qui n'existe pas!",__FILE__),$logicalId,$group));
+				}
+			}
+		}
+		$return = array();
+		if ($mandatoryOnly){
+			foreach ($commands as $logicalId => $command){
+				if ($command['mandatory']){
+					$return[$logicalId] = $command;
+				}
+			}
+		} else {
+			$return = $commands;
 		}
 		return $return;
 	}

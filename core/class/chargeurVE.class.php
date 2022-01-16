@@ -263,6 +263,18 @@ class chargeurVE extends eqLogic {
 		return $this->getConfiguration($configName);
 	}
 
+	public function startListener() {
+		if (! $this->getIsEnable()) {
+			return;
+		}
+		$message = array(
+			'cmd' => 'start_charger_listener',
+			'chargerId' => $this->id,
+			'identifiant' => $this->getIdentifiant()
+		);
+		account::byId($this->getAccountId())->send2Deamon($message);
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 	public function getAccountId() {

@@ -102,8 +102,8 @@ def start_account(accountType, accountId):
 
     # On informe Jeedon du démarrage
     jeedom_com.send_change_immediate({
-        'object' : 'account_thread',
-        'info' : 'started',
+        'object' : 'account',
+        'info' : 'thread_started',
         'account_id' : accountId
     })
             
