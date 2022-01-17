@@ -19,7 +19,6 @@ class easee(account):
         self.connections[serial].send("SubscribeWithCurrentState", [serial, True])
 
     def getToken(self):
-        self.log_debug("====== " + self._token + " =======")
         return self._token
 
     def on_ProductUpdate(self,messages):
@@ -32,10 +31,14 @@ class easee(account):
                 continue
             logicalId = self._cfg['signalR_id'][cmd_id]
             msg2Jeedom = {}
+            msg2Jeedom['object'] = 'cmd'
+            msg2Jeedom['type'] = 'easee'
             msg2Jeedom['chargeur'] = message['mid']
-            msg2Jeedom['cmd'] = logicalId
+            msg2Jeedom['logicalId'] = logicalId
             msg2Jeedom['value'] = message['value']
             self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+            self._jeedom_com.send_change_immediate(msg2Jeedom)
+
 
     def on_CommandResponse(self,messages):
         pass

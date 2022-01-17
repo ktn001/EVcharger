@@ -21,6 +21,21 @@ try {
 	function process_chargeur_message($message) {
 	}
 
+	function process_cmd_message($message) {
+		if (!array_key_exists('chargeur',$message)) {
+			log::error(__("Message du demon de type <cmd> mais sans identifiant de chargeur!",__FILE__));
+		}
+		if (!array_key_exists('type',$message)) {
+			log::error(__("Message du demon de type <cmd> mais sans type de chargeur!",__FILE__));
+		}
+		if (!array_key_exists('logicalId',$message)) {
+			log::error(__("Message du demon de type <cmd> mais sans <logicalId>!",__FILE__));
+		}
+		foreach (chargeurVE::byTypeAndIdentifiant($message['type'],$message['chargeur']) as $chargeur){
+			$chargeur->checkAndUpdateCmd($message['logicalId'],$message['value']);
+		}
+	}
+
 	if (!jeedom::apiAccess(init('apikey'), 'chargeurVE')) {
 		echo __('Vous n\'êtes pas autorisé à effectuer cette action', __FILE__);
 		die();
@@ -47,6 +62,8 @@ try {
 		process_account_message($message);
 	case 'chargeur':
 		process_chargeur_message($message);
+	case 'cmd':
+		process_cmd_message($message);
 	}
 
 

@@ -91,7 +91,7 @@ def start_account(accountType, accountId):
 
     logging.info(f"Creating account <{accountType}> id:{accountId}")
     queue = Queue()
-    account = eval("account." + accountType)(accountId, accountType, queue)
+    account = eval("account." + accountType)(accountId, accountType, queue, jeedom_com)
     accounts[accountId] = {
             'type' : accountType,
             'queue' : queue,

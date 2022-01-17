@@ -25,10 +25,11 @@ import json
 class account():
     """Class de base pour les differents types d'account"""
 
-    def __init__(self, id, type, queue):
+    def __init__(self, id, type, queue, jeedom_com):
         self._id = id
         self._type = type
         self._jeedomQueue = queue
+        self._jeedom_com = jeedom_com
 
     def log_debug(self,txt):
         logging.debug(f'[account][{self._type}][{self._id}] {txt}')

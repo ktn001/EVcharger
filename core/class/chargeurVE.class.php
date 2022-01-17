@@ -29,6 +29,19 @@ class chargeurVE extends eqLogic {
 		return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
 	}
 
+	public static function byTypeAndIdentifiant($type, $identifiant) {
+		$identKey = type::getIdentifiantChargeur($type);
+		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
+		$chargeurs = array();
+		foreach (chargeurVE::byTypeAndSearchConfiguration('chargeurVE',$searchConf) as $chargeur){
+			if ($chargeur->getConfiguration('type') == $type){
+				$chargeurs[] = $chargeur;
+			}
+		}
+		return $chargeurs;
+
+	}
+
     /*     * **********************Gestion du daemon************************* */
 
     /*
