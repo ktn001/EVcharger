@@ -24,7 +24,7 @@ from optparse import OptionParser
 import json
 import argparse
 import importlib
-#import asyncio
+import time
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../lib')
 sys.path.append (libDir)
@@ -99,6 +99,7 @@ def start_account(accountType, accountId):
             'thread' : account.run()
             }
     logging.debug(f"Thread for account {accountId} started")
+    logging.debug(accounts)
 
     # On informe Jeedon du démarrage
     jeedom_com.send_change_immediate({
@@ -167,9 +168,18 @@ def shutdown():
     logging.debug("Shutdown...")
     msgStop = json.dumps({'cmd' : 'stop'})
     logging.debug(accounts)
-    for account in accounts:
-        logging.debug(account['account'])
-        logging.debug(account['type'])
+    for accountId in accounts:
+        queue = accounts[accountId]['queue']
+        queue.put(msgStop)
+    for i in range(10):
+        for accountId, account in list(accounts.items()):
+            if not account['thread'].is_alive():
+                del accounts[accountId]
+        if len(accounts) == 0:
+            break
+        time.sleep(1)
+
+        
 
     logging.debug("Removing PID file " + str(_pidfile))
     try:

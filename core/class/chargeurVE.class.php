@@ -106,13 +106,9 @@ class chargeurVE extends eqLogic {
 	public static function deamon_stop() {
 		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
 		if (file_exists($pid_file)) {
-			foreach (account::all(true) as $account) {
-				$account->stopDeamonThread();
-			}
-			sleep (5);
 			$pid = intval(trim(file_get_contents($pid_file)));
 			log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
-			system::kill($pid);
+			system::kill($pid, false);
 			sleep(1);
 			return;
 		}
