@@ -19,17 +19,20 @@ try {
 	}
 
 	function process_chargeur_message($message) {
+		if ($message['info'] == 'closed'){
+			log::add('chargeurVE',info,'[' . $message['type'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
+		}
 	}
 
 	function process_cmd_message($message) {
 		if (!array_key_exists('chargeur',$message)) {
-			log::error(__("Message du demon de type <cmd> mais sans identifiant de chargeur!",__FILE__));
+			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans identifiant de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('type',$message)) {
-			log::error(__("Message du demon de type <cmd> mais sans type de chargeur!",__FILE__));
+			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans type de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('logicalId',$message)) {
-			log::error(__("Message du demon de type <cmd> mais sans <logicalId>!",__FILE__));
+			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans <logicalId>!",__FILE__));
 		}
 		foreach (chargeurVE::byTypeAndIdentifiant($message['type'],$message['chargeur']) as $chargeur){
 			$chargeur->checkAndUpdateCmd($message['logicalId'],$message['value']);
@@ -52,18 +55,22 @@ try {
 	log::add("chargeurVE","debug","Message reçu du démon: " . print_r($message,true));
 
 	if (!array_key_exists('object',$message)){
-		log::error('chargeurVE','error','Message reçu du deamon dans champ "object"');
+		log::error('chargeurVE','error','Message reçu du deamon sans champ "object"');
 		die();
 	}
 	switch ($message['object']) {
 	case 'deamon':
 		process_deamon_message($message);
+		break;
 	case 'account':
 		process_account_message($message);
+		break;
 	case 'chargeur':
 		process_chargeur_message($message);
+		break;
 	case 'cmd':
 		process_cmd_message($message);
+		break;
 	}
 
 

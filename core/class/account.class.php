@@ -277,6 +277,9 @@ class account {
 	public function startDeamonThread() {
 		if ($this->isEnabled()){
 			$message = array('cmd' => 'start');
+			if (method_exists($this,'msgToStartDeamonThread')){
+				$message = $this->msgToStartDeamonThread();
+			}
 			$this->send2Deamon($message);
 		}
 	}

@@ -95,9 +95,9 @@ def start_account(accountType, accountId):
     accounts[accountId] = {
             'type' : accountType,
             'queue' : queue,
-            'account' : account
+            'account' : account,
+            'thread' : account.run()
             }
-    accounts[accountId]['account'].run()
     logging.debug(f"Thread for account {accountId} started")
 
     # On informe Jeedon du démarrage
@@ -164,7 +164,13 @@ def handler(signum=None, frame=None):
     shutdown()
 
 def shutdown():
-    logging.debug("Shutdown")
+    logging.debug("Shutdown...")
+    msgStop = json.dumps({'cmd' : 'stop'})
+    logging.debug(accounts)
+    for account in accounts:
+        logging.debug(account['account'])
+        logging.debug(account['type'])
+
     logging.debug("Removing PID file " + str(_pidfile))
     try:
         os.remove(_pidfile)

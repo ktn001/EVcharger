@@ -164,13 +164,13 @@ class easeeAccount extends account {
 		}
 	}
 
-	public function startDeamonThread() {
+	public function msgToStartDeamonThread() {
 		$message = array(
 			'cmd' => 'start',
 			'url' => $this->url,
 			'token' => $this->token['accessToken'],
 		);
-		$this->send2Deamon($message);
+		return $message;
 	}
 
 	public function execute_cable_lock($cmd) {

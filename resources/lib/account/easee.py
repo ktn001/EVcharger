@@ -18,11 +18,34 @@ class easee(account):
         self.log_debug(self.connections)
         self.connections[serial].send("SubscribeWithCurrentState", [serial, True])
 
+    def on_close(self,serial):
+        if serial in self.connections:
+            self.connections.pop(serial)
+        msg2Jeedom = {}
+        msg2Jeedom['object'] = 'chargeur'
+        msg2Jeedom['type'] = 'easee'
+        msg2Jeedom['chargeur'] = serial
+        msg2Jeedom['info'] = 'closed'
+        self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+        self._jeedom_com.send_change_immediate(msg2Jeedom)
+
     def getToken(self):
         return self._token
 
     def on_ProductUpdate(self,messages):
-        pass
+        for message in messages:
+            cmd_id = str(message['id'])
+            if not cmd_id in self._cfg['signalR_id']:
+                continue
+            logicalId = self._cfg['signalR_id'][cmd_id]
+            msg2Jeedom = {}
+            msg2Jeedom['object'] = 'cmd'
+            msg2Jeedom['type'] = 'easee'
+            msg2Jeedom['chargeur'] = message['mid']
+            msg2Jeedom['logicalId'] = logicalId
+            msg2Jeedom['value'] = message['value']
+            self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+            self._jeedom_com.send_change_immediate(msg2Jeedom)
 
     def on_ChargeurUpdate(self,messages):
         for message in messages:
@@ -38,7 +61,6 @@ class easee(account):
             msg2Jeedom['value'] = message['value']
             self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
             self._jeedom_com.send_change_immediate(msg2Jeedom)
-
 
     def on_CommandResponse(self,messages):
         pass
@@ -75,7 +97,9 @@ class easee(account):
             self._cfg.read('/var/www/html/plugins/chargeurVE/core/config/easee/chargeurVEd.ini')
         url = self._url + '/hubs/chargers'
         options = {'access_token_factory': self.getToken}
-                #.configure_logging(logging.DEBUG)\
+
+        if msg['identifiant'] in self.connections:
+            return
         connection = HubConnectionBuilder().with_url(url,options)\
                 .with_automatic_reconnect({
                     "type": "raw",
@@ -85,6 +109,7 @@ class easee(account):
                 }).build()
         self.connections[msg['identifiant']] = connection
         connection.on_open(lambda: self.on_open(msg['identifiant']))
+        connection.on_close(lambda: self.on_close(msg['identifiant']))
         connection.on('ProductUpdate', self.on_ProductUpdate)
         connection.on('ChargerUpdate', self.on_ChargeurUpdate)
         connection.on('CommandResponse', self.on_CommandResponse)

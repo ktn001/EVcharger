@@ -68,8 +68,9 @@ class account():
 
     def run(self):
         self.log_debug(f'Lancement de thread')
-        threading.Thread(target=self.listen_jeedom, args=()).start()
+        thread = threading.Thread(target=self.listen_jeedom, args=()).start()
         self.log_info(f'Thread lancé')
+        return thread
 
     def do_stop(self,msg):
         self._stop = True
