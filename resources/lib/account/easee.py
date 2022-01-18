@@ -4,12 +4,12 @@ import os
 import sys
 import configparser
 import time
+from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../')
 sys.path.append(libDir)
 
 from account import account
-from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 class easee(account):
 
@@ -33,6 +33,14 @@ class easee(account):
         connection.on('ChargerUpdate', self.on_ChargeurUpdate)
         connection.on('CommandResponse', self.on_CommandResponse)
         connection.start()
+        return
+
+    def stop_charger_listener(self,serial):
+        self.connections[serial].stopping = True
+        self.connections[serial].stop()
+        for i in range(10):
+            if len(self.connections) == 0:
+                break
         return
 
     def on_open(self,serial):
@@ -105,11 +113,7 @@ class easee(account):
 
     def do_stop(self,message):
         for serial, connection in list(self.connections.items()):
-            self.connections[serial].stopping = True
-            self.connections[serial].stop()
-        for i in range(10):
-            if len(self.connections) == 0:
-                break
+            self.stop_charger_listener(serial)
         return
 
     def do_newToken(self,message):
@@ -125,7 +129,6 @@ class easee(account):
 
     def do_start_charger_listener(self,message):
         msg = json.loads(message)
-
         if not 'identifiant' in msg:
             self.log_error(f"do_start_charger_listener(): identifiant is missing")
             return
@@ -135,3 +138,15 @@ class easee(account):
             self._cfg.read('/var/www/html/plugins/chargeurVE/core/config/easee/chargeurVEd.ini')
         self.start_charger_listener(msg['identifiant'])
         
+    def do_stop_charger_listener(self,message):
+        msg = json.loads(message)
+        if not 'identifiant' in msg:
+            self.log_error(f"do_stop_charger_listener(): identifiant is missing")
+            return
+        if not hasattr(self,'connections'):
+            return
+        if not msg['identifiant'] in self.connections:
+            return
+        self.stop_charger_listener(msg['identifiant'])
+
+

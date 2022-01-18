@@ -18,19 +18,24 @@ date
 
 echo 5 > $PROGRESS_FILE
 apt-get clean
-echo 30 > $PROGRESS_FILE
+echo 20 > $PROGRESS_FILE
 apt-get update
-echo 50 > $PROGRESS_FILE
+echo 35 > $PROGRESS_FILE
 
 echo "***********************************"
 echo "*  Install modules using apt-get  *"
 echo "***********************************"
 apt-get install -y python3 python3-requests
-echo 60 > $PROGRESS_FILE
+echo 50 > $PROGRESS_FILE
 apt-get install -y python3 python3-websocket
-echo 70 > $PROGRESS_FILE
+echo 65 > $PROGRESS_FILE
 apt-get install -y python3 python3-msgpack
-echo 90 > $PROGRESS_FILE
+echo 80 > $PROGRESS_FILE
+
+echo "***********************************"
+echo "*  Install modules using apt-get  *"
+echo "***********************************"
+python3 -m pip install signalrcore
 
 echo "***********************************"
 echo "*       Install ended             *"

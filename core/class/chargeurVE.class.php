@@ -226,6 +226,11 @@ class chargeurVE extends eqLogic {
 
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
 	public function postSave() {
+		if ($this->getIsEnable()){
+			$this->startListener();
+		} else {
+			$this->stopListener();
+		}
 	}
 
     // Fonction exécutée automatiquement avant la suppression de l'équipement
@@ -278,6 +283,15 @@ class chargeurVE extends eqLogic {
 		}
 		$message = array(
 			'cmd' => 'start_charger_listener',
+			'chargerId' => $this->id,
+			'identifiant' => $this->getIdentifiant()
+		);
+		account::byId($this->getAccountId())->send2Deamon($message);
+	}
+
+	public function stopListener() {
+		$message = array(
+			'cmd' => 'stop_charger_listener',
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
