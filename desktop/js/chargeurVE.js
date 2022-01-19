@@ -331,9 +331,22 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 	$('#mod_chargeurNameAndType').dialog('open');
 });
 
+/*
+ * Action sur modification d'image d'n chargeur
+ */
 $('#selectChargeurImg').on('change',function(){
 	$('[name=icon_visu]').attr('src', $(this).value());
 });
+
+/*
+ * Action sur mise à jour des commandes
+ */
+$('.cmdAction[data-action=actualize]').on('click',function() {
+	if (checkPageModified()) {
+		return;
+	}
+	alert ("On met à jour");
+})
 
 /*
 * Fonction permettant l'affichage des commandes dans l'équipement

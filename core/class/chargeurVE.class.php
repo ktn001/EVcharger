@@ -193,6 +193,39 @@ class chargeurVE extends eqLogic {
 
     /*     * *********************Méthodes d'instance************************* */
 
+    // Création/mise à jour des commande prédéfinies
+	public function UpdateCmds($mandatoryOnly = true) {
+		$ids = array();
+		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
+			log::add("chargeurVE","debug","logicalID : " . $logicalId);
+			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			if (!is_object($cmd)){
+				$cmd = new chargeurVECMD();
+			}
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__($config['name'],__FILE__));
+			$cmd->setLogicalId($logicalId);
+			$cmd->setType($config['type']);
+			$cmd->setSubType($config['subType']);
+			$cmd->save();
+			$ids[$logicalId] = $cmd->getId();
+		}
+		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
+			log::add("chargeurVE","debug","logicalID : " . $logicalId);
+			if (array_key_exists('value',$config)){
+				log::add("chargeurVE","debug","  value : " . $config['value']);
+				log::add("chargeurVE","debug","     id : " . $ids[$config['value']]);
+				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+				if (!is_object($cmd)){
+					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));
+					continue;
+				}
+				$cmd->setValue($ids[$config['value']]);
+				$cmd->save();
+			}
+		}
+	}
+
     // Fonction exécutée automatiquement avant la création de l'équipement
 	public function preInsert() {
 		$this->setConfiguration('image',type::images($this->getConfiguration('type'),'chargeur')[0]);
@@ -200,25 +233,7 @@ class chargeurVE extends eqLogic {
 
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
-		$ids = array();
-		foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
-			log::add("chargeurVE","debug","88 " . print_r($config,true));
-			$cmd = new chargeurVECMD();
-			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName(__($config['name'],__FILE__));
-			$cmd->setLogicalId($logicalId);
-			$cmd->setType($config['type']);
-			$cmd->setSubType($config['subType']);
-			$cmd->save();
-			ids[logicalId] = $cmd->getId;
-		}
-		foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
-			if (array_key_exists('value',$config)){
-				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
-				$cmd->setValue($ids[$config['value']);
-				$cmd->save();
-			}
-		}
+		$this->UpdateCmds(false);
 	}
 
     // Fonction exécutée automatiquement avant la mise à jour de l'équipement
@@ -249,24 +264,6 @@ class chargeurVE extends eqLogic {
     // Fonction exécutée automatiquement après la suppression de l'équipement
 	public function postRemove() {
 	}
-
-   /*
-    * Non obligatoire : permet de modifier l'affichage du widget (également utilisable par les commandes)
-	public function toHtml($_version = 'dashboard') {
-	}
-    */
-
-    /*
-     * Non obligatoire : permet de déclencher une action après modification de variable de configuration
-	public static function postConfig_<Variable>() {
-	}
-     */
-
-    /*
-     * Non obligatoire : permet de déclencher une action avant modification de variable de configuration
-	public static function preConfig_<Variable>() {
-	}
-     */
 
 	public function getPathImg() {
 		$image = $this->getConfiguration('image');

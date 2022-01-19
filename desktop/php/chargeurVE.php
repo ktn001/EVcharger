@@ -203,6 +203,7 @@ sendVarToJS('typeLabels',type::labels());
 	    <!-- ================================ -->
 	    <div role="tabpanel" class="tab-pane" id="commandtab">
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
+		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="actualize" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Mettre à jour les commande par défaut}}</a>
 		<br/><br/>
 		<div class="table-responsive">
 		    <table id="table_cmd" class="table table-bordered table-condensed">

@@ -54,6 +54,29 @@ try {
 		ajax::success();
 	}
 
+	if (init('action') == 'updateCmds') {
+		$id = init('id');
+		if ($id == ''){
+			throw new Exception(__("L'Id du chargeur n'est pas indiqué",__FILE__));
+		}
+		$mandatoryOnly = init('mandatoryOnly');
+		$chargeur = chargeurVE::byId($id);
+		if (!is_object($chargeur)){
+			throw new Exception(sprintf(__("Chargeur %s introuvable.",__FILE__),$id));
+			ajax::error();
+		}
+		try {
+			if ($mandatoryOnly == ''){
+				$chargeur->updateCmds();
+			} else {
+				$chargeur->updateCmds($mandatoryOnly);
+			}
+			ajax::success();
+		} catch (Exception $e){
+			ajax::error(displayException($e), $e->getCode());
+		}
+	}
+
 	throw new Exception(__("Aucune méthode correspondante à : ", __FILE__) . init('action'));
 
 	/*     * *********Catch exeption*************** */
