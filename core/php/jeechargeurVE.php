@@ -20,7 +20,7 @@ try {
 
 	function process_chargeur_message($message) {
 		if ($message['info'] == 'closed'){
-			log::add('chargeurVE',info,'[' . $message['type'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
+			log::add('chargeurVE','info','[' . $message['type'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
 		}
 	}
 

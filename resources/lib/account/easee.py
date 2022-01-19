@@ -4,6 +4,7 @@ import os
 import sys
 import configparser
 import time
+
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../')
@@ -50,21 +51,21 @@ class easee(account):
     def on_close(self,serial):
         if serial in self.connections:
             if not hasattr(self.connections[serial],'stopping'):
-                self.connections.pop(serial)
-                time.sleep(1)
-                self.start_charger_listener(serial)
+                del self.connections[serial]
+                msg2Account  = {}
+                msg2Account['cmd'] = 'start_charger_listener'
+                msg2Account['identifiant'] =  serial
+                self._jeedomQueue.put(json.dumps(msg2Account))
                 return
             else:
-               self.connections.pop(serial)
-        msg2Jeedom = {}
-        msg2Jeedom['object'] = 'chargeur'
-        msg2Jeedom['type'] = 'easee'
-        msg2Jeedom['chargeur'] = serial
-        msg2Jeedom['info'] = 'closed'
-        self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
-        self._jeedom_com.send_change_immediate(msg2Jeedom)
-        if serial in self.connections:
-            del self.connections[serial]
+                msg2Jeedom = {}
+                msg2Jeedom['object'] = 'chargeur'
+                msg2Jeedom['type'] = 'easee'
+                msg2Jeedom['chargeur'] = serial
+                msg2Jeedom['info'] = 'closed'
+                self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+                self._jeedom_com.send_change_immediate(msg2Jeedom)
+                del self.connections[serial]
 
     def on_ProductUpdate(self,messages):
         for message in messages:
@@ -119,9 +120,9 @@ class easee(account):
     def do_newToken(self,message):
         msg = json.loads(message)
         if not hasattr(self,'token') or self.token != msg['token']:
-            logger.debug("Nouveau token reçu")
+            self.log_debug("Nouveau token reçu")
         else:
-            logger.warn("Reception d'une commande 'newToken' sans modification du token")
+            self.log_warning("Reception d'une commande 'newToken' sans modification du token")
         return
 
     def getToken(self):

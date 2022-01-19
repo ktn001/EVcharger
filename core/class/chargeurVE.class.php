@@ -200,6 +200,7 @@ class chargeurVE extends eqLogic {
 
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
+		$ids = array();
 		foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
 			log::add("chargeurVE","debug","88 " . print_r($config,true));
 			$cmd = new chargeurVECMD();
@@ -209,6 +210,14 @@ class chargeurVE extends eqLogic {
 			$cmd->setType($config['type']);
 			$cmd->setSubType($config['subType']);
 			$cmd->save();
+			ids[logicalId] = $cmd->getId;
+		}
+		foreach (type::commands($this->getConfiguration('type'),true) as $logicalId => $config) {
+			if (array_key_exists('value',$config)){
+				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+				$cmd->setValue($ids[$config['value']);
+				$cmd->save();
+			}
 		}
 	}
 
@@ -295,7 +304,9 @@ class chargeurVE extends eqLogic {
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
-		account::byId($this->getAccountId())->send2Deamon($message);
+		if ($this->getAccountId()) {
+			account::byId($this->getAccountId())->send2Deamon($message);
+		}
 	}
 
     /*     * **********************Getteur Setteur*************************** */
