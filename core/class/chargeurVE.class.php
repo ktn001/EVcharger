@@ -207,6 +207,14 @@ class chargeurVE extends eqLogic {
 			$cmd->setLogicalId($logicalId);
 			$cmd->setType($config['type']);
 			$cmd->setSubType($config['subType']);
+			$cmd->setOrder($config['order']);
+			if (array_key_exists('template', $config)) {
+				$cmd->setTemplate('dashboard',$config['template']);
+				$cmd->setTemplate('mobile',$config['template']);
+			}
+			if (array_key_exists('visible', $config)) {
+				$cmd->setIsVisible($config['visible']);
+			}
 			$cmd->save();
 			$ids[$logicalId] = $cmd->getId();
 		}

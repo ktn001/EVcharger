@@ -345,7 +345,36 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 	if (checkPageModified()) {
 		return;
 	}
-	alert ("On met à jour");
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		data: {
+			action: 'updateCmds',
+			id:  $('.eqLogicAttr[data-l1key=id]').value(),
+		},
+		dataType : 'json',
+		global:false,
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			}
+			modifyWithoutSave = false
+			vars = getUrlVars()
+			url = 'index.php?'
+			for (i in vars) {
+				if (i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+					url += i + '=' + vars[i] + '&'
+				}
+			}
+			url += 'saveSuccessFull=1' + document.location.hash
+			console.log(url)
+			loadPage(url)
+		}
+	});
 })
 
 /*
