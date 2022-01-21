@@ -109,7 +109,12 @@ class chargeurVE extends eqLogic {
 			$pid = intval(trim(file_get_contents($pid_file)));
 			log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
 			system::kill($pid, false);
-			sleep(1);
+			foreach (range(0,15) as $i){
+				if (self::deamon_info()['state'] == 'nok'){
+					break;
+				}
+				sleep(1);
+			}
 			return;
 		}
 	}

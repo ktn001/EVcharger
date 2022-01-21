@@ -257,8 +257,8 @@ class account {
 	public function send2Deamon($message) {
 		$this->log('debug','send2Deamon: ' . print_r($message,true));
 		if (chargeurVE::deamon_info()['state'] != 'ok'){
-			$this->log('error', __("Le démon n'est pas démarré!",__FILE__));
-			throw new Exception(__("Le démon n'est pas démarré!",__FILE__));
+			$this->log('warning', __("Le démon n'est pas démarré!",__FILE__));
+			return;
 		}
 		$params['apikey'] = jeedom::getApiKey('chargeurVE');
 		$params['type'] = $this->getType();

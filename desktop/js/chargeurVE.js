@@ -46,8 +46,8 @@ function loadAccountCards() {
 			accounts = json_decode(data.result);
 			$('#accounts-div.eqLogicThumbnailContainer').empty();
 			for (account of accounts) {
-				opacity = (account.enabled == 1) ? '' : 'disableCard';
-				html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
+				let opacity = (account.enabled == 1) ? '' : 'disableCard';
+				let html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
 				html += '<img src="' + account.image + '"/>';
 				html += '<br/>';
 				html += '<span class="name">' + account.humanName + '</span>';
@@ -178,7 +178,7 @@ function editAccount (type, accountId ='') {
 			$('#mod_editAccount').dialog('option','title','{{Compte de type:}} ' + typeLabels[result.account.type]);
  		}
  	});
- 	buttons = []
+ 	let buttons = []
  	buttons.push( {
  		text: "{{Annuler}}",
  		click: function() {
@@ -205,7 +205,7 @@ function editAccount (type, accountId ='') {
  				success: function (retour) {
  					if (retour.state != 'ok') {
 						if (retour.code == 1) {
-							response = json_decode(retour.result);
+							let response = json_decode(retour.result);
 							saveWithPassword(response.account);
  							$('#div_alert').showAlert({message: response.message, level: 'warning'});
 							return;
@@ -303,7 +303,7 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
-			chargeurs = mod_chargeurNameAndType('result');
+			let chargeurs = mod_chargeurNameAndType('result');
 			if ( chargeurs[0].name != '') {
 				$(this).dialog("close");
 			 	jeedom.eqLogic.save({
@@ -313,8 +313,8 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 						$('#div_alert').showAlert({message: error.message, level: 'danger'});
 					},
 					success: function(_data) {
-						var vars = getUrlVars();
-						var url = 'index.php?';
+						let vars = getUrlVars();
+						let url = 'index.php?';
 						for (var i in vars) {
 							if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
 								url += i + '=' + vars[i].replace('#', '') + '&';
@@ -363,9 +363,9 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 				return;
 			}
 			modifyWithoutSave = false
-			vars = getUrlVars()
-			url = 'index.php?'
-			for (i in vars) {
+			let vars = getUrlVars()
+			let url = 'index.php?'
+			for (let i in vars) {
 				if (i != 'saveSuccessFull' && i != 'removeSuccessFull') {
 					url += i + '=' + vars[i] + '&'
 				}
@@ -387,7 +387,7 @@ function addCmdToTable(_cmd) {
 	if (!isset(_cmd.configuration)) {
 		_cmd.configuration = {};
 	}
-	var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
+	let  tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
 	tr += '<td style="min-width:50px;width:70px;">';
 	tr += '<span class="cmdAttr" data-l1key="id"></span>';
 	tr += '</td>';
@@ -427,7 +427,7 @@ function addCmdToTable(_cmd) {
 	tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
 	tr += '</tr>';
 	$('#table_cmd tbody').append(tr);
-	var tr = $('#table_cmd tbody tr').last();
+	tr = $('#table_cmd tbody tr').last();
 	jeedom.eqLogic.builSelectCmd({
 		id:  $('.eqLogicAttr[data-l1key=id]').value(),
 		filter: {type: 'info'},
@@ -466,7 +466,7 @@ function loadSelectAccount(defaut) {
 			$('#selectAccount').empty();
 			datas = json_decode(data.result);
 			content = "";
-			for (data of datas) {
+			for (let data of datas) {
 				content += '<option value="' + data.id + '">' + data.value + '</option>';
 			}
 			$('#selectAccount').append(content).val(defaut).trigger('change');
@@ -493,8 +493,8 @@ function loadSelectImg(defaut) {
 				return;
 			}
 			$('#selectChargeurImg').empty();
-			images = json_decode(data.result);
-			options = "";
+			let images = json_decode(data.result);
+			let options = "";
 			for (image of images) {
 				splitPath = image.split('/').reverse();
 				if (splitPath[1] != 'img') {
@@ -529,7 +529,7 @@ function printEqLogic (configs) {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
-			html = data.result;
+			let html = data.result;
 			$('#ChargeurSpecificsParams').html(html);
 			$('#ChargeurSpecificsParams').setValues(configs, '.eqLogicAttr');
 		}
