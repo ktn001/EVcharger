@@ -64,7 +64,7 @@ class easee(account):
                 msg2Jeedom['chargeur'] = serial
                 msg2Jeedom['info'] = 'closed'
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
-                self._jeedom_com.send_change_immediate(msg2Jeedom)
+                self.send2Jeedom(msg2Jeedom)
                 del self.connections[serial]
 
     def on_ProductUpdate(self,messages):
@@ -72,30 +72,30 @@ class easee(account):
             cmd_id = str(message['id'])
             if not cmd_id in self._cfg['signalR_id']:
                 continue
-            logicalId = self._cfg['signalR_id'][cmd_id]
-            msg2Jeedom = {}
-            msg2Jeedom['object'] = 'cmd'
-            msg2Jeedom['type'] = 'easee'
-            msg2Jeedom['chargeur'] = message['mid']
-            msg2Jeedom['logicalId'] = logicalId
-            msg2Jeedom['value'] = message['value']
-            self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
-            self._jeedom_com.send_change_immediate(msg2Jeedom)
+            for logicalId in self._cfg['signalR_id'][cmd_id].split(','):
+                msg2Jeedom = {}
+                msg2Jeedom['object'] = 'cmd'
+                msg2Jeedom['type'] = 'easee'
+                msg2Jeedom['chargeur'] = message['mid']
+                msg2Jeedom['logicalId'] = logicalId
+                msg2Jeedom['value'] = message['value']
+                self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+                self.send2Jeedom(msg2Jeedom)
 
     def on_ChargeurUpdate(self,messages):
         for message in messages:
             cmd_id = str(message['id'])
             if not cmd_id in self._cfg['signalR_id']:
                 continue
-            logicalId = self._cfg['signalR_id'][cmd_id]
-            msg2Jeedom = {}
-            msg2Jeedom['object'] = 'cmd'
-            msg2Jeedom['type'] = 'easee'
-            msg2Jeedom['chargeur'] = message['mid']
-            msg2Jeedom['logicalId'] = logicalId
-            msg2Jeedom['value'] = message['value']
-            self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
-            self._jeedom_com.send_change_immediate(msg2Jeedom)
+            for logicalId in self._cfg['signalR_id'][cmd_id].split(','):
+                msg2Jeedom = {}
+                msg2Jeedom['object'] = 'cmd'
+                msg2Jeedom['type'] = 'easee'
+                msg2Jeedom['chargeur'] = message['mid']
+                msg2Jeedom['logicalId'] = logicalId
+                msg2Jeedom['value'] = message['value']
+                self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+                self.send2Jeedom(msg2Jeedom)
 
     def on_CommandResponse(self,messages):
         pass
@@ -135,8 +135,9 @@ class easee(account):
             return
         if not hasattr(self,'connections'):
             self.connections = {}
+            configDir = os.path.dirname(__file__) + '/../../../core/config/easee'
             self._cfg = configparser.ConfigParser()
-            self._cfg.read('/var/www/html/plugins/chargeurVE/core/config/easee/chargeurVEd.ini')
+            self._cfg.read(f'{configDir}/chargeurVEd.ini')
         self.start_charger_listener(msg['identifiant'])
         
     def do_stop_charger_listener(self,message):

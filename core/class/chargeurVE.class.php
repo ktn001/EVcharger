@@ -220,6 +220,10 @@ class chargeurVE extends eqLogic {
 			if (array_key_exists('visible', $config)) {
 				$cmd->setIsVisible($config['visible']);
 			}
+			if (array_key_exists('displayName', $config)) {
+				$cmd->setDisplay('showNameOndashboard', $config['displayName']);
+				$cmd->setDisplay('showNameOnmobile', $config['displayName']);
+			}
 			$cmd->save();
 			$ids[$logicalId] = $cmd->getId();
 		}

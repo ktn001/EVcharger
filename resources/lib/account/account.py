@@ -21,6 +21,7 @@ from queue import Queue
 from jeedom import *
 import logging
 import json
+import configparser
 
 class account():
     """Class de base pour les differents types d'account"""
@@ -30,6 +31,9 @@ class account():
         self._type = type
         self._jeedomQueue = queue
         self._jeedom_com = jeedom_com
+        transformsFile = os.path.dirname(__file__) + '/../../../core/config/' + type + '/transforms.ini'
+        self._transforms = configparser.ConfigParser()
+        self._transforms.read(transformsFile)
 
     def log_debug(self,txt):
         logging.debug(f'[account][{self._type}][{self._id}] {txt}')
@@ -42,6 +46,18 @@ class account():
 
     def log_error(self,txt):
         logging.error(f'[account][{self._type}][{self._id}] {txt}')
+
+    def send2Jeedom(self,msg):
+        msgIsCmd = True
+        for key in ('object', 'type', 'chargeur', 'logicalId', 'value'):
+            self.log_debug(key)
+            if not key in msg:
+                msgIsCmd = False
+                break
+        if msgIsCmd:
+            if msg['object'] == 'cmd':
+                msg['value'] = self._transforms.get(msg['logicalId'],msg['value'],fallback=msg['value'])
+        self._jeedom_com.send_change_immediate(msg)
 
     def read_jeedom_queue(self):
         if not self._jeedomQueue.empty():
