@@ -2,7 +2,7 @@
 	"id" : "chargeurVE",
 	"name" : "Chargeur VE",
 	"description" : {
-		"fr_FR": "Plugin pour les station de charge de véhicules électriques"
+		"fr_FR": "Plugin pour les stations de charge de véhicules électriques"
 	},
 	"utilization" : {
 		"fr_FR": "Seuls les chargeurs <easee> sont actuallement utilisables dans ce plusgin.<BR/>D'autres type de chargeurs pourront être inégrés à l'avenir",
