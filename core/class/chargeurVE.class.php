@@ -200,15 +200,17 @@ class chargeurVE extends eqLogic {
 
     // Création/mise à jour des commande prédéfinies
 	public function UpdateCmds($mandatoryOnly = true) {
+		log::add('chargeurVE','debug','EpdateCmds');
 		$ids = array();
 		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
 			log::add("chargeurVE","debug","logicalID : " . $logicalId);
 			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				$cmd = new chargeurVECMD();
+				$cmd->setName(__($config['name'],__FILE__));
 			}
+			$cmd->setConfiguration('mandatory',$config['mandatory']);
 			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName(__($config['name'],__FILE__));
 			$cmd->setLogicalId($logicalId);
 			$cmd->setType($config['type']);
 			$cmd->setSubType($config['subType']);
