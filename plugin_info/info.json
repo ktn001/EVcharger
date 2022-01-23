@@ -5,7 +5,7 @@
 		"fr_FR": "Plugin pour les station de charge de véhicules électriques"
 	},
 	"utilization" : {
-		"fr_FR": "Seuls les chargeurs <easee> sont actuallement utilisables dans ce plusgin.<BR/>D'autres type de chargeurs pourront être inégrés à l'avenir",
+		"fr_FR": "Seuls les chargeurs <easee> sont actuallement utilisables dans ce plusgin.<BR/>D'autres type de chargeurs pourront être inégrés à l'avenir"
 	},
 	"licence" : "GNU",
 	"author" : "ktn",
