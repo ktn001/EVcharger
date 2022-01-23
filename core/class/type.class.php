@@ -94,8 +94,8 @@ class type {
 	public static function commands($type, $mandatoryOnly = false) {
 		$configPath = __DIR__ . '/../config';
 		$configFile = 'cmd.config.ini';
-		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true);
-		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true);
+		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
+		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true, INI_SCANNER_RAW);
 		$configs = array();
 		foreach ($defaultCommands as $logicalId => $cmdConfig) {
 			if (array_key_exists($logicalId, $typeCommands)) {
@@ -110,6 +110,7 @@ class type {
 			}
 		}
 		$commands = array();
+		log::add('chargeurVE','debug',print_r($configs,true));
 		$groups = array();
 		foreach ($configs as $logicalId => $config) {
 			if (strpos($logicalId, 'group:') === 0) {
@@ -132,7 +133,7 @@ class type {
 		$return = array();
 		if ($mandatoryOnly){
 			foreach ($commands as $logicalId => $command){
-				if ($command['mandatory']){
+				if ($command['mandatory'] == 'yes'){
 					$return[$logicalId] = $command;
 				}
 			}
