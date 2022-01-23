@@ -199,11 +199,10 @@ class chargeurVE extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     // Création/mise à jour des commande prédéfinies
-	public function UpdateCmds($mandatoryOnly = true) {
+	public function UpdateCmds($mandatoryOnly = false) {
 		log::add('chargeurVE','debug','EpdateCmds');
 		$ids = array();
 		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
-			log::add("chargeurVE","debug","logicalID : " . $logicalId);
 			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				$cmd = new chargeurVECMD();
@@ -230,10 +229,7 @@ class chargeurVE extends eqLogic {
 			$ids[$logicalId] = $cmd->getId();
 		}
 		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
-			log::add("chargeurVE","debug","logicalID : " . $logicalId);
 			if (array_key_exists('value',$config)){
-				log::add("chargeurVE","debug","  value : " . $config['value']);
-				log::add("chargeurVE","debug","     id : " . $ids[$config['value']]);
 				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
 					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));

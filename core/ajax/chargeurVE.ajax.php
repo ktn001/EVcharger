@@ -45,7 +45,6 @@ try {
 		}
 		$file = realpath (__DIR__.'/../config/'.$type.'/chargeur_params.php');
 		if (file_exists($file)) {
-			log::add("chargeurVE","debug",$file);
 			ob_start();
 			require_once $file;
 			$content = translate::exec(ob_get_clean(), $file);

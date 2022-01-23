@@ -391,7 +391,7 @@ function addCmdToTable(_cmd) {
 	let isMandatory
 	if ('mandatory' in _cmd.configuration) {
 		isStandard = true;
-		isMandatory = (_cmd.configuration.mandatory == 'yes');
+		isMandatory = (_cmd.configuration.mandatory == '1');
 	}
 	let  tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
 	tr += '<td style="min-width:50px;width:70px;">';

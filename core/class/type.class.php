@@ -92,11 +92,16 @@ class type {
 	}
 
 	public static function commands($type, $mandatoryOnly = false) {
+		/*
+		 *  Lecture des fichiers de définition des commandes
+		 */
 		$configPath = __DIR__ . '/../config';
 		$configFile = 'cmd.config.ini';
 		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
 		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true, INI_SCANNER_RAW);
 		$configs = array();
+
+		/* Remplacement des valeurs par defaut par les valeurs spécifiques au type de chargeur */
 		foreach ($defaultCommands as $logicalId => $cmdConfig) {
 			if (array_key_exists($logicalId, $typeCommands)) {
 				$configs[$logicalId] = array_merge($cmdConfig, $typeCommands[$logicalId]);
@@ -104,13 +109,16 @@ class type {
 				$configs[$logicalId] = $cmdConfig;
 			}
 		}
+
+		/* Ajout des valeurs spécifiques au type de chargeur qui n'ont pas de valeur par défaut */
 		foreach ($typeCommands as $logicalId => $cmdConfig) {
 			if (!array_key_exists($logicalId, $configs)) {
 				$configs[$logicalId] = $cmdConfig;
 			}
 		}
+
+		/* tri des commandes et des groupes */
 		$commands = array();
-		log::add('chargeurVE','debug',print_r($configs,true));
 		$groups = array();
 		foreach ($configs as $logicalId => $config) {
 			if (strpos($logicalId, 'group:') === 0) {
@@ -120,6 +128,7 @@ class type {
 				$commands[$logicalId] = $config;
 			}
 		}
+		/* Mise à jour des commandes avec les valeurs de groupe */
 		foreach (array_keys($commands) as $logicalId){
 			if (array_key_exists('group', $commands[$logicalId])) {
 				$group = $commands[$logicalId]['group'];
@@ -130,10 +139,18 @@ class type {
 				}
 			}
 		}
+
+		/* Elimination des commandes qui n'ont pas l'attribut <mandatory> */
+		foreach (array_keys($commands) as $logicalId){
+			if (!array_key_exists('mandatory', $commands[$logicalId])) {
+				unset ($commands[$logicalId]);
+			}
+		}
+
 		$return = array();
 		if ($mandatoryOnly){
 			foreach ($commands as $logicalId => $command){
-				if ($command['mandatory'] == 'yes'){
+				if ($command['mandatory'] == '1'){
 					$return[$logicalId] = $command;
 				}
 			}
