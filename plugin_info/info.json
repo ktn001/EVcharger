@@ -16,6 +16,8 @@
 	"maxDependancyInstallTime" : 10,
 	"changelog" : "https://ktn001.github.io/chargeurVE/#language#/changelog.html",
 	"documentation" : "https://ktn001.github.io/chargeurVE/#language#/index.html",
+	"changelog_beta" : "https://ktn001.github.io/chargeurVE/beta/#language#/changelog.html",
+	"documentation_beta" : "https://ktn001.github.io/chargeurVE/beta/#language#/index.html",
 	"language" : ["fr_FR"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
 }
