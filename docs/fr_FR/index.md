@@ -3,8 +3,7 @@ layout: default
 lang: fr_FR
 ---
 
-Description
-===
+# Description
 
 # Plugin "chargeurVE" pour Jeedom
 Le plugin **chargeurVE** permet d'intégrer un chageur pour véhicules électriques dans Jeedom.
