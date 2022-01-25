@@ -33,3 +33,5 @@ community: https://community.jeedom.com
 market: https://market.jeedom.com
 blog: https://blog.jeedom.com
 doc: https://doc.jeedom.com
+
+theme: jekyll-theme-leap-day
