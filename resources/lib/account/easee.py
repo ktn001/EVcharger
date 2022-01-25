@@ -39,9 +39,12 @@ class easee(account):
     def stop_charger_listener(self,serial):
         self.connections[serial].stopping = True
         self.connections[serial].stop()
-        for i in range(10):
-            if len(self.connections) == 0:
-                break
+        i = 15
+        while serial in self.connections and i > 0:
+            time.sleep(1)
+            i -= 1
+        if i > 0:
+            self.log_error(f"Timeout while stopping {serial}")
         return
 
     def on_open(self,serial):
@@ -123,6 +126,10 @@ class easee(account):
             self.log_debug("Nouveau token reçu")
         else:
             self.log_warning("Reception d'une commande 'newToken' sans modification du token")
+            for serial, connection in list(self.connections.items()):
+                self.log_info(f"Restarting {serial}...")
+                self.stop_charger_listener(serial)
+                self.start_charger_listener(serial)
         return
 
     def getToken(self):
