@@ -225,6 +225,9 @@ class chargeurVE extends eqLogic {
 				$cmd->setDisplay('showNameOndashboard', $config['displayName']);
 				$cmd->setDisplay('showNameOnmobile', $config['displayName']);
 			}
+			if (array_key_exists('display::graphStep', $config)) {
+				$cmd->setDisplay('graphStep', $config['display::graphStep']);
+			}
 			$cmd->save();
 			$ids[$logicalId] = $cmd->getId();
 		}
