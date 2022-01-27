@@ -36,7 +36,7 @@ class easeeAccount extends account {
 	}
 
 	public static function cronHourly() {
-		foreach (self::byType('easee') as $account) {
+		foreach (self::byModel('easee') as $account) {
 			$account->renewApiToken();
 			$account->save();
 		}

@@ -20,21 +20,21 @@ try {
 
 	function process_chargeur_message($message) {
 		if ($message['info'] == 'closed'){
-			log::add('chargeurVE','info','[' . $message['type'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
+			log::add('chargeurVE','info','[' . $message['model'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
 		}
 	}
 
 	function process_cmd_message($message) {
 		if (!array_key_exists('chargeur',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans identifiant de chargeur!",__FILE__));
+			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans identifiant de chargeur!",__FILE__));
 		}
-		if (!array_key_exists('type',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans type de chargeur!",__FILE__));
+		if (!array_key_exists('model',$message)) {
+			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans modèle de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('logicalId',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de type <cmd> mais sans <logicalId>!",__FILE__));
+			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
-		foreach (chargeurVE::byTypeAndIdentifiant($message['type'],$message['chargeur']) as $chargeur){
+		foreach (chargeurVE::byTypeAndIdentifiant($message['model'],$message['chargeur']) as $chargeur){
 			$chargeur->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}

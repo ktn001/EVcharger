@@ -25,7 +25,7 @@ if (!isConnect('admin')) {
   <fieldset>
     <div id='accountParameters' class='col-sm-6'>
       <div class='form-group'>
-        <span class='accountAttr' data-l1key='type' style='display:none'></span>
+        <span class='accountAttr' data-l1key='model' style='display:none'></span>
         <label class='control-label col-sm-3'>Id:</label>
         <span class='accountAttr col-sm-2' data-l1key='id'</span>
       </div>

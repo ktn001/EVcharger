@@ -29,12 +29,12 @@ class chargeurVE extends eqLogic {
 		return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
 	}
 
-	public static function byTypeAndIdentifiant($type, $identifiant) {
-		$identKey = type::getIdentifiantChargeur($type);
+	public static function byModelAndIdentifiant($model, $identifiant) {
+		$identKey = model::getIdentifiantChargeur($model);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
 		$chargeurs = array();
 		foreach (chargeurVE::byTypeAndSearchConfiguration('chargeurVE',$searchConf) as $chargeur){
-			if ($chargeur->getConfiguration('type') == $type){
+			if ($chargeur->getConfiguration('model') == $model){
 				$chargeurs[] = $chargeur;
 			}
 		}
@@ -202,7 +202,7 @@ class chargeurVE extends eqLogic {
 	public function UpdateCmds($mandatoryOnly = false) {
 		log::add('chargeurVE','debug','EpdateCmds');
 		$ids = array();
-		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
+		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
 			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				$cmd = new chargeurVECMD();
@@ -234,7 +234,7 @@ class chargeurVE extends eqLogic {
 			$cmd->save();
 			$ids[$logicalId] = $cmd->getId();
 		}
-		foreach (type::commands($this->getConfiguration('type'),$mandatoryOnly) as $logicalId => $config) {
+		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
 			if (array_key_exists('value',$config)){
 				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
@@ -249,7 +249,7 @@ class chargeurVE extends eqLogic {
 
     // Fonction exécutée automatiquement avant la création de l'équipement
 	public function preInsert() {
-		$this->setConfiguration('image',type::images($this->getConfiguration('type'),'chargeur')[0]);
+		$this->setConfiguration('image',model::images($this->getConfiguration('model'),'chargeur')[0]);
 	}
 
     // Fonction exécutée automatiquement après la création de l'équipement
@@ -299,8 +299,8 @@ class chargeurVE extends eqLogic {
 	}
 
 	public function getIdentifiant() {
-		$type = $this->getConfiguration('type');
-		$configName = type::getIdentifiantChargeur($type);
+		$model = $this->getConfiguration('model');
+		$configName = model::getIdentifiantChargeur($model);
 		return $this->getConfiguration($configName);
 	}
 

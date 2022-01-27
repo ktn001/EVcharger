@@ -20,51 +20,51 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__ . '/../php/chargeurVE.inc.php';
 
-class type {
+class model {
 
     /*     * ***********************Methodes static************************** */
 
 	public static function all($onlyEnabled = true ) {
-		$typesFile = __DIR__ . "/../config/types.ini";
-		$types = parse_ini_file($typesFile,true);
-		if ($types == false) {
-			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$typesFile);
+		$modelsFile = __DIR__ . "/../config/models.ini";
+		$models = parse_ini_file($modelsFile,true);
+		if ($models == false) {
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$modelsFile);
 			log::add("chargeurVE",error,$message);
 			throw new Exception($message);
 		}
 		$result = array();
-		foreach ($types as $typeName => $config){
+		foreach ($models as $modelName => $config){
 			$config['label'] = translate::exec($config['label'],__FILE__);
-			$type = config::byKey('type::' . $typeName, 'chargeurVE');
-			if (is_array($type)){
-				$type = array_merge($config, $type);
+			$model = config::byKey('model::' . $modelName, 'chargeurVE');
+			if (is_array($model)){
+				$model = array_merge($config, $model);
 			} else {
-				$type = $config;
-				$type['enabled'] = 0;
+				$model = $config;
+				$model['enabled'] = 0;
 			}
-			if ($onlyEnabled == false or $type['enabled'] == 1) {
-				$result[$typeName] = $type;
+			if ($onlyEnabled == false or $model['enabled'] == 1) {
+				$result[$modelName] = $model;
 			}
 		}
 		return $result;
 	}
 
-	public static function types() {
-		$typesFile = __DIR__ . "/../config/types.ini";
-		$types = parse_ini_file($typesFile,true);
-		return array_keys($types);
+	public static function models() {
+		$modelsFile = __DIR__ . "/../config/models.ini";
+		$models = parse_ini_file($modelsFile,true);
+		return array_keys($models);
 	}
 
 	public static function labels($onlyEnabled = true) {
 		$labels = array();
-		foreach (type::all($onlyEnabled) as $typeName => $type) {
-			$labels[$typeName] = $type['label'];
+		foreach (model::all($onlyEnabled) as $modelName => $model) {
+			$labels[$modelName] = $model['label'];
 		}
 		return $labels;
 	}
 
-	public static function byName($typeName ) {
-		return self::all()[$typeName];
+	public static function byName($modelName ) {
+		return self::all()[$modelName];
 	}
 
 	public static function allUsed() {
@@ -75,9 +75,9 @@ class type {
 		return array_keys($used);
 	}
 
-	public static function images($type, $objet) {
+	public static function images($model, $objet) {
 		$images = array();
-		$path = realpath(__DIR__ . '/../../desktop/img/' . $type);
+		$path = realpath(__DIR__ . '/../../desktop/img/' . $model);
 		if ($dir = opendir($path)){
 			while (($fileName = readdir($dir)) !== false){
 				if (preg_match('/^' . $objet . '.*\.png$/', $fileName)){
@@ -91,27 +91,27 @@ class type {
 		return $images;
 	}
 
-	public static function commands($type, $mandatoryOnly = false) {
+	public static function commands($model, $mandatoryOnly = false) {
 		/*
 		 *  Lecture des fichiers de définition des commandes
 		 */
 		$configPath = __DIR__ . '/../config';
 		$configFile = 'cmd.config.ini';
 		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
-		$typeCommands = parse_ini_file($configPath.'/'.$type.'/'.$configFile,true, INI_SCANNER_RAW);
+		$modelCommands = parse_ini_file($configPath.'/'.$model.'/'.$configFile,true, INI_SCANNER_RAW);
 		$configs = array();
 
-		/* Remplacement des valeurs par defaut par les valeurs spécifiques au type de chargeur */
+		/* Remplacement des valeurs par defaut par les valeurs spécifiques au modèle de chargeur */
 		foreach ($defaultCommands as $logicalId => $cmdConfig) {
-			if (array_key_exists($logicalId, $typeCommands)) {
-				$configs[$logicalId] = array_merge($cmdConfig, $typeCommands[$logicalId]);
+			if (array_key_exists($logicalId, $modelCommands)) {
+				$configs[$logicalId] = array_merge($cmdConfig, $modelCommands[$logicalId]);
 			} else {
 				$configs[$logicalId] = $cmdConfig;
 			}
 		}
 
-		/* Ajout des valeurs spécifiques au type de chargeur qui n'ont pas de valeur par défaut */
-		foreach ($typeCommands as $logicalId => $cmdConfig) {
+		/* Ajout des valeurs spécifiques au modèle de chargeur qui n'ont pas de valeur par défaut */
+		foreach ($modelCommands as $logicalId => $cmdConfig) {
 			if (!array_key_exists($logicalId, $configs)) {
 				$configs[$logicalId] = $cmdConfig;
 			}
@@ -160,12 +160,12 @@ class type {
 		return $return;
 	}
 
-	private static function getConfigs($type) {
-		return parse_ini_file(__DIR__ . '/../config/' . $type . '/config.ini' ,true);
+	private static function getConfigs($model) {
+		return parse_ini_file(__DIR__ . '/../config/' . $model . '/config.ini' ,true);
 	}
 
-	public static function getIdentifiantChargeur($type) {
-		return type::getConfigs($type)['chargeur']['identifiant'];
+	public static function getIdentifiantChargeur($model) {
+		return model::getConfigs($model)['chargeur']['identifiant'];
 	}
 
     /*     * **********************Getteur Setteur*************************** */

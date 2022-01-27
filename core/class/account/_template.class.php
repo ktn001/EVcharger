@@ -24,11 +24,11 @@ class _templateAccount extends account {
     /*     * *************************Attributs****************************** */
 
 	/* ###
-	 * ### Mettre ici le nom à afficher pour ce type de compte
+	 * ### Mettre ici le nom à afficher pour ce modèle de compte
 	 * ### */
-	public static $typeLabel = "Template";
+	public static $modelLabel = "Template";
 	
-	/* ### Le fichier image pour ce type d'account ### 
+	/* ### Le fichier image pour ce model d'account ### 
 	 * ###
 	 * ### Cet attrubut peurt être omis s'il l'image par défaut doit être utilisée
 	 * ### Le nom du fichier image ne doit pat contenir de "/"
@@ -36,7 +36,7 @@ class _templateAccount extends account {
 	 * ### */
 
 	/* ###
-	 * ### Ajouter ici les attributs spécifiques aux instances de ce type de compte
+	 * ### Ajouter ici les attributs spécifiques aux instances de ce model de compte
 	 * ### */ 
 
     /*     * *********************Méthodes d'instance************************* */
@@ -111,7 +111,7 @@ class _templateAccount extends account {
 	
 	/* ###
 	 * ### Ajouter ici les fonctions get* et set* pour les attributs
-	 * ### spécifiques de ce type de compte
+	 * ### spécifiques de ce model de compte
 	 * ### */ 
 
 }

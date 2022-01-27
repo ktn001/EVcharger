@@ -25,7 +25,7 @@ class account {
 
 	protected static $plugin_id = "chargeurVE";
 
-	protected $type;
+	protected $model;
 	protected $name = "";
 	protected $id;
 	protected $enabled;
@@ -53,15 +53,15 @@ class account {
 	}
 
     /**
-     * Recherche d'accounts selon le type
+     * Recherche d'accounts selon le modèle
      */
-	public static function byType ($type) {
+	public static function byModel ($model) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
 			$account->resetModified();
-			if ($account->getType() == $type) {
+			if ($account->getModel() == $model) {
 				$accounts[] = $account;
 			}
 		}
@@ -69,15 +69,15 @@ class account {
 	}
 
     /**
-     * Recherche les objets qui ont le type et le nom donnés en argument
+     * Recherche les objets qui ont le modèle et le nom donnés en argument
      */
-	public static function byTypeAndName ($type, $name) {
+	public static function byModelAndName ($model, $name) {
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize ($config['value']);
 			$account->resetModified();
-			if ($account->getType() == $type and $account->getName() == $name) {
+			if ($account->getModel() == $model and $account->getName() == $name) {
 				$accounts[] = $account;
 			}
 		}
@@ -137,8 +137,8 @@ class account {
      * Constructeur
      */
 	public function __construct() {
-		$this->type = substr_replace(get_class($this),'',-7);
-		$this->image = type::images($this->type,'account')[0];
+		$this->model = substr_replace(get_class($this),'',-7);
+		$this->image = model::images($this->model,'account')[0];
 	}
 
     /**
@@ -190,14 +190,14 @@ class account {
 		if (method_exists($this, 'preSave')) {
 			$this->preSave($options);
 		}
-		$accounts = self::byTypeAndName($this->getType(),$this->name);
+		$accounts = self::byModelAndName($this->getModel(),$this->name);
 		if (count($accounts) > 1) {
-			throw new Exception (__("Il exsite plusieurs compte de ce type nmmés ",__FILE__) . $this->name);
+			throw new Exception (__("Il exsite plusieurs compte de ce modèle nmmés ",__FILE__) . $this->name);
 		}
 		$onInsert = false;
 		if (!isset($this->id) or $this->id == '' ) {
 			if ($accounts) {
-				throw new Exception (__("Il y a déjà un compte de ce type nommé ",__FILE__) . $this->name);
+				throw new Exception (__("Il y a déjà un compte de ce modèle nommé ",__FILE__) . $this->name);
 			}
 			$onInsert = true;
 			$this->id = self::nextId();
@@ -264,7 +264,7 @@ class account {
 			return;
 		}
 		$params['apikey'] = jeedom::getApiKey('chargeurVE');
-		$params['type'] = $this->getType();
+		$params['model'] = $this->getModel();
 		$params['id'] = $this->getId();
 		$params['message'] = $message;
 		$payLoad = json_encode($params);
@@ -309,19 +309,19 @@ class account {
      */
 	public function getHumanName($_tag = false, $_prettify = false) {
 		$name = '';
-		$type = type::byName($this->getType());
+		$model = model::byName($this->getModel());
 		if ($_tag) {
 			if ($_prettify) {
-				if ($type['customColor'] == 1) {
-					$name .= '<span class="label" style="background-color:' . $type['tagColor'] . ';color:' . $type['tagTextColor'] . '">' . $type['label'] . '</span>';
+				if ($model['customColor'] == 1) {
+					$name .= '<span class="label" style="background-color:' . $model['tagColor'] . ';color:' . $model['tagTextColor'] . '">' . $model['label'] . '</span>';
 				} else {
-					$name .= '<span class="label labelObjectHuman">' . $type['label'] . '</span>';
+					$name .= '<span class="label labelObjectHuman">' . $model['label'] . '</span>';
 				}
 			} else {
-				$name .= $this->getType();
+				$name .= $this->getModel();
 			}
 		} else {
-			$name .= '['.$this->getType().']';
+			$name .= '['.$this->getModel().']';
 		}
 		if ($_prettify) {
 			$name .= '<br/><strong>';
@@ -417,9 +417,9 @@ class account {
 		return $this;
 	}
 
-    /** type **/
-	public function getType() {
-		return $this->type;
+    /** modèle **/
+	public function getModel() {
+		return $this->model;
 	}
 
 }

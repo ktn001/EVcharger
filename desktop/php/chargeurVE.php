@@ -10,7 +10,7 @@ $accounts = account::all();
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
 sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
-sendVarToJS('typeLabels',type::labels());
+sendVarToJS('modelLabels',model::labels());
 ?>
 
 <div class="row row-overflow">
@@ -128,7 +128,7 @@ sendVarToJS('typeLabels',type::labels());
 				<div class="col-sm-7">
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="logicalId" style="display : none;"/>
-				    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="type" style="display : none;"/>
+				    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
 			    </div>
@@ -211,7 +211,7 @@ sendVarToJS('typeLabels',type::labels());
 			    <tr>
 				<th>{{Id}}</th>
 				<th>{{Nom}}</th>
-				<th>{{Type}}</th>
+				<th>{{Modèle}}</th>
 				<th>{{Options}}</th>
 				<th>{{Paramètres}}</th>
 				<th>{{Action}}</th>

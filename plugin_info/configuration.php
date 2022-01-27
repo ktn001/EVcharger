@@ -22,7 +22,7 @@ if (!isConnect()) {
   die();
 }
 include_file('core', 'chargeurVE', 'class', 'chargeurVE');
-sendVarToJS('usedTypes',type::allUsed());
+sendVarToJS('usedTypes',model::allUsed());
 $defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
 $defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
 $defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'];
@@ -48,7 +48,7 @@ $defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daem
         </label>
       </div>
       <div class='col-sm-6'>
-        <legend><i class="fas fa-charging-station"></i> {{Les types de chargeurs}}:</legend>
+        <legend><i class="fas fa-charging-station"></i> {{Les modèles de chargeurs}}:</legend>
         <table class='table table-bordered'>
           <thead>
             <tr>
@@ -61,22 +61,22 @@ $defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daem
           </thead>
           <tbody>
             <?php
-            foreach (type::all(false) as $typeName => $type) {
-              if ($typeName[0] == '_') {
+            foreach (model::all(false) as $modelName => $model) {
+              if ($modelName[0] == '_') {
                 continue;
               }
-              $config = config::byKey('type::' . $typeName,'chargeurVE');
+              $config = config::byKey('model::' . $modelName,'chargeurVE');
               if ($config == '') {
                 $cfg['tagColor'] = $defaultTagColor;
                 $cfg['tagTextColor'] = $defaultTextTagColor;
-                config::save('type::' . $type['type'],$cfg,'chargeurVE');
+                config::save('model::' . $modelName,$cfg,'chargeurVE');
               }
               echo '<tr>';
-              echo '<td>' . $type['label'] . '</td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $typeName . '" data-l2key="enabled"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="type::' . $typeName . '" data-l2key="customColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $typeName . '" data-l2key="tagColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="type::' . $typeName . '" data-l2key="tagTextColor"/></td>';
+              echo '<td>' . $model['label'] . '</td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="enabled"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="customColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagColor"/></td>';
+              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagTextColor"/></td>';
               echo '</tr>';
             }
             ?>
@@ -88,14 +88,14 @@ $defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daem
 </form>
 
 <script>
-$(".configKey[data-l1key^='type::'][data-l2key='enabled']").on('change',function(){
+$(".configKey[data-l1key^='model::'][data-l2key='enabled']").on('change',function(){
 	if ($(this).value() == 1) {
 		return;
 	}
-	type = $(this).attr('data-l1key').slice(6);
-	if (usedTypes.indexOf(type) != -1) {
+	model = $(this).attr('data-l1key').slice(6);
+	if (usedTypes.indexOf(model) != -1) {
 		$(this).value(1);
-		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte de ce type.}}"});
+		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte pour ce modèle.}}"});
 	}
 
 });

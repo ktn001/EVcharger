@@ -26,24 +26,24 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
-	if (init('action') == 'typeLabels') {
-		ajax::success(json_encode(type::labels()));
+	if (init('action') == 'modelLabels') {
+		ajax::success(json_encode(model::labels()));
 	}
 
 	if (init('action') == 'images') {
-		$type = init('type');
-		if ($type == '') {
-			throw new Exception(__("Le type de chargeur n'est pas indiqué",__FILE__));
+		$model = init('model');
+		if ($model == '') {
+			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		ajax::success(json_encode(type::images($type, 'chargeur')));
+		ajax::success(json_encode(model::images($model, 'chargeur')));
 	}
 
 	if (init('action') == 'chargeurParamsHtml') {
-		$type = init('type');
-		if ($type == '') {
-			throw new Exception(__("Le type de chargeur n'est pas indiqué",__FILE__));
+		$model = init('model');
+		if ($model == '') {
+			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		$file = realpath (__DIR__.'/../config/'.$type.'/chargeur_params.php');
+		$file = realpath (__DIR__.'/../config/'.$model.'/chargeur_params.php');
 		if (file_exists($file)) {
 			ob_start();
 			require_once $file;

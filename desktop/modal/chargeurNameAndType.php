@@ -21,7 +21,7 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_chargeurNameAndType">
+<div id="mod_chargeurNameAndModel">
   <form class="form-horizontal">
     <fieldset>
       <div class="form-group">
@@ -30,8 +30,8 @@ if (!isConnect('admin')) {
         <input class="eqLogicAttr col-sm-8" data-l1key='name' type="text" placeholder="{{Nom}}"></input>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-3">{{Type}}:</label>
-        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='type'>
+        <label class="control-label col-sm-3">{{Model}}:</label>
+        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='model'>
         </select>
       </div>
     </fieldset>
@@ -39,12 +39,12 @@ if (!isConnect('admin')) {
 </div>
 
 <script>
-function mod_chargeurNameAndType_actualizeTypes() {
+function mod_chargeurNameAndModel_actualizeModels() {
     $.ajax({
         type: 'POST',
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
-            action: 'typeLabels',
+            action: 'modelLabels',
 	    onlyEnable: 1,
         },
         dataType: 'json',
@@ -57,26 +57,26 @@ function mod_chargeurNameAndType_actualizeTypes() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            $('#mod_chargeurNameAndType select').empty();
+            $('#mod_chargeurNameAndModel select').empty();
             labels = json_decode(data.result);
-            for (type in labels) {
-                option = '<option value="' + type + '">' + labels[type] + '</option>';
-                $('#mod_chargeurNameAndType select').append(option);
+            for (model in labels) {
+                option = '<option value="' + model + '">' + labels[model] + '</option>';
+                $('#mod_chargeurNameAndModel select').append(option);
             }
         },
     });
 }
 
-function mod_chargeurNameAndType(action) {
+function mod_chargeurNameAndModel(action) {
     if (action = 'result') {
-        return $('#mod_chargeurNameAndType').getValues('.eqLogicAttr');
+        return $('#mod_chargeurNameAndModel').getValues('.eqLogicAttr');
     }
 }
 
-$('#mod_chargeurNameAndType').dialog({
+$('#mod_chargeurNameAndModel').dialog({
     focus: function (event, ui) {
 	    $('.eqLogicAttr[data-l1key=name]').val("");
-	    mod_chargeurNameAndType_actualizeTypes();
+	    mod_chargeurNameAndModel_actualizeModels();
     }
 })
 

@@ -21,10 +21,10 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="selectAccountType">
+<div id="selectAccountModel">
   <form class="form-horizontal">
     <fieldset>
-      <label class="control-label">{{Type d'account}}:</label>
+      <label class="control-label">{{Model d'account}}:</label>
       <select class="toto">
       </select>
     </fieldset>
@@ -32,12 +32,12 @@ if (!isConnect('admin')) {
 </div>
 
 <script>
-function selectAccountType_actualizeTypes() {
+function selectAccountModel_actualizeModels() {
     $.ajax({
         type: 'POST',
         url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
         data: {
-            action: 'typeLabels',
+            action: 'modelLabels',
             onlyEnabled: 1,
         },
         dataType: 'json',
@@ -50,25 +50,25 @@ function selectAccountType_actualizeTypes() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            $('#selectAccountType select').empty();
+            $('#selectAccountModel select').empty();
             labels = json_decode(data.result);
-            for (type in labels) {
-                option = '<option value="' + type + '">' + labels[type] + '</option>';
-                $('#selectAccountType select').append(option);
+            for (model in labels) {
+                option = '<option value="' + model + '">' + labels[model] + '</option>';
+                $('#selectAccountModel select').append(option);
             }
         },
     });
 }
 
-function selectAccountType(action) {
+function selectAccountModel(action) {
     if (action = 'result') {
-        return $('#mod_selectAccountType select').value();
+        return $('#mod_selectAccountModel select').value();
     }
 }
 
-$('#selectAccountType').parent().closest('div').dialog({
+$('#selectAccountModel').parent().closest('div').dialog({
     focus: function (event, ui) {
-        selectAccountType_actualizeTypes();
+        selectAccountModel_actualizeModels();
     }
 })
 

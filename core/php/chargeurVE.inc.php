@@ -23,7 +23,7 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
  * 
  */
 
-require_once __DIR__ . '/../class/type.class.php';
+require_once __DIR__ . '/../class/model.class.php';
 require_once __DIR__ . '/../class/chargeurVEException.class.php';
 
 $dir = __DIR__ . '/../class/account';

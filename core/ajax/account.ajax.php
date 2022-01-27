@@ -31,11 +31,11 @@ try {
 			$data = json_decode(init('account'),true);
 			log::add("chargeurVE",'debug',"Ajax: save: " . init('account'));
 			$options = json_decode(init('options'),true);
-			if ($data['type'] == ''){
-				throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
+			if ($data['model'] == ''){
+				throw new Exception(__("Le modèle de compte n'est pas indiqué",__FILE__));
 			}
 			if ($data['id'] == '') {
-				$classe = $data['type'] . 'Account';
+				$classe = $data['model'] . 'Account';
 				$account = new $classe();
 			} else {
 				$account = account::byId($data['id']);
@@ -67,7 +67,7 @@ try {
 			$data = array(
 				'enabled' => $account->IsEnabled(),
 				'id' => $account->getId(),
-				'type' => $account->getType(),
+				'model' => $account->getModel(),
 				'humanName' => $account->getHumanName(true,true),
 				'image' => $account->getImage(),
 			);
@@ -78,7 +78,7 @@ try {
 
 	if (init('action') == 'getAccountToSelect') {
 		$result = array();
-		foreach (account::byType(init('type')) as $account) {
+		foreach (account::byModel(init('model')) as $account) {
 			$data = array(
 				'id' => $account->getId(),
 				'value' => $account->getHumanName(),
@@ -89,13 +89,13 @@ try {
 	}
 
 	if (init('action') == 'byIdToEdit'){
-		$type = init('type');
+		$model = init('model');
 		$id = init('id');
-		if ($type == ''){
-			throw new Exception(__("Le type de compte n'est pas indiqué",__FILE__));
+		if ($model == ''){
+			throw new Exception(__("Le modèle de compte n'est pas indiqué",__FILE__));
 		}
 		if ($id == '') {
-			$classe = $type . 'Account';
+			$classe = $model . 'Account';
 			$account = new $classe();
 		} else {
 			$account = account::byId($id);
@@ -103,13 +103,13 @@ try {
 		if (!is_object($account)) {
 			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
 		}
-		if ($account->getType() != $type) {
-			throw new Exception(sprintf(__("Le type du compte n'est pas %s (%s)",__FILE__), $type, $account->getType()));
+		if ($account->getModel() != $model) {
+			throw new Exception(sprintf(__("Le modèle du compte n'est pas %s (%s)",__FILE__), $model, $account->getModel()));
 		}
 		
 		$result['account'] = utils::o2a($account);
-		$result['params'] = ($type . "Account")::paramsToEdit();
-		$result['images'] = type::images($type, 'account');
+		$result['params'] = ($model . "Account")::paramsToEdit();
+		$result['images'] = model::images($model, 'account');
 		ajax::success(json_encode($result));
 	}
 

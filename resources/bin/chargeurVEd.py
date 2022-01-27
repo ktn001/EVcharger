@@ -81,19 +81,19 @@ def options():
     logging.info('Socket host : '+str(_socketHost))
     logging.info('PID file : '+str(_pidfile))
 
-def start_account(accountType, accountId):
+def start_account(accountModel, accountId):
     global accounts
-    logging.debug(f'starting account thread: id={accountId} type: {accountType}')
+    logging.debug(f'starting account thread: id={accountId} modèle: {accountModel}')
 
     if accountId in accounts:
         logging.debug(f"Thread for account {accountId} is already running!")
         return
 
-    logging.info(f"Creating account <{accountType}> id:{accountId}")
+    logging.info(f"Creating account <{accountModel}> id:{accountId}")
     queue = Queue()
-    account = eval("account." + accountType)(accountId, accountType, queue, jeedom_com)
+    account = eval("account." + accountModel)(accountId, accountModel, queue, jeedom_com)
     accounts[accountId] = {
-            'type' : accountType,
+            'model' : accountModel,
             'queue' : queue,
             'account' : account,
             'thread' : account.run()
@@ -126,20 +126,20 @@ def read_socket():
             logging.error("Invalid apikey from socket : " + str(payload))
             return
 
-        if 'type' in payload:
-            accountType = payload['type']
+        if 'model' in payload:
+            accountModel = payload['model']
 
             if not 'id' in payload:
-                logging.error(f"Message for accountType ({accountType}) but with no 'id'")
+                logging.error(f"Message for accountModel ({accountModel}) but with no 'id'")
                 return
             accountId = payload['id']
 
             if not 'message' in payload:
-                logging.error(f"Message for accountType ({accountType}) and id ({accountId}) but with no 'message'")
+                logging.error(f"Message for accountModel ({accountModel}) and id ({accountId}) but with no 'message'")
             message = payload['message']
 
             if 'cmd' in message and message['cmd'] == 'start':
-                start_account(accountType, accountId);
+                start_account(accountModel, accountId);
 
             # Envoi du message dans la queue de traitement de l'account
             accounts[accountId]['queue'].put(json.dumps(message))

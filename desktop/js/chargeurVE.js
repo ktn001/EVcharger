@@ -47,7 +47,7 @@ function loadAccountCards() {
 			$('#accounts-div.eqLogicThumbnailContainer').empty();
 			for (account of accounts) {
 				let opacity = (account.enabled == 1) ? '' : 'disableCard';
-				let html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_type="' + account.type + '">';
+				let html = '<div class="accountDisplayCard cursor ' + opacity + '" data-account_id="' + account.id + '" data-account_model="' + account.model + '">';
 				html += '<img src="' + account.image + '"/>';
 				html += '<br/>';
 				html += '<span class="name">' + account.humanName + '</span>';
@@ -134,14 +134,14 @@ function saveWithPassword(account) {
 /*
  * Edition d'un account
  */
-function editAccount (type, accountId ='') {
-  	if (type === undefined) {
-  		$('#div_alert').showAlert({message: "{{Type de compte pas défini!}}", level: 'danger'});
+function editAccount (model, accountId ='') {
+  	if (model === undefined) {
+  		$('#div_alert').showAlert({message: "{{Modèle pas défini!}}", level: 'danger'});
   		return;
   	}
 
 	if ($('#mod_editAccount').length == 0){
- 		$('body').append("<div id='mod_editAccount' title='{{Compte de type:}} '" + typeLabels[type] + '"/>');
+ 		$('body').append("<div id='mod_editAccount' title='{{Compte pour modèle:}} '" + modelLabels[model] + '"/>');
  		$('#mod_editAccount').dialog({
  			closeText: '',
  			autoOpen: false,
@@ -159,7 +159,7 @@ function editAccount (type, accountId ='') {
  		data: {
  			action: 'byIdToEdit',
  			id: accountId,
- 			type: type
+ 			model: model
  		},
  		dataType : 'json',
  		global:false,
@@ -175,7 +175,7 @@ function editAccount (type, accountId ='') {
 			mod_editAccount.build(result.params, result.images);
  			$('#mod_editAccount .accountAttr').value('');
  			$('#mod_editAccount').setValues(result.account,'.accountAttr');
-			$('#mod_editAccount').dialog('option','title','{{Compte de type:}} ' + typeLabels[result.account.type]);
+			$('#mod_editAccount').dialog('option','title','{{Compte modèle:}} ' + modelLabels[result.account.model]);
  		}
  	});
  	let buttons = []
@@ -247,9 +247,9 @@ function editAccount (type, accountId ='') {
  * Action du bouton d'ajout d'un account
  */
 $('.accountAction[data-action=add]').off('click').on('click', function() {
-	if ($('#mod_selectAccountType').length == 0) {
-		$('body').append('<div id="mod_selectAccountType" title="{{Sélection d\'un type de compte}}"/>');
-		$("#mod_selectAccountType").dialog({
+	if ($('#mod_selectAccountModel').length == 0) {
+		$('body').append('<div id="mod_selectAccountModel" title="{{Sélection d\'un modèle}}"/>');
+		$("#mod_selectAccountModel").dialog({
 			closeText: '',
 			autoOpen: false,
 			modal: true,
@@ -257,19 +257,19 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 			width:300
 		});
 		jQuery.ajaxSetup({async: false});
-		$('#mod_selectAccountType').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountType');
+		$('#mod_selectAccountModel').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountModel');
 		jQuery.ajaxSetup({async: true});
 	}
-	$('#mod_selectAccountType').dialog('option', 'buttons', {
+	$('#mod_selectAccountModel').dialog('option', 'buttons', {
 		"{{Annuler}}": function () {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
 			$(this).dialog("close");
-			editAccount(selectAccountType('result'));
+			editAccount(selectAccountModel('result'));
 		}
 	});
-	$('#mod_selectAccountType').dialog('open');
+	$('#mod_selectAccountModel').dialog('open');
 });
 
 /*
@@ -277,20 +277,20 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
  */
 $('#accounts-div.eqLogicThumbnailContainer').off('click').on('click','.accountDisplayCard', function () {
 	account_id = $(this).attr("data-account_id");
-	account_type = $(this).attr("data-account_type");
-	editAccount(account_type, account_id);
+	account_model = $(this).attr("data-account_model");
+	editAccount(account_model, account_id);
 });
 
 /*
  * Action du bouton d'ajout d'un chargeur
  */
 $('.chargeurAction[data-action=add').off('click').on('click',function () {
-	if ($('#modContainer_chargeurNameAndType').length == 0) {
-		$('body').append('<div id="modContainer_chargeurNameAndType" title="{{Nouveau chargeur:}}"/>');
+	if ($('#modContainer_chargeurNameAndModel').length == 0) {
+		$('body').append('<div id="modContainer_chargeurNameAndModel" title="{{Nouveau chargeur:}}"/>');
 		jQuery.ajaxSetup({async: false});
-		$('#modContainer_chargeurNameAndType').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndType');
+		$('#modContainer_chargeurNameAndModel').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndModel');
 		jQuery.ajaxSetup({async: true});
-		$("#mod_chargeurNameAndType").dialog({
+		$("#mod_chargeurNameAndModel").dialog({
 			closeText: '',
 			autoOpen: false,
 			modal: true,
@@ -298,12 +298,12 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 			width:400
 		});
 	}
-	$('#mod_chargeurNameAndType').dialog('option', 'buttons', {
+	$('#mod_chargeurNameAndModel').dialog('option', 'buttons', {
 		"{{Annuler}}": function () {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
-			let chargeurs = mod_chargeurNameAndType('result');
+			let chargeurs = mod_chargeurNameAndModel('result');
 			if ( chargeurs[0].name != '') {
 				$(this).dialog("close");
 			 	jeedom.eqLogic.save({
@@ -328,7 +328,7 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 			}
 		}
 	});
-	$('#mod_chargeurNameAndType').dialog('open');
+	$('#mod_chargeurNameAndModel').dialog('open');
 });
 
 /*
@@ -469,7 +469,7 @@ function loadSelectAccount(defaut) {
 		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
 		data: {
 			action: 'getAccountToSelect',
-			type: $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value(),
+			model: $('.eqLogicAttr[data-l1key=configuration][data-l2key=model]').value(),
 		},
 		dataType : 'json',
 		global:false,
@@ -498,7 +498,7 @@ function loadSelectImg(defaut) {
 		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
 		data: {
 			action: 'images',
-			type: $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value(),
+			model: $('.eqLogicAttr[data-l1key=configuration][data-l2key=model]').value(),
 		},
 		dataType : 'json',
 		global:false,
@@ -535,7 +535,7 @@ function printEqLogic (configs) {
 		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
 		data: {
 			action: 'chargeurParamsHtml',
-			type: configs.configuration.type
+			model: configs.configuration.model
 		},
 		dataType: 'json',
 		global: false,
