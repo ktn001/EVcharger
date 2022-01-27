@@ -92,6 +92,9 @@ class account {
 		$accounts = array();
 		foreach ($configs as $config) {
 			$account = unserialize($config['value']);
+			if ( ! is_a($account, 'account')) {
+				continue;
+			}
 			$account->resetModified();
 			if ( ! $enabled or $account->isEnabled()){
 				$accounts[] = $account;

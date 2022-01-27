@@ -30,8 +30,8 @@ class easee(account):
         self.connections[identifiant] = connection
         connection.on_open(lambda: self.on_open(identifiant))
         connection.on_close(lambda: self.on_close(identifiant))
-        connection.on('ProductUpdate', self.on_ProductUpdate)
-        connection.on('ChargerUpdate', self.on_ChargeurUpdate)
+        connection.on('ProductUpdate', self.on_Update)
+        connection.on('ChargerUpdate', self.on_Update)
         connection.on('CommandResponse', self.on_CommandResponse)
         connection.start()
         return
@@ -70,11 +70,13 @@ class easee(account):
                 self.send2Jeedom(msg2Jeedom)
                 del self.connections[serial]
 
-    def on_ProductUpdate(self,messages):
+    def on_Update(self,messages):
         for message in messages:
             cmd_id = str(message['id'])
             if not cmd_id in self._cfg['signalR_id']:
                 continue
+            if self._cfg.has_option('rounding',cmd_id):
+                message['value'] = message['value'][:message['value'].find('.')+1+int(self._cfg.get('rounding',cmd_id))]
             for logicalId in self._cfg['signalR_id'][cmd_id].split(','):
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'cmd'
@@ -82,22 +84,7 @@ class easee(account):
                 msg2Jeedom['chargeur'] = message['mid']
                 msg2Jeedom['logicalId'] = logicalId
                 msg2Jeedom['value'] = message['value']
-                self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
-                self.send2Jeedom(msg2Jeedom)
-
-    def on_ChargeurUpdate(self,messages):
-        for message in messages:
-            cmd_id = str(message['id'])
-            if not cmd_id in self._cfg['signalR_id']:
-                continue
-            for logicalId in self._cfg['signalR_id'][cmd_id].split(','):
-                msg2Jeedom = {}
-                msg2Jeedom['object'] = 'cmd'
-                msg2Jeedom['type'] = 'easee'
-                msg2Jeedom['chargeur'] = message['mid']
-                msg2Jeedom['logicalId'] = logicalId
-                msg2Jeedom['value'] = message['value']
-                self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+                self.log_info("msg2Jeddom: " + str(msg2Jeedom))
                 self.send2Jeedom(msg2Jeedom)
 
     def on_CommandResponse(self,messages):

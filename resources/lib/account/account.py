@@ -50,7 +50,6 @@ class account():
     def send2Jeedom(self,msg):
         msgIsCmd = True
         for key in ('object', 'type', 'chargeur', 'logicalId', 'value'):
-            self.log_debug(key)
             if not key in msg:
                 msgIsCmd = False
                 break
