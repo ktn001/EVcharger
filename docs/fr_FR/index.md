@@ -1,3 +1,6 @@
+---
+title : MOn titre
+---
 # Descriptionx
 
 Le plugin **chargeurVE** permet d'intégrer un chargeur pour véhicules électriques dans Jeedom.
