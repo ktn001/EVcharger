@@ -24,38 +24,46 @@ import json
 import configparser
 
 class account():
-    """Class de base pour les differents types d'account"""
+    """Class de base pour les differents model d'account"""
 
-    def __init__(self, id, type, queue, jeedom_com):
+    def __init__(self, id, model, queue, jeedom_com):
         self._id = id
-        self._type = type
+        self._model = model
         self._jeedomQueue = queue
         self._jeedom_com = jeedom_com
-        transformsFile = os.path.dirname(__file__) + '/../../../core/config/' + type + '/transforms.ini'
+        configDir = os.path.dirname(__file__) + '/../../../core/config'
         self._transforms = configparser.ConfigParser()
-        self._transforms.read(transformsFile)
+        self._transforms.read(f"{configDir}/transforms.ini")
+        self._transforms.read(f"{configDir}/{model}/transforms.ini")
+        self._format = configparser.ConfigParser()
+        self._format.read(f"{configDir}/format.ini")
+        self._format.read(f"{configDir}/{model}/format.ini")
 
     def log_debug(self,txt):
-        logging.debug(f'[account][{self._type}][{self._id}] {txt}')
+        logging.debug(f'[account][{self._model}][{self._id}] {txt}')
 
     def log_info(self,txt):
-        logging.info(f'[account][{self._type}][{self._id}] {txt}')
+        logging.info(f'[account][{self._model}][{self._id}] {txt}')
 
     def log_warning(self,txt):
-        logging.warning(f'[account][{self._type}][{self._id}] {txt}')
+        logging.warning(f'[account][{self._model}][{self._id}] {txt}')
 
     def log_error(self,txt):
-        logging.error(f'[account][{self._type}][{self._id}] {txt}')
+        logging.error(f'[account][{self._model}][{self._id}] {txt}')
 
     def send2Jeedom(self,msg):
         msgIsCmd = True
-        for key in ('object', 'type', 'chargeur', 'logicalId', 'value'):
+        for key in ('object', 'model', 'chargeur', 'logicalId', 'value'):
             if not key in msg:
                 msgIsCmd = False
                 break
+        msgIsCmd = msgIsCmd and (msg['object'] == 'cmd')
         if msgIsCmd:
-            if msg['object'] == 'cmd':
-                msg['value'] = self._transforms.get(msg['logicalId'],msg['value'],fallback=msg['value'])
+            msg['value'] = self._transforms.get(msg['logicalId'],msg['value'],fallback=msg['value'])
+            if self._format.has_option('rounding',msg['logicalId']):
+                dotPos = msg['value'].find('.')
+                if dotPos >= 0:
+                    msg['value'] = msg['value'][:dotPos + 1 + int(self._format.get('rounding',msg['logicalId']))]
         self._jeedom_com.send_change_immediate(msg)
 
     def read_jeedom_queue(self):

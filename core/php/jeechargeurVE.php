@@ -34,7 +34,7 @@ try {
 		if (!array_key_exists('logicalId',$message)) {
 			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
-		foreach (chargeurVE::byTypeAndIdentifiant($message['model'],$message['chargeur']) as $chargeur){
+		foreach (chargeurVE::byModelAndIdentifiant($message['model'],$message['chargeur']) as $chargeur){
 			$chargeur->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}

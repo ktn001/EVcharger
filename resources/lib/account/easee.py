@@ -63,7 +63,7 @@ class easee(account):
             else:
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'chargeur'
-                msg2Jeedom['type'] = 'easee'
+                msg2Jeedom['model'] = 'easee'
                 msg2Jeedom['chargeur'] = serial
                 msg2Jeedom['info'] = 'closed'
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
@@ -73,14 +73,12 @@ class easee(account):
     def on_Update(self,messages):
         for message in messages:
             cmd_id = str(message['id'])
-            if not cmd_id in self._cfg['signalR_id']:
+            if not cmd_id in self._mapping['signalR_id']:
                 continue
-            if self._cfg.has_option('rounding',cmd_id):
-                message['value'] = message['value'][:message['value'].find('.')+1+int(self._cfg.get('rounding',cmd_id))]
-            for logicalId in self._cfg['signalR_id'][cmd_id].split(','):
+            for logicalId in self._mapping['signalR_id'][cmd_id].split(','):
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'cmd'
-                msg2Jeedom['type'] = 'easee'
+                msg2Jeedom['model'] = 'easee'
                 msg2Jeedom['chargeur'] = message['mid']
                 msg2Jeedom['logicalId'] = logicalId
                 msg2Jeedom['value'] = message['value']
@@ -130,8 +128,8 @@ class easee(account):
         if not hasattr(self,'connections'):
             self.connections = {}
             configDir = os.path.dirname(__file__) + '/../../../core/config/easee'
-            self._cfg = configparser.ConfigParser()
-            self._cfg.read(f'{configDir}/chargeurVEd.ini')
+            self._mapping = configparser.ConfigParser()
+            self._mapping.read(f'{configDir}/mapping.ini')
         self.start_charger_listener(msg['identifiant'])
         
     def do_stop_charger_listener(self,message):

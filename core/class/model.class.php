@@ -70,7 +70,7 @@ class model {
 	public static function allUsed() {
 		$used = array();
 		foreach (account::all() as $account) {
-			$used[$account->getType()] = 1;
+			$used[$account->getModel()] = 1;
 		}
 		return array_keys($used);
 	}
