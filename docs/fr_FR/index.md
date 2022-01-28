@@ -8,7 +8,7 @@ Le plugin **chargeurVE** permet d'intégrer des chargeurs pour véhicules élect
 Pour le moment, seule l'intégration de chargeurs ***[Easee](http://easee.com)*** est prévue mais le plugin est conçu pour permettre l'intégration d'autres modèles de chargeur.
 
 # Installation
-Installer doit être installer via le market Jeedom. Ce plugin est gratuit.
+Le plugin doit être installer via le market Jeedom. Ce plugin est gratuit.
 
 # Configuration
 Après installation du plugin, il faut se rendre sur sa page de configuration et l'activer. 
