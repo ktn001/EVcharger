@@ -87,9 +87,9 @@ sendVarToJS('modelLabels',model::labels());
 
     </div> <!-- Page d'accueil du plugin -->
 
-    <!-- =================================== -->
-    <!-- Page de configuration d'un chargeur -->
-    <!-- =================================== -->
+    <!-- ==================================== -->
+    <!-- Pages de configuration d'un chargeur -->
+    <!-- ==================================== -->
     <div class="col-xs-12 eqLogic" style="display: none;">
 
 	<!-- barre de gestion du chargeur -->
@@ -188,7 +188,7 @@ sendVarToJS('modelLabels',model::labels());
 			    -->
 			    <div class="form-group">
 				<div class="text-center">
-				    <img name="icon_visu" src="<?= $plugin->getPathImgIcon(); ?>" style="max-width:160px;"/>
+				    <img name="icon_visu" style="max-width:160px;"/>
 				    <select id="selectChargeurImg" class="eqLogicAttr" data-l1key="configuration" data-l2key="image">
 				    </select>
 				</div>

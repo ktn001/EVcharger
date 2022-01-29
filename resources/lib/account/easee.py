@@ -20,13 +20,14 @@ class easee(account):
 
         if identifiant in self.connections:
             return
-        connection = HubConnectionBuilder().with_url(url,options)\
-                .with_automatic_reconnect({
-                    "type": "raw",
-                    "keep_alive_interval": 10,
-                    "reconnect_interval": 5,
-                    "max_attempts": 5
-                }).build()
+        connection = HubConnectionBuilder().with_url(url,options).build()
+        #connection = HubConnectionBuilder().with_url(url,options)\
+        #        .with_automatic_reconnect({
+        #            "type": "raw",
+        #            "keep_alive_interval": 10,
+        #            "reconnect_interval": 5,
+        #            "max_attempts": 5
+        #        }).build()
         self.connections[identifiant] = connection
         connection.on_open(lambda: self.on_open(identifiant))
         connection.on_close(lambda: self.on_close(identifiant))
@@ -72,7 +73,11 @@ class easee(account):
 
     def on_Update(self,messages):
         for message in messages:
+            if message == self.lastMessage:
+                continue
+            self.lastMessage = message
             cmd_id = str(message['id'])
+            self.log_debug(f"Traitement de la commande {cmd_id}, value: {message['value']}")
             if not cmd_id in self._mapping['signalR_id']:
                 continue
             for logicalId in self._mapping['signalR_id'][cmd_id].split(','):
@@ -98,6 +103,7 @@ class easee(account):
             return
         self.token = msg['token']
         self._url = msg['url']
+        self.lastMessage = None
         return
 
     def do_stop(self,message):
