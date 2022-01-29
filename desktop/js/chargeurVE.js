@@ -387,6 +387,9 @@ function addCmdToTable(_cmd) {
 	if (!isset(_cmd.configuration)) {
 		_cmd.configuration = {};
 	}
+	if (init(_cmd.logicalId) == 'refresh'){
+		return;
+	}
 	let isStandard = false;
 	let isMandatory
 	if ('mandatory' in _cmd.configuration) {
