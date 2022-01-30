@@ -49,7 +49,27 @@ class easeeAccount extends account {
 		$this->url = "https://api.easee.cloud";
 	}
 
-	private function sendRequest($path, $data) {
+	private function getMapping() {
+		$mappingFile = __DIR__ . '/../../config/easee/mapping.ini';
+		$mapping = parse_ini_file($mappingFile, true);
+		if ($mapping == false) {
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$mappingFile);
+			log::add("chargeurVE","error",$msg);
+		}
+		return $mapping['API'];
+	}
+
+	private function getTransforms() {
+		$transfomsFile = __DIR__ . '/../../config/easee/transforms.ini';
+		$transfoms = parse_ini_file($transfomsFile, true);
+		if ($transfoms == false) {
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$transfomsFile);
+			log::add("chargeurVE","error",$msg);
+		}
+		return $transfoms;
+	}
+
+	private function sendRequest($path, $data = '' ) {
 		if (is_array($data)) {
 			$data = json_encode($data);
 		}
@@ -61,7 +81,7 @@ class easeeAccount extends account {
 			CURLOPT_MAXREDIRS => 10,
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_CUSTOMREQUEST => $data == "" ? 'GET' : 'POST',
 			CURLOPT_HTTPHEADER => [
 				"Authorization: Bearer " . $this->token['accessToken'],
 				"Accept: application/json",
@@ -185,6 +205,33 @@ class easeeAccount extends account {
 		$path = '/api/chargers/'. $serial .'/commands/lock_state';
 		$data = array ( 'state' => 'false');
 		$response = $this->sendRequest($path, $data);
+	}
+
+	public function execute_refresh($cmd) {
+		$chargeurId = $cmd->getEqLogic()->getId();
+		$chargeur = chargeurVE::byId($chargeurId);
+		$serial =  $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/'.$serial.'/state';
+		$response = $this->sendRequest($path);
+		$mapping = $this->getMapping();
+		$transforms = $this->getTransforms();
+		foreach (array_keys($response) as $key){
+			log::add('chargeurVE','debug',$key);
+			if ( ! array_key_exists($key,$mapping)){
+				continue;
+			}
+			foreach (explode(',',$mapping[$key]) as $logicalId){
+				log::add('chargeurVE','debug',"  " . $logicalId);
+				$value = $response[$key];
+				if (array_key_exists($logicalId, $transforms)) {
+					log::add('chargeurVE','debug',print_r($transforms,true));
+					log::add('chargeurVE','debug',print_r($value,true));
+					$value = $transforms[$logicalId][$value];
+				}
+				$chargeur->checkAndUpdateCmd($logicalId,$value);
+			}
+		}
+
 	}
 
     /*     * **********************Getteur Setteur*************************** */

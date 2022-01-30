@@ -29,8 +29,8 @@ class model {
 		$models = parse_ini_file($modelsFile,true);
 		if ($models == false) {
 			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$modelsFile);
-			log::add("chargeurVE",error,$message);
-			throw new Exception($message);
+			log::add("chargeurVE","error",$msg);
+			throw new Exception($msg);
 		}
 		$result = array();
 		foreach ($models as $modelName => $config){

@@ -35,9 +35,6 @@ class account():
         self._transforms = configparser.ConfigParser()
         self._transforms.read(f"{configDir}/transforms.ini")
         self._transforms.read(f"{configDir}/{model}/transforms.ini")
-        self._format = configparser.ConfigParser()
-        self._format.read(f"{configDir}/format.ini")
-        self._format.read(f"{configDir}/{model}/format.ini")
 
     def log_debug(self,txt):
         logging.debug(f'[account][{self._model}][{self._id}] {txt}')
@@ -60,10 +57,6 @@ class account():
         msgIsCmd = msgIsCmd and (msg['object'] == 'cmd')
         if msgIsCmd:
             msg['value'] = self._transforms.get(msg['logicalId'],msg['value'],fallback=msg['value'])
-            if self._format.has_option('rounding',msg['logicalId']):
-                dotPos = msg['value'].find('.')
-                if dotPos >= 0:
-                    msg['value'] = msg['value'][:dotPos + 1 + int(self._format.get('rounding',msg['logicalId']))]
         self._jeedom_com.send_change_immediate(msg)
 
     def read_jeedom_queue(self):

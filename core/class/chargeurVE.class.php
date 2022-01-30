@@ -231,6 +231,9 @@ class chargeurVE extends eqLogic {
 			if (array_key_exists('display::graphStep', $config)) {
 				$cmd->setDisplay('graphStep', $config['display::graphStep']);
 			}
+			if (array_key_exists('rounding', $config)) {
+				$cmd->setConfiguration('historizeRound', $config['rounding']);
+			}
 			$cmd->save();
 			$ids[$logicalId] = $cmd->getId();
 		}

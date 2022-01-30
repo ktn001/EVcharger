@@ -353,6 +353,7 @@ class account {
 		}
 		$this->$method($cmd);
 	}
+
     /*     * **********************Getteur Setteur*************************** */
 
     /** id **/
