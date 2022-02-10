@@ -2,6 +2,6 @@
 
 **IMPORTANT**
 
-Pour rappel s’il n’y a pas d’information sur la mise à jour, c’est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+En cas d’absence pour une relaese, les mises à jour ne concernent que la doc et des corrections mineures
 
 ### **Le plugin est en phase de développement. Il n'y a pas encore de release disponible.**
