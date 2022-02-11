@@ -363,7 +363,12 @@ class chargeurVECmd extends cmd {
     */
 
     /*     * ***********************Methode static*************************** */
-
+	public static function dontRemoveCmd() {
+		if ($this->getLogicalId() == "refresh") {
+			return true;
+		}
+		return false;
+	}
 
     /*     * *********************Methode d'instance************************* */
 
