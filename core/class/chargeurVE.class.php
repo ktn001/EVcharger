@@ -363,21 +363,15 @@ class chargeurVECmd extends cmd {
     */
 
     /*     * ***********************Methode static*************************** */
-	public static function dontRemoveCmd() {
+
+    /*     * *********************Methode d'instance************************* */
+
+	public function dontRemoveCmd() {
 		if ($this->getLogicalId() == "refresh") {
 			return true;
 		}
 		return false;
 	}
-
-    /*     * *********************Methode d'instance************************* */
-
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
 
     // Exécution d'une commande
 	public function execute($_options = array()) {
