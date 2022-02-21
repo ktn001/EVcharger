@@ -19,15 +19,21 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 // Fonction exécutée automatiquement après l'installation du plugin
-  function chargeurVE_install() {
-
-  }
+function chargeurVE_install() {
+	config::save('daemon::port', '34739', 'chargeurVE');
+	config::save('api', config::genKey(), 'chargeurVE');
+	config::save('api::chargeurVE::mode', 'localhost');
+	config::save('api::chargeurVE::restricted', '1');
+}
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
 function chargeurVE_update() {
-	if (config::byKey("daemon::port", "chargeurVE") == '') {
-		config::save("daemon::port", '34739', chargeurVE);
+	if (config::byKey('daemon::port', 'chargeurVE') == '') {
+		config::save('daemon::port', '34739', 'chargeurVE');
 	}
+	config::save('api', config::genKey(), 'chargeurVE');
+	config::save('api::chargeurVE::mode', 'localhost');
+	config::save('api::chargeurVE::restricted', '1');
 }
 
 // Fonction exécutée automatiquement après la suppression du plugin
