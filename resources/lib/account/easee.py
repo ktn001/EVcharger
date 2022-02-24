@@ -21,16 +21,10 @@ class easee(account):
         if identifiant in self.connections:
             return
         connection = HubConnectionBuilder().with_url(url,options).build()
-        #connection = HubConnectionBuilder().with_url(url,options)\
-        #        .with_automatic_reconnect({
-        #            "type": "raw",
-        #            "keep_alive_interval": 10,
-        #            "reconnect_interval": 5,
-        #            "max_attempts": 5
-        #        }).build()
         self.connections[identifiant] = connection
         connection.on_open(lambda: self.on_open(identifiant))
         connection.on_close(lambda: self.on_close(identifiant))
+        connection.on_error(lambda data: self.on_error(data))
         connection.on('ProductUpdate', self.on_Update)
         connection.on('ChargerUpdate', self.on_Update)
         connection.on('CommandResponse', self.on_CommandResponse)
@@ -47,6 +41,10 @@ class easee(account):
         if i > 0:
             self.log_error(f"Timeout while stopping {serial}")
         return
+
+    def on_error(self,data):
+        self.log_error(data.error)
+        self.log_error(data)
 
     def on_open(self,serial):
         self.log_debug("openning connection " + serial)
