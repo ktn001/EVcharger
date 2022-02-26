@@ -20,7 +20,13 @@ class easee(account):
 
         if identifiant in self.connections:
             return
-        connection = HubConnectionBuilder().with_url(url,options).build()
+        connection = HubConnectionBuilder().with_url(url,options)\
+                .with_automatic_reconnect({
+                    "type": "raw",
+                    "keep_alive_interval": 30,
+                    "interval_reconnect": 5,
+                    "max_attemps": 5
+                }).build()
         self.connections[identifiant] = connection
         connection.on_open(lambda: self.on_open(identifiant))
         connection.on_close(lambda: self.on_close(identifiant))
