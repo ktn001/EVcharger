@@ -89,7 +89,7 @@ class easeeAccount extends account {
 			],
 			CURLOPT_POSTFIELDS => $data,
 		]);
-		$reponse = json_decode(curl_exec($curl),true);
+		$reponse = curl_exec($curl);
 		$httpCode = curl_getinfo($curl,CURLINFO_HTTP_CODE);
 		$err = curl_error($curl);
 		curl_close($curl);
@@ -98,11 +98,18 @@ class easeeAccount extends account {
 			throw new Exception($err);
 		}
 		if (substr($httpCode,0,1) != '2') {
-			$this->log("warning", $httpCode . ": " . $reponse['title']);
-			$this->log("warning", print_r( $reponse,true));
-			throw new Exception ($reponse['title']);
+			$this->log("debug", "Requête: path:". $path);
+			$this->log("debug", "         data:". $data);
+			$this->log("error", "Code retour http: " . $httpCode);
+			$title = $reponse;
+			$matches = array();
+			if (preg_match('/<title>(.*?)<\/title>/',$reponse, $matches)) {
+				$title = $matches[1];
+			}
+			$this->log("error", $title);
+			throw new Exception ($title);
 		}
-		return $reponse;
+		return json_decode($reponse, true);
 	}
 
 	private function renewApiToken() {

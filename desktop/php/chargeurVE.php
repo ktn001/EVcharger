@@ -209,12 +209,13 @@ sendVarToJS('modelLabels',model::labels());
 		    <table id="table_cmd" class="table table-bordered table-condensed">
 			<thead>
 			    <tr>
-				<th>{{Id}}</th>
-				<th>{{Nom}}</th>
-				<th>{{Modèle}}</th>
-				<th>{{Options}}</th>
-				<th>{{Paramètres}}</th>
-				<th>{{Action}}</th>
+				<th class="hidden-xs" style="min-width:50px;width:70px"> ID</th>
+				<th style="min-width:200px;width:240px">{{Nom}}</br>Logical_Id</th>
+				<th style="min-width:200px;width:240px">{{Icône}}</br>{{valeur retour}}</th>
+				<th style="width:130px">{{Type}}</br>{{Sous-type}}</th>
+				<th>{{Valeur}}</th>
+				<th style="min-width:260px;width:310px">{{Options}}</th>
+				<th style="min-width:80px;width:200px">{{Action}}</th>
 			    </tr>
 			</thead>
 			<tbody>

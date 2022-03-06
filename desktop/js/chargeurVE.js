@@ -397,25 +397,24 @@ function addCmdToTable(_cmd) {
 		isMandatory = (_cmd.configuration.mandatory == '1');
 	}
 	let  tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-	tr += '<td style="min-width:50px;width:70px;">';
+	tr += '<td class="hidden-xs">';
 	tr += '<span class="cmdAttr" data-l1key="id"></span>';
 	tr += '</td>';
-	tr += '<td style="min-width:300px;width:350px;">';
-	tr += '<div class="row">';
-	tr += '<div class="col-xs-7">';
-	tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom de la commande}}">';
-	tr += '<select class="cmdAttr form-control input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{Commande information liée}}">';
-	tr += '<option value="">{{Aucune}}</option>';
-	tr += '</select>';
-	tr += '</div>';
-	tr += '<div class="col-xs-5">';
-	tr += '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fas fa-flag"></i> {{Icône}}</a>';
-	tr += '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>';
-	tr += '</div>';
-	tr += '</div>';
+	tr += '<td>';
+	tr += '  <input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom de la commande}}" style="margin-bottom:3px">';
+	if (isStandard) {
+		tr += '  <input class="cmdAttr form-control input-sm" data-l1key="logicalId" style="margin-top:5px" disabled>';
+	}
 	tr += '</td>';
 	tr += '<td>';
-	if (isStandard) {
+	tr += '  <a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fas fa-flag"></i> {{Icône}}</a>';
+	tr += '  <span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>';
+	tr += '  <select class="cmdAttr form-control input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{Commande information liée}}">';
+	tr += '    <option value="">{{Aucune}}</option>';
+	tr += '  </select>';
+	tr += '</td>';
+	tr += '<td>';
+	if (isStandard ) {
 		tr += '<input class="cmdAttr form-control input-sm" data-l1key="type" style="width:120px; margin-bottom:3px" disabled>';
 		tr += '<input class="cmdAttr form-control input-sm" data-l1key="subType" style="width:120px; margin-top:5px" disabled>';
 	} else {
@@ -423,15 +422,20 @@ function addCmdToTable(_cmd) {
 		tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
 	}
 	tr += '</td>';
-	tr += '<td style="min-width:120px;width:140px;">';
-	tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></div> ';
-	tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></div> ';
-	tr += '<div><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></div>';
+	tr += '<td>';
+	if (!isStandard || _cmd.configuration.hasOwnProperty('calcul')) {
+		tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
+	}
 	tr += '</td>';
-	tr += '<td style="min-width:180px;">';
-	tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min.}}" title="{{Min.}}" style="width:30%;display:inline-block;"/> ';
-	tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max.}}" title="{{Max.}}" style="width:30%;display:inline-block;"/> ';
-	tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;display:inline-block;"/>';
+	tr += '<td>';
+	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label>';
+	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label>';
+	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label>';
+	tr += '<div style="margin-top:7px">';
+	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min.}}" title="{{Min.}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px"/>';
+	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max.}}" title="{{Max.}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px"/>';
+	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;display:inline-block;margin-right:2px"/>';
+	tr += '</div>';
 	tr += '</td>';
 	tr += '<td>';
 	if (is_numeric(_cmd.id)) {
@@ -444,6 +448,12 @@ function addCmdToTable(_cmd) {
 	tr += '</tr>';
 	$('#table_cmd tbody').append(tr);
 	tr = $('#table_cmd tbody tr').last();
+	if (isStandard){
+		tr.find('.cmdAttr[data-l1key=unite]:visible').prop('disabled',true);
+		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=minValue]:visible').prop('disabled',true);
+		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=maxValue]:visible').prop('disabled',true);
+		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=calcul]').prop('disabled',true);
+	}
 	jeedom.eqLogic.buildSelectCmd({
 		id:  $('.eqLogicAttr[data-l1key=id]').value(),
 		filter: {type: 'info'},
@@ -456,11 +466,6 @@ function addCmdToTable(_cmd) {
 			jeedom.cmd.changeType(tr, init(_cmd.subType));
 		}
 	});
-	if (isStandard){
-		tr.find('.cmdAttr[data-l1key=unite]:visible').prop('disabled',true);
-		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=minValue]:visible').prop('disabled',true);
-		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=maxValue]:visible').prop('disabled',true);
-	}
 }
 
 /*

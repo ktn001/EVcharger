@@ -16,14 +16,14 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* * ***************************Includes********************************* */
+/* * *************************** Includes ********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/account.class.php';
 
 class chargeurVE extends eqLogic {
-    /*     * *************************Attributs****************************** */
+    /*     * ************************* Attributs ****************************** */
 
-    /*     * ***********************Methode static*************************** */
+    /*     * *********************** Methode static *************************** */
 
 	public static function byAccountId($accountId) {
 		return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
@@ -42,7 +42,7 @@ class chargeurVE extends eqLogic {
 
 	}
 
-    /*     * **********************Gestion du daemon************************* */
+    /*     * ********************** Gestion du daemon ************************* */
 
     /*
      * Info sur le daemon
@@ -149,38 +149,29 @@ class chargeurVE extends eqLogic {
 		return $return;
 	}
 
-    /*     * ************************Les crons**************************** */
+    /*     * ************************ Les widgets **************************** */
 
     /*
-     * Fonction exécutée automatiquement toutes les minutes par Jeedom
-	public static function cron() {
-	}
+     * template pour les widget
      */
+	public static function templateWidget() {
+		$return = array(
+			'action' => array(
+				'other' => array(
+					'cable_lock' => array(
+						'template' => 'cable_lock',
+						'replace' => array(
+							'#_icon_on_#' => '<i class=\'icon_green icon jeedom-lock-ferme\'><i>',
+							'#_icon_off_#' => '<i class=\'icon_orange icon jeedom-lock-ouvert\'><i>'
+						)
+					)
+				)
+			)
+		);
+		return $return;
+	}
 
-    /*
-     * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-	public static function cron5() {
-		account::cronHourly();
-	}
-     */
-
-    /*
-     * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
-	public static function cron10() {
-	}
-     */
-
-    /*
-     * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
-	public static function cron15() {
-	}
-     */
-
-    /*
-     * Fonction exécutée automatiquement toutes les 30 minutes par Jeedom
-	public static function cron30() {
-	}
-     */
+    /*     * ************************ Les crons **************************** */
 
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
@@ -189,18 +180,10 @@ class chargeurVE extends eqLogic {
 		account::cronHourly();
 	}
 
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-	public static function cronDaily() {
-	}
-     */
-
-
     /*     * *********************Méthodes d'instance************************* */
 
     // Création/mise à jour des commande prédéfinies
 	public function UpdateCmds($mandatoryOnly = false) {
-		log::add('chargeurVE','debug','EpdateCmds');
 		$ids = array();
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
 			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
@@ -235,16 +218,31 @@ class chargeurVE extends eqLogic {
 				$cmd->setConfiguration('historizeRound', $config['rounding']);
 			}
 			$cmd->save();
-			$ids[$logicalId] = $cmd->getId();
 		}
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
 			if (array_key_exists('value',$config)){
 				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
+					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
+					continue;
+				}
+				$value = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value'])->getId();
+				$cmd->setValue($value);
+				$cmd->save();
+			}
+			if (array_key_exists('calcul',$config)){
+				$calcul = $config['calcul'];
+				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+				if (!is_object($cmd)){
 					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));
 					continue;
 				}
-				$cmd->setValue($ids[$config['value']]);
+				preg_match_all('/#(.+?)#/',$calcul,$matches);
+				foreach ($matches[1] as $logicalId) {
+					$id = cmd::byEqLogicIdAndLogicalId($this->getId(), $logicalId)->getId();
+					$calcul = str_replace('#' . $logicalId . '#', '#' . $id . '#', $calcul);
+				}
+				$cmd->setConfiguration('calcul', $calcul);
 				$cmd->save();
 			}
 		}
@@ -260,18 +258,6 @@ class chargeurVE extends eqLogic {
 		$this->UpdateCmds(false);
 	}
 
-    // Fonction exécutée automatiquement avant la mise à jour de l'équipement
-	public function preUpdate() {
-	}
-
-    // Fonction exécutée automatiquement après la mise à jour de l'équipement
-	public function postUpdate() {
-	}
-
-    // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
-	public function preSave() {
-	}
-
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
 	public function postSave() {
 		if ($this->getIsEnable()){
@@ -279,14 +265,6 @@ class chargeurVE extends eqLogic {
 		} else {
 			$this->stopListener();
 		}
-	}
-
-    // Fonction exécutée automatiquement avant la suppression de l'équipement
-	public function preRemove() {
-	}
-
-    // Fonction exécutée automatiquement après la suppression de l'équipement
-	public function postRemove() {
 	}
 
 	public function getPathImg() {
@@ -373,12 +351,60 @@ class chargeurVECmd extends cmd {
 		return false;
 	}
 
+	public function preSave() {
+		if ($this->getLogicalId() == 'refresh') {
+                        return;
+                }
+		if ($this->getType() == 'info') {
+			$calcul = $this->getConfiguration('calcul');
+			if (strpos($calcul, '#' . $this->getId() . '#') !== false) {
+				throw new Exception(__('Vous ne pouvez appeler la commande elle-même (boucle infinie) sur',__FILE__) . ' : '.$this->getName());
+			}
+			$added_value = [];
+			preg_match_all("/#([0-9]+)#/", $calcul, $matches);
+			$value = '';
+			foreach ($matches[1] as $cmd_id) {
+				$cmd = self::byId($cmd_id);
+				if (is_object($cmd) && $cmd->getType() == 'info') {
+					if(isset($added_value[$cmd_id])) {
+						continue;
+					}
+					$value .= '#' . $cmd_id . '#';
+					$added_value[$cmd_id] = $cmd_id;
+				}
+			}
+			preg_match_all("/variable\((.*?)\)/",$calcul, $matches);
+			foreach ($matches[1] as $variable) {
+				if(isset($added_value['#variable(' . $variable . ')#'])){
+					continue;
+				}
+				$value .= '#variable(' . $variable . ')#';
+				$added_value['#variable(' . $variable . ')#'] = '#variable(' . $variable . ')#';
+			}
+			$this->setValue($value);
+		}
+	}
+
+	public function postSave() {
+		if ($this->getType() == 'info' && $this->getConfiguration('calcul') != '') {
+			$this->event($this->execute());
+		}
+	}
+
     // Exécution d'une commande
 	public function execute($_options = array()) {
-		$this->getEqLogic()->getAccount()->execute($this);
+		log::add("chargeurVE","debug","Execute : " . $this->getLogicalId());
+		switch ($this->getType()) {
+		case 'info':
+			$calcul = $this->getConfiguration('calcul');
+			if ($calcul) {
+				return jeedom::evaluateExpression($calcul);
+			}
+			break;
+		case 'action':
+			$this->getEqLogic()->getAccount()->execute($this);
+		}
 	}
 
     /*     * **********************Getteur Setteur*************************** */
 }
-
-

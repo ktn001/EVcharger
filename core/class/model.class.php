@@ -92,72 +92,97 @@ class model {
 	}
 
 	public static function commands($model, $mandatoryOnly = false) {
+
+		$parameters = array(
+			'calcul',
+			'disabled',
+			'display::graphStep',
+			'displayName',
+			'group',
+			'mandatory',
+			'name',
+			'order',
+			'rounding',
+			'subType',
+			'template',
+			'type',
+			'unite',
+			'value',
+			'visible'
+		);
+
 		/*
 		 *  Lecture des fichiers de définition des commandes
 		 */
 		$configPath = __DIR__ . '/../config';
 		$configFile = 'cmd.config.ini';
-		$defaultCommands = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
-		$modelCommands = parse_ini_file($configPath.'/'.$model.'/'.$configFile,true, INI_SCANNER_RAW);
-		$configs = array();
 
-		/* Remplacement des valeurs par defaut par les valeurs spécifiques au modèle de chargeur */
-		foreach ($defaultCommands as $logicalId => $cmdConfig) {
-			if (array_key_exists($logicalId, $modelCommands)) {
-				$configs[$logicalId] = array_merge($cmdConfig, $modelCommands[$logicalId]);
+		$globalConfigs = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
+		$modelConfigs = parse_ini_file($configPath.'/'.$model.'/'.$configFile,true, INI_SCANNER_RAW);
+
+		$sections = array();
+		foreach (array_keys($globalConfigs) as $section) {
+			$sections[$section] = array();
+		}
+		foreach (array_keys($modelConfigs) as $section) {
+			$sections[$section] = array();
+		}
+
+		foreach (array_keys($sections) as $section) {
+			if (array_key_exists($section,$globalConfigs)) {
+				$sections[$section] = $globalConfigs[$section];
+				if (array_key_exists($section,$modelConfigs)) {
+					foreach ($parameters as $parameter) {
+						if (array_key_exists($parameter,$modelConfigs[$section])) {
+							$sections[$section][$parameter] = $modelConfigs[$section][$parameter];
+						}
+					}
+				}
 			} else {
-				$configs[$logicalId] = $cmdConfig;
+				$sections[$section] = $modelConfigs[$section];
 			}
 		}
 
-		/* Ajout des valeurs spécifiques au modèle de chargeur qui n'ont pas de valeur par défaut */
-		foreach ($modelCommands as $logicalId => $cmdConfig) {
-			if (!array_key_exists($logicalId, $configs)) {
-				$configs[$logicalId] = $cmdConfig;
-			}
-		}
-
-		/* tri des commandes et des groupes */
-		$commands = array();
-		$groups = array();
-		foreach ($configs as $logicalId => $config) {
-			if (strpos($logicalId, 'group:') === 0) {
-				$group = substr($logicalId,6);
-				$groups[$group] = $config;
+		$groupConfigs = array();
+		$cmdConfigs = array();
+		foreach (array_keys($sections) as $section) {
+			if (strpos($section, 'group:') === 0) {
+				$group = substr($section,6);
+				$groupConfigs[$group] = $sections[$section];
 			} else {
-				$commands[$logicalId] = $config;
+				$cmdConfigs[$section] = $sections[$section];
 			}
 		}
-		/* Mise à jour des commandes avec les valeurs de groupe */
-		foreach (array_keys($commands) as $logicalId){
-			if (array_key_exists('group', $commands[$logicalId])) {
-				$group = $commands[$logicalId]['group'];
-				if (array_key_exists($group, $groups)) {
-					$commands[$logicalId] = array_merge($commands[$logicalId],$groups[$group]);
-				} else {
-					log::add('chargeurVE','error',sprintf(__("La commande %s a le groupe %s qui n'existe pas!",__FILE__),$logicalId,$group));
+
+		foreach (array_keys($cmdConfigs) as $cmd) {
+			if (array_key_exists('group',$cmdConfigs[$cmd])) {
+				$group = $cmdConfigs[$cmd]['group'];
+				if (! array_key_exists($group,$groupConfigs)) {
+					throw new Exception (sprintf(__("Le groupe %s utilisé dans la définition de la commande %s est introuvable.",__FILE__), $group, $cmd));
+				}
+				foreach ($parameters as $parameter) {
+					if (array_key_exists($parameter,$groupConfigs[$group])) {
+						$cmdConfigs[$cmd][$parameter] = $groupConfigs[$group][$parameter];
+					}
 				}
 			}
 		}
 
-		/* Elimination des commandes qui n'ont pas l'attribut <mandatory> */
-		foreach (array_keys($commands) as $logicalId){
-			if (!array_key_exists('mandatory', $commands[$logicalId])) {
-				unset ($commands[$logicalId]);
+		foreach (array_keys($cmdConfig) as $cmd) {
+			if (array_key_exists($cmdConfigs[$cmd]['disabled']) && $cmdConfigs[$cmd]['disabled'] == 1) {
+				unset ($cmdConfigs[$cmd]);
 			}
 		}
 
-		$return = array();
 		if ($mandatoryOnly){
-			foreach ($commands as $logicalId => $command){
-				if ($command['mandatory'] == '1'){
-					$return[$logicalId] = $command;
+			foreach (array_keys($cmdConfig) as $cmd) {
+				if (! array_key_exists('mandatory', $cmdConfigs[$cmd]) || $cmdConfigs[$cmd]['mandatory'] == 0) {
+					unset ($cmdConfigs[$cmd]);
 				}
 			}
-		} else {
-			$return = $commands;
 		}
-		return $return;
+
+		return $cmdConfigs;
 	}
 
 	private static function getConfigs($model) {
