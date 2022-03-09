@@ -267,6 +267,19 @@ class chargeurVE extends eqLogic {
 		}
 	}
 
+	// Fonction exécutée automatiquement après la sauvegarde de l'eqLogid ET des commandes si sauvegarde lancée via un AJAX
+	public function postAjax() {
+		if ($this->getAccountId() == '') {
+			return;
+		}
+		$cmd_refresh = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		if (!is_object($cmd_refresh)) {
+			return;
+		}
+		$cmd_refresh->execute();
+		return;
+	}
+
 	public function getPathImg() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
