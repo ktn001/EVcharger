@@ -170,6 +170,21 @@ sendVarToJS('modelLabels',model::labels());
 
 			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
 			    <div class='chargeurParams form-group'>
+				<label class="col-sm-3 control-label">{{Coordonnées GPS}}</label>
+				<div class="row col-sm-7">
+				    <div class="col-sm-12">
+					<i class="far fa-comment"></i>
+					<i>{{Pour obtenir vos coordonnées GPS, vous pouvez utiliser ce <a href="https://www.torop.net/coordonnees-gps.php" target="_blank">site.</a>}}</i>
+				    </div>
+				    <div class="col-sm-6">
+					<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="latitude" placeholder="{{Latitude}}"/>
+				    </div>
+				    <div class="col-sm-6">
+					<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="longitude" placeholder="{{Longitude}}"/>
+				    </div>
+				</div>
+			    </div>
+			    <div class='chargeurParams form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
 				<div class="col-sm-7">
 				    <select id="selectAccount" class="eqLogicAttr" data-l1key="configuration" data-l2key="accountId">

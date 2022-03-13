@@ -16,8 +16,6 @@
     permanentlyLockedColor = "";
 
     jeedom.cmd.update['#id#'] =function(_options) {
-      console.log(_options)
-      console.log(permanentlyLockedColor)
       var cmd = $('.cmd[data-cmd_id=#id#]')
       if ('#_time_widget_#' != '1') {
         cmd.find('.timeCmd').parent().remove()

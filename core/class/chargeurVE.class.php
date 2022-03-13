@@ -166,6 +166,21 @@ class chargeurVE extends eqLogic {
 						)
 					)
 				)
+			),
+			'info' => array(
+				'string' => array(
+					'etat' => array(
+						'template' => 'etat',
+						'replace' => array(
+							'#texte_1#' =>  '{{Débranché}}',
+							'#texte_2#' =>  '{{En attente}}',
+							'#texte_3#' =>  '{{Recharge}}',
+							'#texte_4#' =>  '{{Terminé}}',
+							'#texte_5#' =>  '{{Erreur}}',
+							'#texte_6#' =>  '{{Prêt}}'
+						)
+					)
+				)
 			)
 		);
 		return $return;
