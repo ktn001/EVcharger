@@ -54,7 +54,7 @@ class easeeAccount extends account {
 		$mapping = parse_ini_file($mappingFile, true);
 		if ($mapping == false) {
 			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$mappingFile);
-			log::add("chargeurVE","error",$msg);
+			log::add("EVcharger","error",$msg);
 		}
 		return $mapping['API'];
 	}
@@ -64,7 +64,7 @@ class easeeAccount extends account {
 		$transfoms = parse_ini_file($transfomsFile, true);
 		if ($transfoms == false) {
 			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$transfomsFile);
-			log::add("chargeurVE","error",$msg);
+			log::add("EVcharger","error",$msg);
 		}
 		return $transfoms;
 	}
@@ -216,23 +216,23 @@ class easeeAccount extends account {
 
 	public function execute_refresh($cmd) {
 		$chargeurId = $cmd->getEqLogic()->getId();
-		$chargeur = chargeurVE::byId($chargeurId);
+		$chargeur = EVcharger::byId($chargeurId);
 		$serial =  $cmd->getEqLogic()->getConfiguration("serial");
 		$path = '/api/chargers/'.$serial.'/state';
 		$response = $this->sendRequest($path);
 		$mapping = $this->getMapping();
 		$transforms = $this->getTransforms();
 		foreach (array_keys($response) as $key){
-			log::add('chargeurVE','debug',$key);
+			log::add('EVcharger','debug',$key);
 			if ( ! array_key_exists($key,$mapping)){
 				continue;
 			}
 			foreach (explode(',',$mapping[$key]) as $logicalId){
-				log::add('chargeurVE','debug',"  " . $logicalId);
+				log::add('EVcharger','debug',"  " . $logicalId);
 				$value = $response[$key];
 				if (array_key_exists($logicalId, $transforms)) {
-					log::add('chargeurVE','debug',print_r($transforms,true));
-					log::add('chargeurVE','debug',print_r($value,true));
+					log::add('EVcharger','debug',print_r($transforms,true));
+					log::add('EVcharger','debug',print_r($value,true));
 					$value = $transforms[$logicalId][$value];
 				}
 				$chargeur->checkAndUpdateCmd($logicalId,$value);

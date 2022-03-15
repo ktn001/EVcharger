@@ -1,9 +1,9 @@
 {
-	"plugins\/chargeurVE\/core\/config\/easee\/chargeur_params.php": {
+	"plugins\/EVcharger\/core\/config\/easee\/chargeur_params.php": {
 		"N° de série": "Serial number",
 		"N° du chargeur": "charger ID"
 	},
-	"plugins\/chargeurVE\/desktop\/js\/chargeurVE.js": {
+	"plugins\/EVcharger\/desktop\/js\/EVcharger.js": {
 		"Afficher": "Show",
 		"Annuler": "Cancel",
 		"Aucune": "None",
@@ -26,12 +26,12 @@
 		"Valider": "Validate",
 		"Êtes-vous sûr de vouloir supprimer ce compte ?": "Êtes-vous sûr de vouloir supprimer ce compte ?"
 	},
-	"plugins\/chargeurVE\/desktop\/modal\/chargeurNameAndType.php": {
+	"plugins\/EVcharger\/desktop\/modal\/chargeurNameAndType.php": {
 		"401 - Accès non autorisé": "401 - Unauthorized access",
 		"Nom": "Name",
 		"Type": "Type"
 	},
-	"plugins\/chargeurVE\/desktop\/modal\/edit_account.php": {
+	"plugins\/EVcharger\/desktop\/modal\/edit_account.php": {
 		"401 - Accès non autorisé": "401 - Unauthorized access",
 		"Activer": "Activate",
 		"Login": "Login",
@@ -41,14 +41,14 @@
 		"Password": "Password",
 		"URL": "URL"
 	},
-	"plugins\/chargeurVE\/desktop\/modal\/modal.chargeurVE.php": {
+	"plugins\/EVcharger\/desktop\/modal\/modal.EVcharger.php": {
 		"401 - Accès non autorisé": "401 - Unauthorized access"
 	},
-	"plugins\/chargeurVE\/desktop\/modal\/selectAccountType.php": {
+	"plugins\/EVcharger\/desktop\/modal\/selectAccountType.php": {
 		"401 - Accès non autorisé": "401 - Unauthorized access",
 		"Type d'account": "Type d'account"
 	},
-	"plugins\/chargeurVE\/desktop\/php\/chargeurVE.php": {
+	"plugins\/EVcharger\/desktop\/php\/EVcharger.php": {
 		"401 - Accès non autorisé": "401 - Unauthorized access",
 		"Action": "Action",
 		"Activer": "Activate",
@@ -81,7 +81,7 @@
 		"Type": "Type",
 		"Visible": "Visible"
 	},
-	"plugins\/chargeurVE\/plugin_info\/configuration.php": {
+	"plugins\/EVcharger\/plugin_info\/configuration.php": {
 		"Activer": "Activate",
 		"Confirme": "Confirme",
 		"Couleur du tag": "Tag color",

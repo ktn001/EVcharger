@@ -29,7 +29,7 @@ try {
 	if (init('action') == 'save') {
 		try {
 			$data = json_decode(init('account'),true);
-			log::add("chargeurVE",'debug',"Ajax: save: " . init('account'));
+			log::add("EVcharger",'debug',"Ajax: save: " . init('account'));
 			$options = json_decode(init('options'),true);
 			if ($data['model'] == ''){
 				throw new Exception(__("Le modèle de compte n'est pas indiqué",__FILE__));

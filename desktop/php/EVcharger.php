@@ -3,13 +3,13 @@ if (!isConnect('admin')) {
      throw new Exception('{{401 - Accès non autorisé}}');
 }
 // Déclaration des variables obligatoires
-$plugin = plugin::byId('chargeurVE');
+$plugin = plugin::byId('EVcharger');
 $eqLogics = eqLogic::byType($plugin->getId());
 $accounts = account::all();
 
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
-sendVarToJs('confirmDelete',config::byKey('confirmDelete','chargeurVE'));
+sendVarToJs('confirmDelete',config::byKey('confirmDelete','EVcharger'));
 sendVarToJS('modelLabels',model::labels());
 ?>
 
@@ -244,7 +244,7 @@ sendVarToJS('modelLabels',model::labels());
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
-<?php include_file('desktop', 'chargeurVE', 'js', 'chargeurVE');?>
-<?php include_file('desktop', 'chargeurVE', 'css', 'chargeurVE');?>
+<?php include_file('desktop', 'EVcharger', 'js', 'EVcharger');?>
+<?php include_file('desktop', 'EVcharger', 'css', 'EVcharger');?>
 <!-- Inclusion du fichier javascript du core - NE PAS MODIFIER NI SUPPRIMER -->
 <?php include_file('core', 'plugin.template', 'js');?>

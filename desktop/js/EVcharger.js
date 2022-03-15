@@ -29,7 +29,7 @@ $('#table_cmd').on('sortupdate',function(event,ui){
 function loadAccountCards() {
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
 		data: {
 			action: 'displayCards',
 		},
@@ -70,7 +70,7 @@ loadAccountCards();
 function deleteAccount (accountId) { 
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
 		data: {
 			action: 'remove',
 			accountId: accountId,
@@ -105,7 +105,7 @@ function saveWithPassword(account) {
 			}
 			$.ajax({
 				type: 'POST',
-				url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+				url: 'plugins/EVcharger/core/ajax/account.ajax.php',
 				data: {
 					action: 'save',
 					account: account,
@@ -150,12 +150,12 @@ function editAccount (model, accountId ='') {
  			width:680
  		});
  		jQuery.ajaxSetup({async: false});
- 		$('#mod_editAccount').load('index.php?v=d&plugin=chargeurVE&modal=edit_account');
+ 		$('#mod_editAccount').load('index.php?v=d&plugin=EVcharger&modal=edit_account');
  		jQuery.ajaxSetup({async: true});
 	}
  	$.ajax({
  		type: 'POST',
- 		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+ 		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
  		data: {
  			action: 'byIdToEdit',
  			id: accountId,
@@ -191,7 +191,7 @@ function editAccount (model, accountId ='') {
  			account =  json_encode($('#mod_editAccount').getValues('.accountAttr')[0]);
  			$.ajax({
  				type: 'POST',
- 				url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+ 				url: 'plugins/EVcharger/core/ajax/account.ajax.php',
  				data: {
  					action: 'save',
  					account: account
@@ -257,7 +257,7 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 			width:300
 		});
 		jQuery.ajaxSetup({async: false});
-		$('#mod_selectAccountModel').load('index.php?v=d&plugin=chargeurVE&modal=selectAccountModel');
+		$('#mod_selectAccountModel').load('index.php?v=d&plugin=EVcharger&modal=selectAccountModel');
 		jQuery.ajaxSetup({async: true});
 	}
 	$('#mod_selectAccountModel').dialog('option', 'buttons', {
@@ -288,7 +288,7 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 	if ($('#modContainer_chargeurNameAndModel').length == 0) {
 		$('body').append('<div id="modContainer_chargeurNameAndModel" title="{{Nouveau chargeur:}}"/>');
 		jQuery.ajaxSetup({async: false});
-		$('#modContainer_chargeurNameAndModel').load('index.php?v=d&plugin=chargeurVE&modal=chargeurNameAndModel');
+		$('#modContainer_chargeurNameAndModel').load('index.php?v=d&plugin=EVcharger&modal=chargeurNameAndModel');
 		jQuery.ajaxSetup({async: true});
 		$("#mod_chargeurNameAndModel").dialog({
 			closeText: '',
@@ -347,7 +347,7 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 	}
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
 			action: 'updateCmds',
 			id:  $('.eqLogicAttr[data-l1key=id]').value(),
@@ -474,7 +474,7 @@ function addCmdToTable(_cmd) {
 function loadSelectAccount(defaut) {
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/account.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
 		data: {
 			action: 'getAccountToSelect',
 			model: $('.eqLogicAttr[data-l1key=configuration][data-l2key=model]').value(),
@@ -503,7 +503,7 @@ function loadSelectAccount(defaut) {
 function loadSelectImg(defaut) {
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
 			action: 'images',
 			model: $('.eqLogicAttr[data-l1key=configuration][data-l2key=model]').value(),
@@ -540,7 +540,7 @@ function printEqLogic (configs) {
 	loadSelectImg(configs.configuration.image);
 	$.ajax({
 		type: 'POST',
-		url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
 			action: 'chargeurParamsHtml',
 			model: configs.configuration.model

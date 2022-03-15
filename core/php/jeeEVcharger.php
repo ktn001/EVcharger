@@ -12,7 +12,7 @@ try {
 	function process_account_message($message) {
 		if ($message['info'] == 'thread_started'){
 			$accountId = $message['account_id'];
-			foreach(chargeurVE::byAccountId($accountId) as $charger){
+			foreach(EVcharger::byAccountId($accountId) as $charger){
 				$charger->startListener();
 			}
 		}
@@ -20,26 +20,26 @@ try {
 
 	function process_chargeur_message($message) {
 		if ($message['info'] == 'closed'){
-			log::add('chargeurVE','info','[' . $message['model'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
+			log::add('EVcharger','info','[' . $message['model'] . '][' . $message['chargeur'] . __('Connection du démon fermée',__FILE__));
 		}
 	}
 
 	function process_cmd_message($message) {
 		if (!array_key_exists('chargeur',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans identifiant de chargeur!",__FILE__));
+			log::add('EVcharger','error',__("Message du demon de modèle <cmd> mais sans identifiant de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('model',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans modèle de chargeur!",__FILE__));
+			log::add('EVcharger','error',__("Message du demon de modèle <cmd> mais sans modèle de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('logicalId',$message)) {
-			log::add('chargeurVE','error',__("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
+			log::add('EVcharger','error',__("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
-		foreach (chargeurVE::byModelAndIdentifiant($message['model'],$message['chargeur']) as $chargeur){
+		foreach (EVcharger::byModelAndIdentifiant($message['model'],$message['chargeur']) as $chargeur){
 			$chargeur->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}
 
-	if (!jeedom::apiAccess(init('apikey'), 'chargeurVE')) {
+	if (!jeedom::apiAccess(init('apikey'), 'EVcharger')) {
 		echo __('Vous n\'êtes pas autorisé à effectuer cette action', __FILE__);
 		die();
 	}
@@ -52,10 +52,10 @@ try {
 	if (!is_array($message)) {
 		die();
 	}
-	log::add("chargeurVE","debug","Message reçu du démon: " . print_r($message,true));
+	log::add("EVcharger","debug","Message reçu du démon: " . print_r($message,true));
 
 	if (!array_key_exists('object',$message)){
-		log::error('chargeurVE','error','Message reçu du deamon sans champ "object"');
+		log::error('EVcharger','error','Message reçu du deamon sans champ "object"');
 		die();
 	}
 	switch ($message['object']) {
@@ -75,7 +75,7 @@ try {
 
 
 } catch (Exception $e) {
-	log::add('chargeurVE','error', displayException($e));
+	log::add('EVcharger','error', displayException($e));
 }
 
 ?>

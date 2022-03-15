@@ -21,11 +21,11 @@ if (!isConnect()) {
   include_file('desktop', '404', 'php');
   die();
 }
-include_file('core', 'chargeurVE', 'class', 'chargeurVE');
+include_file('core', 'EVcharger', 'class', 'EVcharger');
 sendVarToJS('usedTypes',model::allUsed());
-$defaultTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTagColor'];
-$defaultTextTagColor = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['defaultTextTagColor'];
-$defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daemon::port'];
+$defaultTagColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor'];
+$defaultTextTagColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor'];
+$defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon::port'];
 ?>
 
 <form class="form-horizontal">
@@ -65,11 +65,11 @@ $defaultPort = config::getDefaultConfiguration('chargeurVE')['chargeurVE']['daem
               if ($modelName[0] == '_') {
                 continue;
               }
-              $config = config::byKey('model::' . $modelName,'chargeurVE');
+              $config = config::byKey('model::' . $modelName,'EVcharger');
               if ($config == '') {
                 $cfg['tagColor'] = $defaultTagColor;
                 $cfg['tagTextColor'] = $defaultTextTagColor;
-                config::save('model::' . $modelName,$cfg,'chargeurVE');
+                config::save('model::' . $modelName,$cfg,'EVcharger');
               }
               echo '<tr>';
               echo '<td>' . $model['label'] . '</td>';

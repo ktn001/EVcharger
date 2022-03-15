@@ -35,7 +35,7 @@ import account
 _logLevel = "error"
 _socketPort = -1
 _socketHost = 'localhost'
-_pidfile = '/tmp/jeedom/chargeurVE/daemond.pid'
+_pidfile = '/tmp/jeedom/EVcharger/daemond.pid'
 _apiKey = ''
 _callback = ''
 accounts = {}
@@ -52,7 +52,7 @@ def options():
     global _pidfile
     global _socketPort
 
-    parser = argparse.ArgumentParser( description='chargeurVE Daemon for Jeedom plugin')
+    parser = argparse.ArgumentParser( description='EVcharger Daemon for Jeedom plugin')
     parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
     parser.add_argument("--callback", help="Callback", type=str)
     parser.add_argument("--apikey", help="Apikey", type=str)

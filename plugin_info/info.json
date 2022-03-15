@@ -1,5 +1,5 @@
 {
-	"id" : "chargeurVE",
+	"id" : "EVcharger",
 	"name" : "Chargeur VE",
 	"description" : {
 		"fr_FR": "Plugin pour les stations de charge de véhicules électriques"
@@ -14,10 +14,10 @@
 	"hasDependency" : true,
 	"hasOwnDeamon" : true,
 	"maxDependancyInstallTime" : 10,
-	"changelog" : "https://ktn001.github.io/chargeurVE/#language#/changelog.html",
-	"documentation" : "https://ktn001.github.io/chargeurVE/#language#/index.html",
-	"changelog_beta" : "https://ktn001.github.io/chargeurVE/beta/#language#/changelog.html",
-	"documentation_beta" : "https://ktn001.github.io/chargeurVE/beta/#language#/index.html",
+	"changelog" : "https://ktn001.github.io/EVcharger/#language#/changelog.html",
+	"documentation" : "https://ktn001.github.io/EVcharger/#language#/index.html",
+	"changelog_beta" : "https://ktn001.github.io/EVcharger/beta/#language#/changelog.html",
+	"documentation_beta" : "https://ktn001.github.io/EVcharger/beta/#language#/index.html",
 	"language" : ["fr_FR"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
 }

@@ -22,7 +22,7 @@
  *    1 : Un password doit être saisi
  */
 
-class chargeurVEException extends Exception {
+class EVchargerException extends Exception {
 }
 
 ?>

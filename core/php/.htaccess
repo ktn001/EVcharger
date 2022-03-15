@@ -1,7 +1,7 @@
 Order allow,deny
 Deny from all
 
-<Files  "jeechargeurVE.php">
+<Files  "jeeEVcharger.php">
 Order deny,allow
 deny from all
 allow from 127.0.0.1

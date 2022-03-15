@@ -18,7 +18,7 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
-require_once __DIR__ . '/../php/chargeurVE.inc.php';
+require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 class model {
 
@@ -29,13 +29,13 @@ class model {
 		$models = parse_ini_file($modelsFile,true);
 		if ($models == false) {
 			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$modelsFile);
-			log::add("chargeurVE","error",$msg);
+			log::add("EVcharger","error",$msg);
 			throw new Exception($msg);
 		}
 		$result = array();
 		foreach ($models as $modelName => $config){
 			$config['label'] = translate::exec($config['label'],__FILE__);
-			$model = config::byKey('model::' . $modelName, 'chargeurVE');
+			$model = config::byKey('model::' . $modelName, 'EVcharger');
 			if (is_array($model)){
 				$model = array_merge($config, $model);
 			} else {

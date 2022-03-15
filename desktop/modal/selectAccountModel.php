@@ -35,7 +35,7 @@ if (!isConnect('admin')) {
 function selectAccountModel_actualizeModels() {
     $.ajax({
         type: 'POST',
-        url: 'plugins/chargeurVE/core/ajax/chargeurVE.ajax.php',
+        url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
         data: {
             action: 'modelLabels',
             onlyEnabled: 1,

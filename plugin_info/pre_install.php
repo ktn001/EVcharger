@@ -19,7 +19,7 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 // Fonction exécutée automatiquement avant la mise à jour du plugin
-  function chargeurVE_pre_update() {
+  function EVcharger_pre_update() {
 
   }
   

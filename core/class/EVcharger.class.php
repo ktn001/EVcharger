@@ -20,20 +20,20 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/account.class.php';
 
-class chargeurVE extends eqLogic {
+class EVcharger extends eqLogic {
     /*     * ************************* Attributs ****************************** */
 
     /*     * *********************** Methode static *************************** */
 
 	public static function byAccountId($accountId) {
-		return self::byTypeAndSearchConfiguration('chargeurVE','"accountId":"'.$accountId.'"');
+		return self::byTypeAndSearchConfiguration('EVcharger','"accountId":"'.$accountId.'"');
 	}
 
 	public static function byModelAndIdentifiant($model, $identifiant) {
 		$identKey = model::getIdentifiantChargeur($model);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
 		$chargeurs = array();
-		foreach (chargeurVE::byTypeAndSearchConfiguration('chargeurVE',$searchConf) as $chargeur){
+		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $chargeur){
 			if ($chargeur->getConfiguration('model') == $model){
 				$chargeurs[] = $chargeur;
 			}
@@ -74,15 +74,15 @@ class chargeurVE extends eqLogic {
 		}
 
 		$path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
-		$cmd = 'python3 ' . $path . '/chargeurVEd.py';
+		$cmd = 'python3 ' . $path . '/EVchargerd.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
 		$cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
-		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/chargeurVE/core/php/jeechargeurVE.php';
+		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/EVcharger/core/php/jeeEVcharger.php';
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
 		$cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
 		log::add(__CLASS__, 'info', 'Lancement démon');
-		log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon') . ' 2>&1 &');
-		$result = exec($cmd . ' >> ' . log::getPathToLog('chargeurVE_daemon.out') . ' 2>&1 &');
+		log::add(__CLASS__, "info", $cmd . ' >> ' . log::getPathToLog('EVcharger_daemon') . ' 2>&1 &');
+		$result = exec($cmd . ' >> ' . log::getPathToLog('EVcharger_daemon.out') . ' 2>&1 &');
 		$i = 0;
 		while ($i < 20) {
 			$daemon_info = self::deamon_info();
@@ -201,9 +201,9 @@ class chargeurVE extends eqLogic {
 	public function UpdateCmds($mandatoryOnly = false) {
 		$ids = array();
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
-			$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
-				$cmd = new chargeurVECMD();
+				$cmd = new EVchargerCMD();
 				$cmd->setName(__($config['name'],__FILE__));
 			}
 			$cmd->setConfiguration('mandatory',$config['mandatory']);
@@ -236,9 +236,9 @@ class chargeurVE extends eqLogic {
 		}
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
 			if (array_key_exists('value',$config)){
-				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+				$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
-					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
+					log::add("EVcharger","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
 					continue;
 				}
 				$value = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value'])->getId();
@@ -247,9 +247,9 @@ class chargeurVE extends eqLogic {
 			}
 			if (array_key_exists('calcul',$config)){
 				$calcul = $config['calcul'];
-				$cmd = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+				$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
-					log::add("chargeurVE","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));
+					log::add("EVcharger","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));
 					continue;
 				}
 				preg_match_all('/#(.+?)#/',$calcul,$matches);
@@ -287,7 +287,7 @@ class chargeurVE extends eqLogic {
 		if ($this->getAccountId() == '') {
 			return;
 		}
-		$cmd_refresh = chargeurVECmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		$cmd_refresh = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
 		if (!is_object($cmd_refresh)) {
 			return;
 		}
@@ -298,7 +298,7 @@ class chargeurVE extends eqLogic {
 	public function getPathImg() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
-			return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
 		}
 		return $image;
 	}
@@ -350,7 +350,7 @@ class chargeurVE extends eqLogic {
 	public function getImage() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
-			return "/plugins/chargeurVE/plugin_info/chargeurVE_icon.png";
+			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
 		}
 		return $image;
 	}
@@ -361,7 +361,7 @@ class chargeurVE extends eqLogic {
 	}
 }
 
-class chargeurVECmd extends cmd {
+class EVchargerCmd extends cmd {
     /*     * *************************Attributs****************************** */
 
     /*
@@ -421,7 +421,7 @@ class chargeurVECmd extends cmd {
 
     // Exécution d'une commande
 	public function execute($_options = array()) {
-		log::add("chargeurVE","debug","Execute : " . $this->getLogicalId());
+		log::add("EVcharger","debug","Execute : " . $this->getLogicalId());
 		switch ($this->getType()) {
 		case 'info':
 			$calcul = $this->getConfiguration('calcul');

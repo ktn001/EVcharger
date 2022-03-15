@@ -59,7 +59,7 @@ try {
 			throw new Exception(__("L'Id du chargeur n'est pas indiqué",__FILE__));
 		}
 		$mandatoryOnly = init('mandatoryOnly');
-		$chargeur = chargeurVE::byId($id);
+		$chargeur = EVcharger::byId($id);
 		if (!is_object($chargeur)){
 			throw new Exception(sprintf(__("Chargeur %s introuvable.",__FILE__),$id));
 			ajax::error();

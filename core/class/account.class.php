@@ -18,12 +18,12 @@
 
 /* * ***************************Includes********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
-require_once __DIR__ . '/../php/chargeurVE.inc.php';
+require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 class account {
     /*     * *************************Attributs****************************** */
 
-	protected static $plugin_id = "chargeurVE";
+	protected static $plugin_id = "EVcharger";
 
 	protected $model;
 	protected $name = "";
@@ -47,7 +47,7 @@ class account {
      * retourne l'account dont l'id est donné en argument
      */
 	public static function byId($id) {
-		$account =  unserialize (config::byKey('account::' . $id, 'chargeurVE' ));
+		$account =  unserialize (config::byKey('account::' . $id, 'EVcharger' ));
 		$account->resetModified();
 		return $account;
 	}
@@ -145,7 +145,7 @@ class account {
      * Wrapper pour les logs
      */
 	protected function log($level, $message){
-		log::add('chargeurVE',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
+		log::add('EVcharger',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
 	}
 
     /**
@@ -153,7 +153,7 @@ class account {
      */
 	protected function setModified($name){
 		if (! in_array($name, $this->modified)) {
-			log::add("chargeurVE","debug", $this->getHumanName() . " " . $name . __(" est modifié.",__FILE__));
+			log::add("EVcharger","debug", $this->getHumanName() . " " . $name . __(" est modifié.",__FILE__));
 			$this->modified[] = $name;
 		}
 	}
@@ -239,7 +239,7 @@ class account {
      * suppression de l'account
      */
 	public function remove() {
-		if (chargeurVE::byAccountId($this->id)) {
+		if (EVcharger::byAccountId($this->id)) {
 			throw new Exception (__("Au moins un chargeur est liée à l'account",__FILE__));
 		}
 		if (method_exists($this, 'preRemove')) {
@@ -259,17 +259,17 @@ class account {
      */
 	public function send2Deamon($message) {
 		$this->log('debug','send2Deamon: ' . print_r($message,true));
-		if (chargeurVE::deamon_info()['state'] != 'ok'){
+		if (EVcharger::deamon_info()['state'] != 'ok'){
 			$this->log('warning', __("Le démon n'est pas démarré!",__FILE__));
 			return;
 		}
-		$params['apikey'] = jeedom::getApiKey('chargeurVE');
+		$params['apikey'] = jeedom::getApiKey('EVcharger');
 		$params['model'] = $this->getModel();
 		$params['id'] = $this->getId();
 		$params['message'] = $message;
 		$payLoad = json_encode($params);
 		$socket = socket_create(AF_INET, SOCK_STREAM,0);
-		socket_connect($socket,'127.0.0.1', config::byKey('daemon::port','chargeurVE'));
+		socket_connect($socket,'127.0.0.1', config::byKey('daemon::port','EVcharger'));
 		socket_write($socket, $payLoad, strlen($payLoad));
 		socket_close($socket);
 	}
@@ -291,7 +291,7 @@ class account {
      * Arrêt du thread dédié à l'account 
      */
 	public function stopDeamonThread() {
-		foreach (chargeurVE::byAccountId($this->getId()) as $chargeur) {
+		foreach (EVcharger::byAccountId($this->getId()) as $chargeur) {
 			if ($chargeur->getIsEnable()) {
 				$message = array(
 					'cmd' => 'stop',
@@ -341,8 +341,8 @@ class account {
      * Execution d'une commande
      */
 	public function execute ($cmd){
-		if (! is_a($cmd, 'chargeurVECMD')){
-			$this->log('error', sprintf(__("La commande n'est pas de la class %s",__FILE__),"chargeurVECMD"));
+		if (! is_a($cmd, 'EVchargerCMD')){
+			$this->log('error', sprintf(__("La commande n'est pas de la class %s",__FILE__),"EVchargerCMD"));
 			return;
 		}
 		$this->log("debug", __("Exécution de ",__FILE__) . $cmd->getLogicalId());

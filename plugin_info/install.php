@@ -19,19 +19,19 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 // Fonction exécutée automatiquement après l'installation du plugin
-function chargeurVE_install() {
-	config::save('daemon::port', '34739', 'chargeurVE');
-	config::save('api', config::genKey(), 'chargeurVE');
-	config::save('api::chargeurVE::mode', 'localhost');
-	config::save('api::chargeurVE::restricted', '1');
+function EVcharger_install() {
+	config::save('daemon::port', '34739', 'EVcharger');
+	config::save('api', config::genKey(), 'EVcharger');
+	config::save('api::EVcharger::mode', 'localhost');
+	config::save('api::EVcharger::restricted', '1');
 }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
-function chargeurVE_update() {
+function EVcharger_update() {
 }
 
 // Fonction exécutée automatiquement après la suppression du plugin
-  function chargeurVE_remove() {
+  function EVcharger_remove() {
 
   }
 
