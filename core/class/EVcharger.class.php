@@ -32,13 +32,13 @@ class EVcharger extends eqLogic {
 	public static function byModelAndIdentifiant($model, $identifiant) {
 		$identKey = model::getIdentifiantChargeur($model);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
-		$chargeurs = array();
-		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $chargeur){
-			if ($chargeur->getConfiguration('model') == $model){
-				$chargeurs[] = $chargeur;
+		$chargers = array();
+		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $charger){
+			if ($charger->getConfiguration('model') == $model){
+				$chargers[] = $charger;
 			}
 		}
-		return $chargeurs;
+		return $chargers;
 
 	}
 
@@ -265,7 +265,7 @@ class EVcharger extends eqLogic {
 
     // Fonction exécutée automatiquement avant la création de l'équipement
 	public function preInsert() {
-		$this->setConfiguration('image',model::images($this->getConfiguration('model'),'chargeur')[0]);
+		$this->setConfiguration('image',model::images($this->getConfiguration('model'),'charger')[0]);
 	}
 
     // Fonction exécutée automatiquement après la création de l'équipement

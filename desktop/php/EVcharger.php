@@ -28,7 +28,7 @@ sendVarToJS('modelLabels',model::labels());
 		<br>
 		<span>{{Ajouter un compte}}</span>
 	    </div>
-	    <div class="cursor chargeurAction logoPrimary" data-action="add">
+	    <div class="cursor chargerAction logoPrimary" data-action="add">
 		<i class="fas fa-charging-station"></i>
 		<br>
 		<span>{{Ajouter un chargeur}}</span>
@@ -169,7 +169,7 @@ sendVarToJS('modelLabels',model::labels());
 			    <br>
 
 			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
-			    <div class='chargeurParams form-group'>
+			    <div class='chargerParams form-group'>
 				<label class="col-sm-3 control-label">{{Coordonnées GPS}}</label>
 				<div class="row col-sm-7">
 				    <div class="col-sm-12">
@@ -184,7 +184,7 @@ sendVarToJS('modelLabels',model::labels());
 				    </div>
 				</div>
 			    </div>
-			    <div class='chargeurParams form-group'>
+			    <div class='chargerParams form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
 				<div class="col-sm-7">
 				    <select id="selectAccount" class="eqLogicAttr" data-l1key="configuration" data-l2key="accountId">

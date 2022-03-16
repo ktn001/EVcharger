@@ -35,15 +35,15 @@ try {
 		if ($model == '') {
 			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		ajax::success(json_encode(model::images($model, 'chargeur')));
+		ajax::success(json_encode(model::images($model, 'charger')));
 	}
 
-	if (init('action') == 'chargeurParamsHtml') {
+	if (init('action') == 'chargerParamsHtml') {
 		$model = init('model');
 		if ($model == '') {
 			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		$file = realpath (__DIR__.'/../config/'.$model.'/chargeur_params.php');
+		$file = realpath (__DIR__.'/../config/'.$model.'/charger_params.php');
 		if (file_exists($file)) {
 			ob_start();
 			require_once $file;
@@ -59,16 +59,16 @@ try {
 			throw new Exception(__("L'Id du chargeur n'est pas indiqué",__FILE__));
 		}
 		$mandatoryOnly = init('mandatoryOnly');
-		$chargeur = EVcharger::byId($id);
-		if (!is_object($chargeur)){
+		$charger = EVcharger::byId($id);
+		if (!is_object($charger)){
 			throw new Exception(sprintf(__("Chargeur %s introuvable.",__FILE__),$id));
 			ajax::error();
 		}
 		try {
 			if ($mandatoryOnly == ''){
-				$chargeur->updateCmds();
+				$charger->updateCmds();
 			} else {
-				$chargeur->updateCmds($mandatoryOnly);
+				$charger->updateCmds($mandatoryOnly);
 			}
 			ajax::success();
 		} catch (Exception $e){

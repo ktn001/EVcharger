@@ -50,7 +50,7 @@ class account():
 
     def send2Jeedom(self,msg):
         msgIsCmd = True
-        for key in ('object', 'model', 'chargeur', 'logicalId', 'value'):
+        for key in ('object', 'model', 'charger', 'logicalId', 'value'):
             if not key in msg:
                 msgIsCmd = False
                 break

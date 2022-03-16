@@ -190,7 +190,7 @@ class model {
 	}
 
 	public static function getIdentifiantChargeur($model) {
-		return model::getConfigs($model)['chargeur']['identifiant'];
+		return model::getConfigs($model)['charger']['identifiant'];
 	}
 
     /*     * **********************Getteur Setteur*************************** */

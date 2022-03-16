@@ -284,13 +284,13 @@ $('#accounts-div.eqLogicThumbnailContainer').off('click').on('click','.accountDi
 /*
  * Action du bouton d'ajout d'un chargeur
  */
-$('.chargeurAction[data-action=add').off('click').on('click',function () {
-	if ($('#modContainer_chargeurNameAndModel').length == 0) {
-		$('body').append('<div id="modContainer_chargeurNameAndModel" title="{{Nouveau chargeur:}}"/>');
+$('.chargerAction[data-action=add').off('click').on('click',function () {
+	if ($('#modContainer_chargerNameAndModel').length == 0) {
+		$('body').append('<div id="modContainer_chargerNameAndModel" title="{{Nouveau chargeur:}}"/>');
 		jQuery.ajaxSetup({async: false});
-		$('#modContainer_chargeurNameAndModel').load('index.php?v=d&plugin=EVcharger&modal=chargeurNameAndModel');
+		$('#modContainer_chargerNameAndModel').load('index.php?v=d&plugin=EVcharger&modal=chargerNameAndModel');
 		jQuery.ajaxSetup({async: true});
-		$("#mod_chargeurNameAndModel").dialog({
+		$("#mod_chargerNameAndModel").dialog({
 			closeText: '',
 			autoOpen: false,
 			modal: true,
@@ -298,17 +298,17 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 			width:400
 		});
 	}
-	$('#mod_chargeurNameAndModel').dialog('option', 'buttons', {
+	$('#mod_chargerNameAndModel').dialog('option', 'buttons', {
 		"{{Annuler}}": function () {
 			$(this).dialog("close");
 		},
 		"{{Valider}}": function () {
-			let chargeurs = mod_chargeurNameAndModel('result');
-			if ( chargeurs[0].name != '') {
+			let chargers = mod_chargerNameAndModel('result');
+			if ( chargers[0].name != '') {
 				$(this).dialog("close");
 			 	jeedom.eqLogic.save({
 					type: eqType,
-					eqLogics: chargeurs,
+					eqLogics: chargers,
 					error: function(error) {
 						$('#div_alert').showAlert({message: error.message, level: 'danger'});
 					},
@@ -328,7 +328,7 @@ $('.chargeurAction[data-action=add').off('click').on('click',function () {
 			}
 		}
 	});
-	$('#mod_chargeurNameAndModel').dialog('open');
+	$('#mod_chargerNameAndModel').dialog('open');
 });
 
 /*
@@ -542,7 +542,7 @@ function printEqLogic (configs) {
 		type: 'POST',
 		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
-			action: 'chargeurParamsHtml',
+			action: 'chargerParamsHtml',
 			model: configs.configuration.model
 		},
 		dataType: 'json',

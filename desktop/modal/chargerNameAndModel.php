@@ -21,11 +21,11 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_chargeurNameAndModel">
+<div id="mod_chargerNameAndModel">
   <form class="form-horizontal">
     <fieldset>
       <div class="form-group">
-        <input class='eqLogicAttr' data-l1key='logicalId' value='chargeur' style='display:none'></input>
+        <input class='eqLogicAttr' data-l1key='logicalId' value='charger' style='display:none'></input>
         <label class="control-label col-sm-3">{{Nom}}:</label>
         <input class="eqLogicAttr col-sm-8" data-l1key='name' type="text" placeholder="{{Nom}}"></input>
       </div>
@@ -39,7 +39,7 @@ if (!isConnect('admin')) {
 </div>
 
 <script>
-function mod_chargeurNameAndModel_actualizeModels() {
+function mod_chargerNameAndModel_actualizeModels() {
     $.ajax({
         type: 'POST',
         url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
@@ -57,26 +57,26 @@ function mod_chargeurNameAndModel_actualizeModels() {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            $('#mod_chargeurNameAndModel select').empty();
+            $('#mod_chargerNameAndModel select').empty();
             labels = json_decode(data.result);
             for (model in labels) {
                 option = '<option value="' + model + '">' + labels[model] + '</option>';
-                $('#mod_chargeurNameAndModel select').append(option);
+                $('#mod_chargerNameAndModel select').append(option);
             }
         },
     });
 }
 
-function mod_chargeurNameAndModel(action) {
+function mod_chargerNameAndModel(action) {
     if (action = 'result') {
-        return $('#mod_chargeurNameAndModel').getValues('.eqLogicAttr');
+        return $('#mod_chargerNameAndModel').getValues('.eqLogicAttr');
     }
 }
 
-$('#mod_chargeurNameAndModel').dialog({
+$('#mod_chargerNameAndModel').dialog({
     focus: function (event, ui) {
 	    $('.eqLogicAttr[data-l1key=name]').val("");
-	    mod_chargeurNameAndModel_actualizeModels();
+	    mod_chargerNameAndModel_actualizeModels();
     }
 })
 

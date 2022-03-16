@@ -291,11 +291,11 @@ class account {
      * Arrêt du thread dédié à l'account 
      */
 	public function stopDeamonThread() {
-		foreach (EVcharger::byAccountId($this->getId()) as $chargeur) {
-			if ($chargeur->getIsEnable()) {
+		foreach (EVcharger::byAccountId($this->getId()) as $charger) {
+			if ($charger->getIsEnable()) {
 				$message = array(
 					'cmd' => 'stop',
-					'chargeur' => $chargeur->getIdentifiant(),
+					'charger' => $charger->getIdentifiant(),
 				);
 				$this->send2Deamon($message);
 			}

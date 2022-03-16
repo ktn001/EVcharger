@@ -67,9 +67,9 @@ class easee(account):
                 return
             else:
                 msg2Jeedom = {}
-                msg2Jeedom['object'] = 'chargeur'
+                msg2Jeedom['object'] = 'charger'
                 msg2Jeedom['model'] = 'easee'
-                msg2Jeedom['chargeur'] = serial
+                msg2Jeedom['charger'] = serial
                 msg2Jeedom['info'] = 'closed'
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
                 self.send2Jeedom(msg2Jeedom)
@@ -88,7 +88,7 @@ class easee(account):
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'cmd'
                 msg2Jeedom['model'] = 'easee'
-                msg2Jeedom['chargeur'] = message['mid']
+                msg2Jeedom['charger'] = message['mid']
                 msg2Jeedom['logicalId'] = logicalId
                 msg2Jeedom['value'] = message['value']
                 self.log_info("msg2Jeddom: " + str(msg2Jeedom))

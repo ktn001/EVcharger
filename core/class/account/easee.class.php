@@ -215,8 +215,8 @@ class easeeAccount extends account {
 	}
 
 	public function execute_refresh($cmd) {
-		$chargeurId = $cmd->getEqLogic()->getId();
-		$chargeur = EVcharger::byId($chargeurId);
+		$chargerId = $cmd->getEqLogic()->getId();
+		$charger = EVcharger::byId($chargerId);
 		$serial =  $cmd->getEqLogic()->getConfiguration("serial");
 		$path = '/api/chargers/'.$serial.'/state';
 		$response = $this->sendRequest($path);
@@ -235,7 +235,7 @@ class easeeAccount extends account {
 					log::add('EVcharger','debug',print_r($value,true));
 					$value = $transforms[$logicalId][$value];
 				}
-				$chargeur->checkAndUpdateCmd($logicalId,$value);
+				$charger->checkAndUpdateCmd($logicalId,$value);
 			}
 		}
 
