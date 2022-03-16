@@ -88,19 +88,18 @@ sendVarToJS('modelLabels',model::labels());
 
 	<!-- Les véhicules -->
 	<!-- ============= -->
-	<legend><i class="fas fa-charging-station"></i> {{Mes véhicules}}</legend>
+	<legend><i class="fas fa-car"></i> {{Mes véhicules}}</legend>
 	<!-- Champ de recherche des véhicules -->
 	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchVehicle"/>
 	    <div class="input-group-btn">
-		<a id="bt_resetSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+		<a id="bt_resetSearchVehicle" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 	    </div>
 	</div> <!-- Champ de recherche des véhicules -->
 	<!-- Liste des véhicules -->
 	<div class="eqLogicThumbnailContainer">
 	    <?php
 	    foreach ($vehicles as $vehicle) {
-		$opacity = ($vehicle->getIsEnable()) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '">';
 		echo '<img src="' . $vehicle->getPathImg() . '"/>';
 		echo '<br>';

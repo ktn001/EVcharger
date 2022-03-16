@@ -293,7 +293,7 @@ $('#in_searchAccount').off('keyup').keyup(function() {
 })
 
 /*
- * Remise à zèro de la recherche d'account
+ * Remise à zéro de la recherche d'account
  */
 $('#bt_resetSearchAccount').on('click', function() {
 	$('#in_searchAccount').val('').keyup()
