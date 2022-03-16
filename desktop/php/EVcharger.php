@@ -4,7 +4,8 @@ if (!isConnect('admin')) {
 }
 // Déclaration des variables obligatoires
 $plugin = plugin::byId('EVcharger');
-$eqLogics = eqLogic::byType($plugin->getId());
+$chargers = eqLogic::byLogicalId('charger',$plugin->getId(),true);
+$vehicles = eqLogic::byLogicalId('vehicle',$plugin->getId(),true);
 $accounts = account::all();
 
 // Déclaration de variables pour javasctipt
@@ -33,7 +34,7 @@ sendVarToJS('modelLabels',model::labels());
 		<br>
 		<span>{{Ajouter un chargeur}}</span>
 	    </div>
-	    <div class="cursor carAction logoPrimary" data-action="add">
+	    <div class="cursor vehicleAction logoPrimary" data-action="add">
 		<i class="fas fa-car"></i>
 		<br>
 		<span>{{Ajouter un véhicule}}</span>
@@ -52,7 +53,7 @@ sendVarToJS('modelLabels',model::labels());
 	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchAccount"/>
 	    <div class="input-group-btn">
-		<a id="bt_resetAccountSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+		<a id="bt_resetSearchAccount" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 	    </div>
 	</div> <!-- Champs de recherche des accounts -->
 	<!-- Liste des accounts -->
@@ -63,27 +64,52 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- Les chargeurs -->
 	<!-- ============= -->
 	<legend><i class="fas fa-charging-station"></i> {{Mes chargeurs}}</legend>
-	<!-- Champ de recherche des chargeur -->
+	<!-- Champ de recherche des chargeurs -->
 	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic"/>
 	    <div class="input-group-btn">
 		<a id="bt_resetSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
 	    </div>
-	</div> <!-- Champ de recherche des chargeur -->
+	</div> <!-- Champ de recherche des chargeurs -->
 	<!-- Liste des chargeurs -->
 	<div class="eqLogicThumbnailContainer">
 	    <?php
-	    foreach ($eqLogics as $eqLogic) {
-		$opacity = ($eqLogic->getIsEnable()) ? '' : 'disableCard';
-		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $eqLogic->getId() . '">';
-		echo '<img src="' . $eqLogic->getPathImg() . '"/>';
+	    foreach ($chargers as $charger) {
+		$opacity = ($charger->getIsEnable()) ? '' : 'disableCard';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '">';
+		echo '<img src="' . $charger->getPathImg() . '"/>';
 		echo '<br>';
-		echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
+		echo '<span class="name">' . $charger->getHumanName(true, true) . '</span>';
 		echo '</div>';
 	    }
 	    ?>
 	</div> <!-- Liste des chargeurs -->
 	<!-- Les chargeurs -->
+
+	<!-- Les véhicules -->
+	<!-- ============= -->
+	<legend><i class="fas fa-charging-station"></i> {{Mes véhicules}}</legend>
+	<!-- Champ de recherche des véhicules -->
+	<div class="input-group">
+	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchVehicle"/>
+	    <div class="input-group-btn">
+		<a id="bt_resetSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+	    </div>
+	</div> <!-- Champ de recherche des véhicules -->
+	<!-- Liste des véhicules -->
+	<div class="eqLogicThumbnailContainer">
+	    <?php
+	    foreach ($vehicles as $vehicle) {
+		$opacity = ($vehicle->getIsEnable()) ? '' : 'disableCard';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '">';
+		echo '<img src="' . $vehicle->getPathImg() . '"/>';
+		echo '<br>';
+		echo '<span class="name">' . $vehicle->getHumanName(true, true) . '</span>';
+		echo '</div>';
+	    }
+	    ?>
+	</div> <!-- Liste des véhicules -->
+	<!-- Les véhicules -->
 
     </div> <!-- Page d'accueil du plugin -->
 
@@ -191,7 +217,7 @@ sendVarToJS('modelLabels',model::labels());
 				    </select>
 				</div>
 			    </div>
-			    <div id="ChargeurSpecificsParams">
+			    <div id="ChargerSpecificsParams">
 			    </div>
 			</div> <!-- Partie gauche de l'onglet "Equipements" -->
 
@@ -204,7 +230,7 @@ sendVarToJS('modelLabels',model::labels());
 			    <div class="form-group">
 				<div class="text-center">
 				    <img name="icon_visu" style="max-width:160px;"/>
-				    <select id="selectChargeurImg" class="eqLogicAttr" data-l1key="configuration" data-l2key="image">
+				    <select id="selectChargerImg" class="eqLogicAttr" data-l1key="configuration" data-l2key="image">
 				    </select>
 				</div>
 			    </div>

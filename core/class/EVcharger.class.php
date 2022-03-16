@@ -30,7 +30,7 @@ class EVcharger extends eqLogic {
 	}
 
 	public static function byModelAndIdentifiant($model, $identifiant) {
-		$identKey = model::getIdentifiantChargeur($model);
+		$identKey = model::getIdentifiantCharger($model);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
 		$chargers = array();
 		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $charger){
@@ -309,7 +309,7 @@ class EVcharger extends eqLogic {
 
 	public function getIdentifiant() {
 		$model = $this->getConfiguration('model');
-		$configName = model::getIdentifiantChargeur($model);
+		$configName = model::getIdentifiantCharger($model);
 		return $this->getConfiguration($configName);
 	}
 

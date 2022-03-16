@@ -273,6 +273,33 @@ $('.accountAction[data-action=add]').off('click').on('click', function() {
 });
 
 /*
+ * Recherche d'account
+ */
+$('#in_searchAccount').off('keyup').keyup(function() {
+	var search = $(this).value()
+	if (search == '') {
+		$('.accountDisplayCard').show()
+		return
+	}
+	$('.accountDisplayCard').hide()
+	search = jeedomUtils.normTextLower(search)
+	var text
+	$('.accountDisplayCard').each(function() {
+		text = jeedomUtils.normTextLower($(this).text())
+		if  (text.indexOf(search) >= 0) {
+			$(this).closest('.accountDisplayCard').show()
+		}
+	})
+})
+
+/*
+ * Remise à zèro de la recherche d'account
+ */
+$('#bt_resetSearchAccount').on('click', function() {
+	$('#in_searchAccount').val('').keyup()
+})
+
+/*
  * Action click sur account Display card
  */
 $('#accounts-div.eqLogicThumbnailContainer').off('click').on('click','.accountDisplayCard', function () {
@@ -332,9 +359,59 @@ $('.chargerAction[data-action=add').off('click').on('click',function () {
 });
 
 /*
- * Action sur modification d'image d'n chargeur
+ * Action du bouton d'ajout d'un véhicule
  */
-$('#selectChargeurImg').on('change',function(){
+$('.vehicleAction[data-action=add').off('click').on('click',function () {
+	if ($('#modContainer_vehicleName').length == 0) {
+		$('body').append('<div id="modContainer_vehicleName" title="{{Nouveau Véhicule:}}"/>');
+		jQuery.ajaxSetup({async: false});
+		$('#modContainer_vehicleName').load('index.php?v=d&plugin=EVcharger&modal=vehicleName');
+		jQuery.ajaxSetup({async: true});
+		$("#mod_vehicleName").dialog({
+			closeText: '',
+			autoOpen: false,
+			modal: true,
+			height:200,
+			width:400
+		});
+		$('#mod_vehicleName').dialog('option', 'buttons', {
+			"{{Annuler}}": function () {
+				$(this).dialog("close");
+			},
+			"{{Valider}}": function () {
+				let vehicles = mod_vehicleName('result');
+				if ( vehicles[0].name != '') {
+					$(this).dialog("close");
+				 	jeedom.eqLogic.save({
+						type: eqType,
+						eqLogics: vehicles,
+						error: function(error) {
+							$('#div_alert').showAlert({message: error.message, level: 'danger'});
+						},
+						success: function(_data) {
+							let vars = getUrlVars();
+							let url = 'index.php?';
+							for (var i in vars) {
+								if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+									url += i + '=' + vars[i].replace('#', '') + '&';
+								}
+							}
+							modifyWithoutSave = false;
+							url += 'id=' + _data.id + '&saveSuccessFull=1';
+							loadPage(url);
+						}
+					})
+				}
+			}
+		})
+	}
+	$('#mod_vehicleName').dialog('open');
+});
+
+/*
+ * Action sur modification d'image d'un chargeur
+ */
+$('#selectChargerImg').on('change',function(){
 	$('[name=icon_visu]').attr('src', $(this).value());
 });
 
@@ -518,7 +595,7 @@ function loadSelectImg(defaut) {
 				$('#div_alert').showAlert({message: data.result, level: 'danger'});
 				return;
 			}
-			$('#selectChargeurImg').empty();
+			$('#selectChargerImg').empty();
 			let images = json_decode(data.result);
 			let options = "";
 			for (image of images) {
@@ -530,7 +607,7 @@ function loadSelectImg(defaut) {
 				}
 				options += '<option value="' + image + '">' + display + '</option>';
 			}
-			$('#selectChargeurImg').append(options).val(defaut).trigger('change');
+			$('#selectChargerImg').append(options).val(defaut).trigger('change');
 		}
 	})
 }
@@ -556,8 +633,8 @@ function printEqLogic (configs) {
 				return;
 			}
 			let html = data.result;
-			$('#ChargeurSpecificsParams').html(html);
-			$('#ChargeurSpecificsParams').setValues(configs, '.eqLogicAttr');
+			$('#ChargerSpecificsParams').html(html);
+			$('#ChargerSpecificsParams').setValues(configs, '.eqLogicAttr');
 		}
 	});
 }

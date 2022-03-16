@@ -189,7 +189,7 @@ class model {
 		return parse_ini_file(__DIR__ . '/../config/' . $model . '/config.ini' ,true);
 	}
 
-	public static function getIdentifiantChargeur($model) {
+	public static function getIdentifiantCharger($model) {
 		return model::getConfigs($model)['charger']['identifiant'];
 	}
 
