@@ -332,9 +332,10 @@ $('.chargerAction[data-action=add').off('click').on('click',function () {
 		"{{Valider}}": function () {
 			let chargers = mod_chargerNameAndModel('result');
 			if ( chargers[0].name != '') {
+				console.log(chargers)
 				$(this).dialog("close");
 			 	jeedom.eqLogic.save({
-					type: eqType,
+					type: chargerType,
 					eqLogics: chargers,
 					error: function(error) {
 						$('#div_alert').showAlert({message: error.message, level: 'danger'});
@@ -383,7 +384,7 @@ $('.vehicleAction[data-action=add').off('click').on('click',function () {
 				if ( vehicles[0].name != '') {
 					$(this).dialog("close");
 				 	jeedom.eqLogic.save({
-						type: eqType,
+						type: vehicleType,
 						eqLogics: vehicles,
 						error: function(error) {
 							$('#div_alert').showAlert({message: error.message, level: 'danger'});

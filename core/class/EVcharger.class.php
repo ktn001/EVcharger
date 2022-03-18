@@ -21,26 +21,6 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/account.class.php';
 
 class EVcharger extends eqLogic {
-    /*     * ************************* Attributs ****************************** */
-
-    /*     * *********************** Methode static *************************** */
-
-	public static function byAccountId($accountId) {
-		return self::byTypeAndSearchConfiguration('EVcharger','"accountId":"'.$accountId.'"');
-	}
-
-	public static function byModelAndIdentifiant($model, $identifiant) {
-		$identKey = model::getIdentifiantCharger($model);
-		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
-		$chargers = array();
-		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $charger){
-			if ($charger->getConfiguration('model') == $model){
-				$chargers[] = $charger;
-			}
-		}
-		return $chargers;
-
-	}
 
     /*     * ********************** Gestion du daemon ************************* */
 
@@ -193,6 +173,30 @@ class EVcharger extends eqLogic {
      */
 	public static function cronHourly() {
 		account::cronHourly();
+	}
+
+}
+
+class EVcharger_charger extends EVcharger {
+    /*     * ************************* Attributs ****************************** */
+
+    /*     * *********************** Methode static *************************** */
+
+	public static function byAccountId($accountId) {
+		return self::byTypeAndSearchConfiguration('EVcharger','"accountId":"'.$accountId.'"');
+	}
+
+	public static function byModelAndIdentifiant($model, $identifiant) {
+		$identKey = model::getIdentifiantCharger($model);
+		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
+		$chargers = array();
+		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $charger){
+			if ($charger->getConfiguration('model') == $model){
+				$chargers[] = $charger;
+			}
+		}
+		return $chargers;
+
 	}
 
     /*     * *********************Méthodes d'instance************************* */
@@ -361,7 +365,13 @@ class EVcharger extends eqLogic {
 	}
 }
 
+class EVcharger_vehicle extends EVcharger {
+}
+
 class EVchargerCmd extends cmd {
+}
+
+class EVcharger_chargerCmd extends EVchargerCmd  {
     /*     * *************************Attributs****************************** */
 
     /*

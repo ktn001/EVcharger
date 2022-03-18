@@ -2,14 +2,17 @@
 if (!isConnect('admin')) {
      throw new Exception('{{401 - Accès non autorisé}}');
 }
-// Déclaration des variables obligatoires
+//  Déclaration des variables obligatoires
 $plugin = plugin::byId('EVcharger');
-$chargers = eqLogic::byLogicalId('charger',$plugin->getId(),true);
-$vehicles = eqLogic::byLogicalId('vehicle',$plugin->getId(),true);
+$chargers = EVcharger_charger::byLogicalId('charger',$plugin->getId() . "_charger",true);
+$vehicles = EVcharger_vehicle::byLogicalId('vehicle',$plugin->getId() . "_vehicle",true);
 $accounts = account::all();
 
+log::add("EVcharger","info",print_r($chargers,true));
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
+sendVarToJS('chargerType', $plugin->getId() . "_charger");
+sendVarToJS('vehicleType', $plugin->getId() . "_vehicle");
 sendVarToJs('confirmDelete',config::byKey('confirmDelete','EVcharger'));
 sendVarToJS('modelLabels',model::labels());
 ?>
