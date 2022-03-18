@@ -61,9 +61,9 @@ sendVarToJS('modelLabels',model::labels());
 	</div> <!-- Liste des accounts -->
 	<!-- Les accounts -->
 
-	<!-- Les chargeurs -->
-	<!-- ============= -->
-	<legend><i class="fas fa-charging-station"></i> {{Mes chargeurs}}</legend>
+	<!-- Les chargeurs et véhicules -->
+	<!-- ========================== -->
+	<legend><i class="fas fa-charging-station"></i><i class="fas fa-car"></i> {{Mes chargeurs et véhicules}}</legend>
 	<!-- Champ de recherche des chargeurs -->
 	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic"/>
@@ -76,46 +76,28 @@ sendVarToJS('modelLabels',model::labels());
 	    <?php
 	    foreach ($chargers as $charger) {
 		$opacity = ($charger->getIsEnable()) ? '' : 'disableCard';
-		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '">';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '" data-eqLogic-type="charger">';
 		echo '<img src="' . $charger->getPathImg() . '"/>';
 		echo '<br>';
 		echo '<span class="name">' . $charger->getHumanName(true, true) . '</span>';
 		echo '</div>';
 	    }
-	    ?>
-	</div> <!-- Liste des chargeurs -->
-	<!-- Les chargeurs -->
-
-	<!-- Les véhicules -->
-	<!-- ============= -->
-	<legend><i class="fas fa-car"></i> {{Mes véhicules}}</legend>
-	<!-- Champ de recherche des véhicules -->
-	<div class="input-group">
-	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchVehicle"/>
-	    <div class="input-group-btn">
-		<a id="bt_resetSearchVehicle" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-	    </div>
-	</div> <!-- Champ de recherche des véhicules -->
-	<!-- Liste des véhicules -->
-	<div class="eqLogicThumbnailContainer">
-	    <?php
 	    foreach ($vehicles as $vehicle) {
-		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '">';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '" data-eqLogic_type="vehicle">';
 		echo '<img src="' . $vehicle->getPathImg() . '"/>';
 		echo '<br>';
 		echo '<span class="name">' . $vehicle->getHumanName(true, true) . '</span>';
 		echo '</div>';
 	    }
 	    ?>
-	</div> <!-- Liste des véhicules -->
-	<!-- Les véhicules -->
+	</div> <!-- Liste des chargeurs -->
 
     </div> <!-- Page d'accueil du plugin -->
 
     <!-- ==================================== -->
     <!-- Pages de configuration d'un chargeur -->
     <!-- ==================================== -->
-    <div class="col-xs-12 eqLogic" style="display: none;">
+    <div class="col-xs-12 eqLogic charger" style="display: none;">
 
 	<!-- barre de gestion du chargeur -->
 	<!-- ============================ -->
@@ -134,13 +116,13 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- ========================= -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-	    <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
-	    <li role="presentation"><a href="#commandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
+	    <li role="presentation" class="active"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
+	    <li role="presentation"><a href="#chargercommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
 	<div class="tab-content">
 	    <!-- Onglet de configuration du chargeur -->
 	    <!-- =================================== -->
-	    <div role="tabpanel" class="tab-pane active" id="eqlogictab">
+	    <div role="tabpanel" class="tab-pane active" id="chargertab">
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
 		    <fieldset>
@@ -241,7 +223,7 @@ sendVarToJS('modelLabels',model::labels());
 
 	    <!-- Onglet des commandes du chargeur -->
 	    <!-- ================================ -->
-	    <div role="tabpanel" class="tab-pane" id="commandtab">
+	    <div role="tabpanel" class="tab-pane" id="chargercommandtab">
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="actualize" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Mettre à jour les commande par défaut}}</a>
 		<br/><br/>
@@ -266,6 +248,67 @@ sendVarToJS('modelLabels',model::labels());
 
 	</div> <!-- Les onglets des chargeurs -->
     </div> <!-- Page de configuration d'un chargeur -->
+
+    <!-- ==================================== -->
+    <!-- Pages de configuration d'un vehicule -->
+    <!-- ==================================== -->
+    <div class="col-xs-12 eqLogic vehicle" style="display: none;">
+
+	<!-- barre de gestion du véhicule -->
+	<div class="input-group pull-right" style="display:inline-flex;">
+	    <span class="input-group-btn">
+		<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
+		<a class="btn btn-sm btn-default eqLogicAction roundedLeft" data-action="configure"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Configuration avancée}}</span>
+		</a><a class="btn btn-sm btn-default eqLogicAction" data-action="copy"><i class="fas fa-copy"></i><span class="hidden-xs"> {{Dupliquer}}</span>
+		</a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}
+		</a><a class="btn btn-sm btn-danger eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}
+		</a>
+	    </span>
+	</div> <!-- barre de gestion du véhicule -->
+
+	<!-- Les onglets des chargeurs -->
+	<!-- ========================= -->
+	<ul class="nav nav-tabs" role="tablist">
+	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
+	    <li role="presentation" class="active"><a href="#vehicletab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
+	    <li role="presentation"><a href="#vehiclecommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
+
+	</ul>
+	<div class="tab-content">
+	    <!-- Onglet de configuration du chargeur -->
+	    <!-- =================================== -->
+	    <div role="tabpanel" class="tab-pane active" id="vehicletab">
+	    </div>
+
+	    <!-- Onglet des commandes du vehicule -->
+	    <!-- ================================ -->
+	    <div role="tabpanel" class="tab-pane" id="vehiclecommandtab">
+		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
+		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="actualize" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Mettre à jour les commande par défaut}}</a>
+		<br/><br/>
+		<div class="table-responsive">
+		    <table id="table_cmd" class="table table-bordered table-condensed">
+			<thead>
+			    <tr>
+				<th class="hidden-xs" style="min-width:50px;width:70px"> ID</th>
+				<th style="min-width:200px;width:240px">{{Nom}}</br>Logical_Id</th>
+				<th style="min-width:200px;width:240px">{{Icône}}</br>{{valeur retour}}</th>
+				<th style="width:130px">{{Type}}</br>{{Sous-type}}</th>
+				<th>{{Valeur}}</th>
+				<th style="min-width:260px;width:310px">{{Options}}</th>
+				<th style="min-width:80px;width:200px">{{Action}}</th>
+			    </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		    </table>
+		</div>
+	    </div> <!-- Onglet des commandes du chargeur -->
+	</div>
+
+    </div> <!-- Pages de configuration d'un vehicule -->
+    
+
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
