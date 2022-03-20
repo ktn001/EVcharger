@@ -25,7 +25,6 @@ if (!isConnect('admin')) {
   <form class="form-horizontal">
     <fieldset>
       <div class="form-group">
-        <input class='eqLogicAttr' data-l1key='logicalId' value='vehicle' style='display:none'></input>
         <label class="control-label col-sm-3">{{Nom}}:</label>
         <input class="eqLogicAttr col-sm-8" data-l1key='name' type="text" placeholder="{{Nom}}"></input>
       </div>

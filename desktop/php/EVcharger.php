@@ -4,8 +4,8 @@ if (!isConnect('admin')) {
 }
 //  Déclaration des variables obligatoires
 $plugin = plugin::byId('EVcharger');
-$chargers = EVcharger_charger::byLogicalId('charger',$plugin->getId() . "_charger",true);
-$vehicles = EVcharger_vehicle::byLogicalId('vehicle',$plugin->getId() . "_vehicle",true);
+$chargers = EVcharger_charger::byType('EVcharger_charger');
+$vehicles = EVcharger_vehicle::byType('EVcharger_vehicle');
 $accounts = account::all();
 
 log::add("EVcharger","info",print_r($chargers,true));
@@ -137,7 +137,6 @@ sendVarToJS('modelLabels',model::labels());
 				<label class="col-sm-3 control-label">{{Nom du chargeur}}</label>
 				<div class="col-sm-7">
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;"/>
-				    <input type="text" class="eqLogicAttr form-control" data-l1key="logicalId" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
 				    <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
