@@ -175,6 +175,13 @@ class EVcharger extends eqLogic {
 		account::cronHourly();
 	}
 
+	public function getLinkToConfiguration() {
+		if (isset($_SESSION['user']) && is_object($_SESSION['user']) && !isConnect('admin')) {
+			return '#';
+		}
+		return 'index.php?v=d&p=EVcharger&m=EVcharger&id=' . $this->getId();
+	}
+
 }
 
 class EVcharger_charger extends EVcharger {
@@ -183,14 +190,14 @@ class EVcharger_charger extends EVcharger {
     /*     * *********************** Methode static *************************** */
 
 	public static function byAccountId($accountId) {
-		return self::byTypeAndSearchConfiguration('EVcharger','"accountId":"'.$accountId.'"');
+		return self::byTypeAndSearchConfiguration(__CLASS__,'"accountId":"'.$accountId.'"');
 	}
 
 	public static function byModelAndIdentifiant($model, $identifiant) {
 		$identKey = model::getIdentifiantCharger($model);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
 		$chargers = array();
-		foreach (EVcharger::byTypeAndSearchConfiguration('EVcharger',$searchConf) as $charger){
+		foreach (self::byTypeAndSearchConfiguration(__CLASS__,$searchConf) as $charger){
 			if ($charger->getConfiguration('model') == $model){
 				$chargers[] = $charger;
 			}
@@ -205,7 +212,7 @@ class EVcharger_charger extends EVcharger {
 	public function UpdateCmds($mandatoryOnly = false) {
 		$ids = array();
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
-			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				$cmd = new EVchargerCMD();
 				$cmd->setName(__($config['name'],__FILE__));
@@ -366,9 +373,24 @@ class EVcharger_charger extends EVcharger {
 }
 
 class EVcharger_vehicle extends EVcharger {
+
+	public function getPathImg() {
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
+		}
+		return $image;
+	}
 }
 
 class EVchargerCmd extends cmd {
+
+	public function dontRemoveCmd() {
+		if ($this->getLogicalId() == "refresh") {
+			return true;
+		}
+		return false;
+	}
 }
 
 class EVcharger_chargerCmd extends EVchargerCmd  {
@@ -381,13 +403,6 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
     /*     * ***********************Methode static*************************** */
 
     /*     * *********************Methode d'instance************************* */
-
-	public function dontRemoveCmd() {
-		if ($this->getLogicalId() == "refresh") {
-			return true;
-		}
-		return false;
-	}
 
 	public function preSave() {
 		if ($this->getLogicalId() == 'refresh') {
@@ -445,4 +460,7 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 	}
 
     /*     * **********************Getteur Setteur*************************** */
+}
+
+class EVcharger_vehicleCmd extends EVchargerCmd  {
 }

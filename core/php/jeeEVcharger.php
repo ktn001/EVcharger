@@ -12,7 +12,7 @@ try {
 	function process_account_message($message) {
 		if ($message['info'] == 'thread_started'){
 			$accountId = $message['account_id'];
-			foreach(EVcharger::byAccountId($accountId) as $charger){
+			foreach(EVcharger_charger::byAccountId($accountId) as $charger){
 				$charger->startListener();
 			}
 		}
@@ -34,7 +34,7 @@ try {
 		if (!array_key_exists('logicalId',$message)) {
 			log::add('EVcharger','error',__("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
-		foreach (EVcharger::byModelAndIdentifiant($message['model'],$message['charger']) as $charger){
+		foreach (EVcharger_charger::byModelAndIdentifiant($message['model'],$message['charger']) as $charger){
 			$charger->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}
