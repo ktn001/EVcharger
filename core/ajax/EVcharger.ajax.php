@@ -43,7 +43,7 @@ try {
 		if ($model == '') {
 			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		$file = realpath (__DIR__.'/../config/'.$model.'/charger_params.php');
+		$file = realpath (__DIR__.'/../config/'.$model.'/charger_params.inc.php');
 		if (file_exists($file)) {
 			ob_start();
 			require_once $file;
