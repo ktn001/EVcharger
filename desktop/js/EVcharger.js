@@ -613,29 +613,39 @@ function loadSelectImg(defaut) {
 	})
 }
 
+function prePrintEqLogic (id) {
+	console.log("ID: " + id)
+	let displayCard = $('.eqLogicDisplayCard[data-eqlogic_id=' + id + ']')
+	console.log(displayCard)
+	let type = displayCard.attr('data-eqlogic_type');
+	if (type =='EVcharger_charger') {
+		model = displayCard.attr('data-eqlogic_model');
+		console.log("MODEL: " + model)
+		$.ajax({
+			type: 'POST',
+			url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+			data: {
+				action: 'chargerParamsHtml',
+				model: model
+			},
+			dataType: 'json',
+			global: false,
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function(data) {
+				if (data.state != 'ok') {
+					$('#div_alert').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
+				let html = data.result;
+				$('#ChargerSpecificsParams').html(html);
+			}
+		});
+	}
+}
+
 function printEqLogic (configs) {
 	loadSelectAccount(configs.configuration.accountId);
 	loadSelectImg(configs.configuration.image);
-	$.ajax({
-		type: 'POST',
-		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
-		data: {
-			action: 'chargerParamsHtml',
-			model: configs.configuration.model
-		},
-		dataType: 'json',
-		global: false,
-		error: function(request, status, error) {
-			handleAjaxError(request, status, error);
-		},
-		success: function(data) {
-			if (data.state != 'ok') {
-				$('#div_alert').showAlert({message: data.result, level: 'danger'});
-				return;
-			}
-			let html = data.result;
-			$('#ChargerSpecificsParams').html(html);
-			$('#ChargerSpecificsParams').setValues(configs, '.eqLogicAttr');
-		}
-	});
 }
