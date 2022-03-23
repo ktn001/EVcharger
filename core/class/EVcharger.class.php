@@ -381,6 +381,17 @@ class EVcharger_vehicle extends EVcharger {
 		}
 		return $image;
 	}
+
+    /*     * **********************Getteur Setteur*************************** */
+
+	public function getImage() {
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
+		}
+		return $image;
+	}
+
 }
 
 class EVchargerCmd extends cmd {

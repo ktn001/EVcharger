@@ -97,13 +97,13 @@ sendVarToJS('modelLabels',model::labels());
 
     </div> <!-- Page d'accueil du plugin -->
 
-    <!-- ==================================== -->
-    <!-- Pages de configuration d'un chargeur -->
-    <!-- ==================================== -->
+    <!-- ================================================= -->
+    <!-- Pages de configuration des chargeurs et véhicules -->
+    <!-- ================================================= -->
     <div class="col-xs-12 eqLogic EVcharger_charger EVcharger_vehicle" style="display: none;">
 
-	<!-- barre de gestion du chargeur -->
-	<!-- ============================ -->
+	<!-- barre de gestion des chargeurs et véhicules -->
+	<!-- =========================================== -->
 	<div class="input-group pull-right" style="display:inline-flex;">
 	    <span class="input-group-btn">
 		<!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
@@ -115,17 +115,18 @@ sendVarToJS('modelLabels',model::labels());
 	    </span>
 	</div> <!-- barre de gestion du chargeur -->
 
-	<!-- Les onglets des chargeurs -->
-	<!-- ========================= -->
+	<!-- Les onglets des chargeurs et véhicules -->
+	<!-- ====================================== -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-	    <li role="presentation" class="tab-EVcharger_charger"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
+	    <li role="presentation" class="tab-EVcharger_charger active"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_vehicle"><a href="#vehicletab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-car"></i><span class="hidden-xs"> {{Véhicule}}</span></a></li>
 	    <li role="presentation"><a href="#chargercommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
+
 	<div class="tab-content">
-	    <!-- Onglet de configuration du chargeur -->
-	    <!-- =================================== -->
+	    <!-- Tab de configuration d'un chargeur -->
+	    <!-- ================================== -->
 	    <div role="tabpanel" class="tab-pane tab-EVcharger_charger" id="chargertab">
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
@@ -179,22 +180,29 @@ sendVarToJS('modelLabels',model::labels());
 			    <br>
 
 			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
-			    <div class='chargerParams form-group'>
+			    <div class='form-group'>
 				<label class="col-sm-3 control-label">{{Coordonnées GPS}}</label>
-				<div class="row col-sm-7">
-				    <div class="col-sm-12">
-					<i class="far fa-comment"></i>
-					<i>{{Pour obtenir vos coordonnées GPS, vous pouvez utiliser ce <a href="https://www.torop.net/coordonnees-gps.php" target="_blank">site.</a>}}</i>
-				    </div>
-				    <div class="col-sm-6">
+				<div class="col-sm-7">
+				   <i class="far fa-comment"></i>
+				   <i>{{Pour obtenir les coordonnées GPS, vous pouvez utiliser ce <a href="https://www.torop.net/coordonnees-gps.php" target="_blank">site.</a>}}</i>
+				</div>
+			    </div>
+			    <div class="col-sm-3"></div>
+			    <div class="col-sm-7">
+				<div class='form-group' style="margin-right:-24px">
+				    <label class="col-sm-3">{{Latitude}}:</label>
+			   	    <div class="col-sm-9">
 					<input type="text" class="EVcharger_chargerAttr form-control" data-l1key="configuration" data-l2key="latitude" placeholder="{{Latitude}}"/>
 				    </div>
-				    <div class="col-sm-6">
+				</div>
+				<div class='form-group' style="margin-right:-24px">
+				    <label class="col-sm-3">{{Longitude}}:</label>
+				    <div class="col-sm-9">
 					<input type="text" class="EVcharger_chargerAttr form-control" data-l1key="configuration" data-l2key="longitude" placeholder="{{Longitude}}"/>
 				    </div>
 				</div>
 			    </div>
-			    <div class='chargerParams form-group'>
+			    <div class='form-group'>
 				<label class="col-sm-3 control-label">{{Compte}}</label>
 				<div class="col-sm-7">
 				    <select id="selectAccount" class="EVcharger_chargerAttr" data-l1key="configuration" data-l2key="accountId">
@@ -207,10 +215,8 @@ sendVarToJS('modelLabels',model::labels());
 
 			<!-- Partie droite de l'onglet "Équipement" -->
 			<div class="col-lg-6">
+			    <!-- Informations des chargeurs -->
 			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
-			    <!--
-			    ---- Informations des chargeurs
-			    -->
 			    <div class="form-group">
 				<div class="text-center">
 				    <img name="icon_visu" style="max-width:160px;"/>
@@ -222,10 +228,10 @@ sendVarToJS('modelLabels',model::labels());
 
 		    </fieldset>
 		</form>
-	    </div> <!-- Onglet de configuration du chargeur -->
+	    </div> <!-- Tab de configuration d'un chargeur -->
 
-	    <!-- Onglet de configuration du chargeur -->
-	    <!-- =================================== -->
+	    <!-- Tab de configuration d'un véhicule -->
+	    <!-- ================================== -->
 	    <div role="tabpanel" class="tab-pane tab-EVcharger_vehicle" id="vehicletab">
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
@@ -242,10 +248,57 @@ sendVarToJS('modelLabels',model::labels());
 				    <input type="text" class="EVcharger_vehicleAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
 			    </div>
-			</div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label" >{{Objet parent}}</label>
+				<div class="col-sm-7">
+				    <select id="sel_object" class="EVcharger_vehicleAttr form-control" data-l1key="object_id">
+					<option value="">{{Aucun}}</option>
+					<?php
+					$options = '';
+					foreach ((jeeObject::buildTree(null, false)) as $object) {
+					    $options .= '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
+					}
+					echo $options;
+					?>
+				    </select>
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label">{{Catégorie}}</label>
+				<div class="col-sm-7">
+				    <?php
+				    foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+					echo '<label class="checkbox-inline">';
+					echo '<input type="checkbox" class="EVcharger_vehicleAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+					echo '</label>';
+				    }
+				    ?>
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label">{{Options}}</label>
+				<div class="col-sm-7">
+				    <label class="checkbox-inline"><input type="checkbox" class="EVcharger_vehicleAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
+				    <label class="checkbox-inline"><input type="checkbox" class="EVcharger_vehicleAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+				</div>
+			    </div>
+			</div> <!-- Partie gauche de l'onglet "Equipements" -->
+
+			<!-- Partie droite de l'onglet "Équipement" -->
+			<div class="col-lg-6">
+			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
+			    <div class="form-group">
+				<div class="text-center">
+				    <img name="icon_visu" style="max-width:160px;"/>
+				    <select id="selectChargerImg" class="EVcharger_vehicleAttr" data-l1key="configuration" data-l2key="image">
+				    </select>
+				</div>
+			    </div>
+			</div> <!-- Partie droite de l'onglet "Équipement" -->
+
 		    </fieldset>
 		</form>
-	    </div> <!-- Onglet de configuration du chargeur -->
+	    </div> <!-- Tab de configuration d'un véhicule -->
 
 	    <!-- Onglet des commandes du chargeur -->
 	    <!-- ================================ -->
