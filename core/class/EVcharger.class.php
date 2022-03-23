@@ -377,7 +377,7 @@ class EVcharger_vehicle extends EVcharger {
 	public function getPathImg() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
-			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
+			return "/plugins/EVcharger/desktop/img/vehicle/compact.png";
 		}
 		return $image;
 	}
@@ -387,7 +387,7 @@ class EVcharger_vehicle extends EVcharger {
 	public function getImage() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
-			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
+			return "/plugins/EVcharger/desktop/img/vehicle/compact.png";
 		}
 		return $image;
 	}

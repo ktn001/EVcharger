@@ -80,7 +80,7 @@ sendVarToJS('modelLabels',model::labels());
 	    foreach ($chargers as $charger) {
 		$opacity = ($charger->getIsEnable()) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '" data-eqLogic_type="EVcharger_charger" data-eqLogic_model="' . $charger->getconfiguration('model') . '">';
-		echo '<img src="' . $charger->getPathImg() . '"/>';
+		echo '<img src="' . $charger->getPathImg() . '" style="width:unset !important"/>';
 		echo '<br>';
 		echo '<span class="name">' . $charger->getHumanName(true, true) . '</span>';
 		echo '</div>';
