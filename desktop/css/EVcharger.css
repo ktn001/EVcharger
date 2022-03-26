@@ -54,3 +54,7 @@
 .accountDisplayCard.disableCard:hover {
 	opacity: 0.8;
 }
+
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_vehicle] img {
+	min-height: auto !important;
+}

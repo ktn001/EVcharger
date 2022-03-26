@@ -87,9 +87,12 @@ sendVarToJS('modelLabels',model::labels());
 	    }
 	    foreach ($vehicles as $vehicle) {
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '" data-eqLogic_type="EVcharger_vehicle">';
-		echo '<img src="' . $vehicle->getPathImg() . '"/>';
+		echo '<div style="position:absolute; bottom:26px">';
+		echo '<img src="' . $vehicle->getImage() . '"/>';
+		echo '<br>';
 		echo '<br>';
 		echo '<span class="name">' . $vehicle->getHumanName(true, true) . '</span>';
+		echo '</div>';
 		echo '</div>';
 	    }
 	    ?>
@@ -119,15 +122,18 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- ====================================== -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-	    <li role="presentation" class="tab-EVcharger_charger active"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
+	    <li role="presentation" class="tab-EVcharger_charger"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_vehicle"><a href="#vehicletab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-car"></i><span class="hidden-xs"> {{Véhicule}}</span></a></li>
-	    <li role="presentation"><a href="#chargercommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
+	    <li role="presentation" class="tab-EVcharger_charger"><a href="#chargercommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
+	    <li role="presentation" class="tab-EVcharger_vehicle"><a href="#vehiclecommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
 
+	<!-- Les panneaux -->
+	<!-- ============ -->
 	<div class="tab-content">
 	    <!-- Tab de configuration d'un chargeur -->
 	    <!-- ================================== -->
-	    <div role="tabpanel" class="tab-pane tab-EVcharger_charger" id="chargertab">
+	    <div role="tabpanel" class="tab-pane" id="chargertab">
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
 		    <fieldset>
@@ -232,7 +238,7 @@ sendVarToJS('modelLabels',model::labels());
 
 	    <!-- Tab de configuration d'un véhicule -->
 	    <!-- ================================== -->
-	    <div role="tabpanel" class="tab-pane tab-EVcharger_vehicle" id="vehicletab">
+	    <div role="tabpanel" class="tab-pane" id="vehicletab">
 		<!-- Paramètres généraux de l'équipement -->
 		<form class="form-horizontal">
 		    <fieldset>
@@ -289,8 +295,18 @@ sendVarToJS('modelLabels',model::labels());
 			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
 			    <div class="form-group">
 				<div class="text-center">
-				    <img name="icon_visu" style="max-width:160px;"/>
-				    <select id="selectChargerImg" class="EVcharger_vehicleAttr" data-l1key="configuration" data-l2key="image">
+				    <img name="vehicle_icon_visu" style="max-width:320px;"/>
+				    <?php
+					$imgDir = str_replace('/var/www/html','',realpath(__DIR__ . "/../img/vehicle"));
+				    echo '<select id="selectVehicleImg" class="EVcharger_vehicleAttr" data-l1key="configuration" data-l2key="type" data-imgDir="' . $imgDir . '">';
+					$types = array (
+						'compact' => '{{Compact}}',
+						'berline' => '{{Berline}}'
+					);
+					foreach ($types as $type => $name) {
+					    echo '<option value="' . $type . '">' . $name . '</option>';
+					}
+				    ?>
 				    </select>
 				</div>
 			    </div>
@@ -307,7 +323,7 @@ sendVarToJS('modelLabels',model::labels());
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="actualize" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Mettre à jour les commande par défaut}}</a>
 		<br/><br/>
 		<div class="table-responsive">
-		    <table id="table_cmd" class="table table-bordered table-condensed">
+		    <table id="table_cmd_charger" class="table table-bordered table-condensed">
 			<thead>
 			    <tr>
 				<th class="hidden-xs" style="min-width:50px;width:70px"> ID</th>
@@ -325,9 +341,33 @@ sendVarToJS('modelLabels',model::labels());
 		</div>
 	    </div> <!-- Onglet des commandes du chargeur -->
 
-	</div> <!-- Les onglets des chargeurs -->
-    </div> <!-- Page de configuration d'un chargeur -->
 
+	    <!-- Onglet des commandes d'un véhicule -->
+	    <!-- ================================== -->
+	    <div role="tabpanel" class="tab-pane" id="vehiclecommandtab">
+		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
+		<br/><br/>
+		<div class="table-responsive">
+		    <table id="table_cmd_vehicle" class="table table-bordered table-condensed">
+			<thead>
+			    <tr>
+				<th class="hidden-xs" style="min-width:50px;width:70px"> ID</th>
+				<th style="min-width:200px;width:240px">{{Nom}}</br>Logical_Id</th>
+				<th style="min-width:200px;width:240px">{{Icône}}</br>{{valeur retour}}</th>
+				<th style="width:130px">{{Type}}</br>{{Sous-type}}</th>
+				<th>{{Valeur}}</th>
+				<th style="min-width:260px;width:310px">{{Options}}</th>
+				<th style="min-width:80px;width:200px">{{Action}}</th>
+			    </tr>
+			</thead>
+			<tbody>
+			</tbody>
+		    </table>
+		</div>
+	    </div> <!-- Onglet des commandes d'un véhicule -->
+
+	</div> <!-- Les panneaux -->
+    </div> <!-- Pages de configuration des chargeurs et véhicules -->
 </div><!-- /.row row-overflow -->
 
 <!-- Inclusion du fichier javascript du plugin (dossier, nom_du_fichier, extension_du_fichier, id_du_plugin) -->
