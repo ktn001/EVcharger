@@ -463,6 +463,15 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 	});
 })
 
+$('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'click', function(){
+	var el = $(this)
+	var subtype = $(this).closest('.cmd').find('.cmdAttr[data-l1key=subType]').value()
+	jeedom.cmd.getSelectModal({cmd: {type: 'info'}}, function(result) {
+		var calcul = el.closest('tr').find('.cmdAttr[data-l1key=configuration][data-l2key=' + el.attr('data-input') + ']')
+		calcul.atCaret('insert',result.human)
+	})
+})
+
 /*
 * Fonction permettant l'affichage des commandes dans l'équipement
 */
@@ -520,8 +529,9 @@ function addCmdToChargerTable(_cmd) {
 		tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> Tester</a>';
 	}
 	if (!isMandatory) {
-		tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
+		tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>';
 	}
+	tr += '</td>';
 	tr += '</tr>';
 	$('#table_cmd_charger tbody').append(tr);
 	tr = $('#table_cmd_charger tbody tr').last();
@@ -531,6 +541,53 @@ function addCmdToChargerTable(_cmd) {
 		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=maxValue]:visible').prop('disabled',true);
 		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=calcul]').prop('disabled',true);
 	}
+	jeedom.eqLogic.buildSelectCmd({
+		id:  $('.eqLogicAttr[data-l1key=id]').value(),
+		filter: {type: 'info'},
+		error: function (error) {
+			$('#div_alert').showAlert({message: error.message, level: 'danger'});
+		},
+		success: function (result) {
+			tr.find('.cmdAttr[data-l1key=value]').append(result);
+			tr.setValues(_cmd, '.cmdAttr');
+			jeedom.cmd.changeType(tr, init(_cmd.subType));
+		}
+	});
+}
+
+function addCmdToVehicleTable(_cmd) {
+	let  tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
+	tr += '<td class="hidden-xs">';
+	tr += '<span class="cmdAttr" data-l1key="id"></span>';
+	tr += '</td>';
+	tr += '<td>';
+	tr += '  <input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom de la commande}}" style="margin-bottom:3px">';
+	tr += '  <input class="cmdAttr form-control input-sm" data-l1key="logicalId" style="margin-top:5px" disabled>';
+	tr += '</td>';
+	tr += '<td>';
+	tr += '  <input class="cmdAttr form-control input-sm" data-l1key="type" style="width:120px; margin-bottom:3px" disabled>';
+	tr += '  <input class="cmdAttr form-control input-sm" data-l1key="subType" style="width:120px; margin-top:5px" disabled>';
+	tr += '</td>';
+	tr += '<td>';
+	tr += '  <div class="input-group" style="margin-bottom:5px">';
+	tr += '    <input class="cmdAttr form-control input-sm roundedleft" data-l1key="configuration" data-l2key="calcul" placeholder="Commande liée">';
+	tr += '    <span class="input-group-btn">';
+	tr += '      <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
+	tr += '        <i class="fas fa-list-alt"></i>';
+	tr += '      </a>';
+	tr += '    </span>';
+	tr += '  </div>';
+	tr += '</td>';
+	tr += '<td>';
+	if (is_numeric(_cmd.id)) {
+		tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
+		tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> Tester</a>';
+	}
+	tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>';
+	tr += '</td>';
+	tr += '</tr>';
+	$('#table_cmd_vehicle tbody').append(tr);
+	tr = $('#table_cmd_vehicle tbody tr').last();
 	jeedom.eqLogic.buildSelectCmd({
 		id:  $('.eqLogicAttr[data-l1key=id]').value(),
 		filter: {type: 'info'},
@@ -558,6 +615,10 @@ function addCmdToTable(_cmd) {
 	}
 	if (init(_cmd.eqType) == 'EVcharger_charger') {
 		addCmdToChargerTable(_cmd);
+		return;
+	}
+	if (init(_cmd.eqType) == 'EVcharger_vehicle') {
+		addCmdToVehicleTable(_cmd);
 	}
 }
 

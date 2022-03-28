@@ -35,8 +35,24 @@ class EVcharger_vehicle extends EVcharger {
 	public function postInsert() {
 		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'latitude');
 		if (!is_object($cmd)){
-			$cmd = new EVchargerCMD();
-			$cmd->setName(__($config['name'],__FILE__));
+			$cmd = new EVcharger_vehicleCMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__('latitude',__FILE__));
+			$cmd->setType('info');
+			$cmd->setSubType('numeric');
+			$cmd->setLogicalId('latitude');
+			log::add('EVcharger','debug',print_r($cmd,true));
+			$cmd->save();
+		}
+		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'longitude');
+		if (!is_object($cmd)){
+			$cmd = new EVcharger_vehicleCMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__('longitude',__FILE__));
+			$cmd->setType('info');
+			$cmd->setSubType('numeric');
+			$cmd->setLogicalId('longitude');
+			$cmd->save();
 		}
 	}
 
@@ -58,4 +74,69 @@ class EVcharger_vehicle extends EVcharger {
 }
 
 class EVcharger_vehicleCmd extends EVchargerCmd  {
+
+	public function preSave() {
+		if ($this->getType() == 'info'){
+			$calcul = $this->getConfiguration('calcul');
+			if (strpos($calcul,'#' . $this->getId() . '#') !== false) {
+				throw new Exception(__('Vous ne pouvez appeler la commande elle-même (boucle infinie) sur',__FILE__) . ' : ' . $this->getName());
+			}
+			$added_value = [];
+			preg_match_all("/#([0-9]*)#/", $calcul, $matches);
+			$value = '';
+			foreach ($matches[1] as $cmd_id) {
+				if (isset($added_values[$cmd_id])) {
+					continue;
+				}
+				$cmd = self::byId($cmd_id);
+				if (is_object($cmd) && $cmd->getType() == 'info') {
+					$value .= '#' . $cmd_id . '#';
+					$added_value[$cmd_id] = $cmd_id;
+				}
+			}
+			preg_match_all("/variable\((.*?)\)/", $calcul, $matches);
+			foreach ($matches[1] as $variable) {
+				if (isset($added_values['#variable(' . $variable . ')#'])){
+					continue;
+				}
+				$value .= '#variable(' . $variable . ')#';
+				$added_value['#variable(' . $variable . ')#'] = '#variable(' . $variable . ')#';
+			}
+			$this->setValue($value);
+		}
+	}
+
+	public function postSave() {
+		if ($this->getType() == 'info' && $this->getConfiguration('calcul') != '') {
+			$this->event($this->execute());
+		}
+	}
+
+	public function execute($_options = null) {
+		if ($this->getType() == 'info'){
+			if ($this->getConfiguration('calcul') != ''){
+				try {
+					$result = jeedom::evaluateExpression($this->getConfiguration('calcul'));
+					if(is_string($result)){
+						$result = str_replace('"', '', $result);
+					}
+					if (in_array($this->getLogicalId(), array('latitude', 'longitude'))){
+						if (preg_match('/^\s*([-+]?[\d\.:]+)\s*[,;]\s*([-+]?[\d\.:]+)\s*$/',$result,$matches)){
+							if ($this->getLogicalId() == 'latitude') {
+								$result = $matches[1];
+							} else {
+								$result = $matches[2];
+							}
+						}
+					}
+					if (preg_match('/^(\d+):(\d+):((\d+)(\.\d+)?)$/',$result,$matches)){
+						$result = $matches[1] + $matches[2]/60 + $matches[2]/3600;
+					}
+					return $result;
+				} catch (Exception $e) {
+					return $this->getConfiguration('calcul');
+				}
+			}
+		}
+	}
 }

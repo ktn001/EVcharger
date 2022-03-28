@@ -353,10 +353,8 @@ sendVarToJS('modelLabels',model::labels());
 			    <tr>
 				<th class="hidden-xs" style="min-width:50px;width:70px"> ID</th>
 				<th style="min-width:200px;width:240px">{{Nom}}</br>Logical_Id</th>
-				<th style="min-width:200px;width:240px">{{Icône}}</br>{{valeur retour}}</th>
 				<th style="width:130px">{{Type}}</br>{{Sous-type}}</th>
 				<th>{{Valeur}}</th>
-				<th style="min-width:260px;width:310px">{{Options}}</th>
 				<th style="min-width:80px;width:200px">{{Action}}</th>
 			    </tr>
 			</thead>

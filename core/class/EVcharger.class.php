@@ -192,6 +192,7 @@ class EVchargerCmd extends cmd {
 		}
 		return false;
 	}
+
 }
 
 require_once __DIR__  . '/EVcharger_charger.class.php';
