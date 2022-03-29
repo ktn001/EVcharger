@@ -18,6 +18,7 @@
 
 class EVcharger_vehicle extends EVcharger {
 
+    //Retourne la liste des types de véhicule
 	public static function types() {
 		$types = array();
 		$path = __DIR__ . '/../../desktop/img/vehicle';
@@ -56,6 +57,7 @@ class EVcharger_vehicle extends EVcharger {
 		}
 	}
 
+    // Retourne l'image du véhicule en fonction de son type
 	public function getImage() {
 		$type = $this->getConfiguration('type');
 		$image = "/plugins/EVcharger/desktop/img/vehicle/" . $type . ".png";
@@ -137,6 +139,9 @@ class EVcharger_vehicleCmd extends EVchargerCmd  {
 					return $this->getConfiguration('calcul');
 				}
 			}
+		}
+		if ($this->getTyoe() == 'action {
+			
 		}
 	}
 }
