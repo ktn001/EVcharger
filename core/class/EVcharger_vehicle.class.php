@@ -159,8 +159,13 @@ class EVcharger_vehicleCmd extends EVchargerCmd  {
 				}
 			}
 		}
-		if ($this->getTyoe() == 'action {
-			
+		if ($this->getType() == 'action') {
+			$linkedCmd_Id = str_replace('#','',$this->getConfiguration('linkedCmd'));	
+			$linkedCmd = cmd::byId($linkedCmd_Id);
+			if (!is_object($linkedCmd)) {
+				throw new Exception(sprintf(__("Exécution de %s: La commande %s est introuvable!",__FILE__),$this->gewtHumanName(),$linkedCmd));
+			}
+			return $linkedCmd->execCmd($_option);
 		}
 	}
 }

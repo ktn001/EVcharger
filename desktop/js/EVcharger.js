@@ -574,12 +574,21 @@ function addCmdToVehicleTable(_cmd) {
 	tr += '</td>';
 	tr += '<td>';
 	tr += '  <div class="input-group" style="margin-bottom:5px">';
-	tr += '    <input class="cmdAttr form-control input-sm roundedleft" data-l1key="configuration" data-l2key="calcul" placeholder="Commande liée">';
-	tr += '    <span class="input-group-btn">';
-	tr += '      <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
-	tr += '        <i class="fas fa-list-alt"></i>';
-	tr += '      </a>';
-	tr += '    </span>';
+	if (_cmd.type == 'info') {
+		tr += '    <input class="cmdAttr form-control input-sm roundedleft" data-l1key="configuration" data-l2key="calcul" placeholder="Commande liée">';
+		tr += '    <span class="input-group-btn">';
+		tr += '      <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
+		tr += '        <i class="fas fa-list-alt"></i>';
+		tr += '      </a>';
+		tr += '    </span>';
+	} else {
+		tr += '    <input class="cmdAttr form-control input-sm roundedleft" data-l1key="configuration" data-l2key="linkedCmd" placeholder="Commande a exécuter">';
+		tr += '    <span class="input-group-btn">';
+		tr += '      <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="linkedCmd">';
+		tr += '        <i class="fas fa-list-alt"></i>';
+		tr += '      </a>';
+		tr += '    </span>';
+	}
 	tr += '  </div>';
 	tr += '</td>';
 	tr += '<td>';
