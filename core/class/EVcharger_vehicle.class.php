@@ -33,25 +33,44 @@ class EVcharger_vehicle extends EVcharger {
 
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
+		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		if (!is_object($cmd)){
+			$cmd = new EVcharger_vehicleCMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__('Rafraichir',__FILE__));
+			$cmd->setType('action');
+			$cmd->setSubType('other');
+			$cmd->setLogicalId('refresh');
+			$cmd->save();
+		}
 		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'latitude');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName(__('latitude',__FILE__));
+			$cmd->setName(__('Latitude',__FILE__));
 			$cmd->setType('info');
 			$cmd->setSubType('numeric');
 			$cmd->setLogicalId('latitude');
-			log::add('EVcharger','debug',print_r($cmd,true));
 			$cmd->save();
 		}
 		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'longitude');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName(__('longitude',__FILE__));
+			$cmd->setName(__('Longitude',__FILE__));
 			$cmd->setType('info');
 			$cmd->setSubType('numeric');
 			$cmd->setLogicalId('longitude');
+			$cmd->save();
+		}
+		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'branche');
+		if (!is_object($cmd)){
+			$cmd = new EVcharger_vehicleCMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__('Branché',__FILE__));
+			$cmd->setType('info');
+			$cmd->setSubType('binary');
+			$cmd->setLogicalId('branche');
 			$cmd->save();
 		}
 	}

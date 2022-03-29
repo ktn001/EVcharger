@@ -466,7 +466,8 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'click', function(){
 	var el = $(this)
 	var subtype = $(this).closest('.cmd').find('.cmdAttr[data-l1key=subType]').value()
-	jeedom.cmd.getSelectModal({cmd: {type: 'info'}}, function(result) {
+	var type = $(this).closest('.cmd').find('.cmdAttr[data-l1key=type]').value()
+	jeedom.cmd.getSelectModal({cmd: {type: type}}, function(result) {
 		var calcul = el.closest('tr').find('.cmdAttr[data-l1key=configuration][data-l2key=' + el.attr('data-input') + ']')
 		calcul.atCaret('insert',result.human)
 	})
@@ -476,6 +477,9 @@ $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'c
 * Fonction permettant l'affichage des commandes dans l'équipement
 */
 function addCmdToChargerTable(_cmd) {
+	if (init(_cmd.logicalId) == 'refresh'){
+		return;
+	}
 	let isStandard = false;
 	let isMandatory
 	if ('mandatory' in _cmd.configuration) {
@@ -609,9 +613,6 @@ function addCmdToTable(_cmd) {
 	}
 	if (!isset(_cmd.configuration)) {
 		_cmd.configuration = {};
-	}
-	if (init(_cmd.logicalId) == 'refresh'){
-		return;
 	}
 	if (init(_cmd.eqType) == 'EVcharger_charger') {
 		addCmdToChargerTable(_cmd);
