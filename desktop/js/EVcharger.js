@@ -60,11 +60,6 @@ function loadAccountCards() {
 }
 
 /*
- * Chargement initial des accounts
- */
-loadAccountCards();
-
-/*
  * Suppression d'un compte
  */
 function deleteAccount (accountId) { 
@@ -129,6 +124,58 @@ function saveWithPassword(account) {
 			});
 		}
 	});
+}
+
+/*
+ * Saisie des nom et modèle d'un nouveau compte ou chargeur
+ */
+function getNameAndModelAndSave (title, eqLogicType) {
+	if ($('#modContainer_nameAndModel').length == 0) {
+		$('body').append('<div id="modContainer_nameAndModel" title="' + title + '"></div>');
+		jQuery.ajaxSetup({async: false});
+		$('#modContainer_nameAndModel').load('index.php?v=d&plugin=EVcharger&modal=nameAndModel');
+		jQuery.ajaxSetup({async: true});
+		$("#modContainer_nameAndModel").dialog({
+			closeText: '',
+			autoOpen: false,
+			modal: true,
+			height:200,
+			width:400
+		});
+	}
+	$('#modContainer_nameAndModel').dialog('option', 'buttons', {
+		"{{Annuler}}": function () {
+			$(this).dialog("close");
+		},
+		"{{Valider}}": function () {
+			let chargers = mod_nameAndModel('result');
+			if ( chargers[0].name != '') {
+				console.log(chargers)
+				$(this).dialog("close");
+			 	jeedom.eqLogic.save({
+					type: eqLogicType,
+					eqLogics: chargers,
+					error: function(error) {
+						$('#div_alert').showAlert({message: error.message, level: 'danger'});
+					},
+					success: function(_data) {
+						let vars = getUrlVars();
+						let url = 'index.php?';
+						for (var i in vars) {
+							if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+								url += i + '=' + vars[i].replace('#', '') + '&';
+							}
+						}
+						modifyWithoutSave = false;
+						url += 'id=' + _data.id + '&saveSuccessFull=1';
+						loadPage(url);
+					}
+				})
+			}
+		}
+	});
+	mod_nameAndModel('init');
+	$('#modContainer_nameAndModel').dialog('open');
 }
 
 /*
@@ -244,6 +291,11 @@ function editAccount (model, accountId ='') {
 }
 
 /*
+ * Chargement initial des accounts
+ */
+loadAccountCards();
+
+/*
  * Action du bouton d'ajout d'un account
  */
 $('.accountAction[data-action=add]').off('click').on('click', function() {
@@ -309,54 +361,17 @@ $('#accounts-div.eqLogicThumbnailContainer').off('click').on('click','.accountDi
 });
 
 /*
+ * Action du bouton d'ajout d'un compte
+ */
+$('.accountAction[data-action=add').off('click').on('click',function () {
+	getNameAndModelAndSave ("Nouveau compte", accountType);
+});
+
+/*
  * Action du bouton d'ajout d'un chargeur
  */
 $('.chargerAction[data-action=add').off('click').on('click',function () {
-	if ($('#modContainer_chargerNameAndModel').length == 0) {
-		$('body').append('<div id="modContainer_chargerNameAndModel" title="{{Nouveau chargeur:}}"/>');
-		jQuery.ajaxSetup({async: false});
-		$('#modContainer_chargerNameAndModel').load('index.php?v=d&plugin=EVcharger&modal=chargerNameAndModel');
-		jQuery.ajaxSetup({async: true});
-		$("#mod_chargerNameAndModel").dialog({
-			closeText: '',
-			autoOpen: false,
-			modal: true,
-			height:200,
-			width:400
-		});
-	}
-	$('#mod_chargerNameAndModel').dialog('option', 'buttons', {
-		"{{Annuler}}": function () {
-			$(this).dialog("close");
-		},
-		"{{Valider}}": function () {
-			let chargers = mod_chargerNameAndModel('result');
-			if ( chargers[0].name != '') {
-				console.log(chargers)
-				$(this).dialog("close");
-			 	jeedom.eqLogic.save({
-					type: chargerType,
-					eqLogics: chargers,
-					error: function(error) {
-						$('#div_alert').showAlert({message: error.message, level: 'danger'});
-					},
-					success: function(_data) {
-						let vars = getUrlVars();
-						let url = 'index.php?';
-						for (var i in vars) {
-							if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
-								url += i + '=' + vars[i].replace('#', '') + '&';
-							}
-						}
-						modifyWithoutSave = false;
-						url += 'id=' + _data.id + '&saveSuccessFull=1';
-						loadPage(url);
-					}
-				})
-			}
-		}
-	});
-	$('#mod_chargerNameAndModel').dialog('open');
+	getNameAndModelAndSave ("Nouveau chargeur", chargerType);
 });
 
 /*
@@ -703,10 +718,17 @@ function prePrintEqLogic (id) {
 	let displayCard = $('.eqLogicDisplayCard[data-eqlogic_id=' + id + ']')
 	let type = displayCard.attr('data-eqlogic_type');
 	$('img[name=icon_visu]').attr('src','')
-	if (type =='EVcharger_charger') {
-		$('.tab-EVcharger_vehicle').hide()
+	$('.tab-EVcharger_account').hide()
+	$('.tab-EVcharger_vehicle').hide()
+	$('.tab-EVcharger_charger').hide()
+	$('.EVcharger_accountAttr').removeClass('eqLogicAttr')
+	$('.EVcharger_vehicleAttr').removeClass('eqLogicAttr')
+	$('.EVcharger_chargerAttr').removeClass('eqLogicAttr')
+	if (type =='EVcharger_account') {
+		$('.tab-EVcharger_account').show()
+		$('.EVcharger_accountAttr').addClass('eqLogicAttr')
+	} else if (type =='EVcharger_charger') {
 		$('.tab-EVcharger_charger').show()
-		$('.EVcharger_vehicleAttr').removeClass('eqLogicAttr')
 		$('.EVcharger_chargerAttr').addClass('eqLogicAttr')
 		model = displayCard.attr('data-eqlogic_model');
 		$.ajax({
@@ -731,9 +753,7 @@ function prePrintEqLogic (id) {
 			}
 		});
 	} else if (type == 'EVcharger_vehicle') {
-		$('.tab-EVcharger_charger').hide()
 		$('.tab-EVcharger_vehicle').show()
-		$('.EVcharger_chargerAttr').removeClass('eqLogicAttr')
 		$('.EVcharger_vehicleAttr').addClass('eqLogicAttr')
 	}
 }

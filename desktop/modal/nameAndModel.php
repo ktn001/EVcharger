@@ -21,7 +21,7 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_chargerNameAndModel">
+<div id="mod_nameAndModel">
   <form class="form-horizontal">
     <fieldset>
       <div class="form-group">
@@ -38,45 +38,41 @@ if (!isConnect('admin')) {
 </div>
 
 <script>
-function mod_chargerNameAndModel_actualizeModels() {
-    $.ajax({
-        type: 'POST',
-        url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
-        data: {
-            action: 'modelLabels',
-	    onlyEnable: 1,
-        },
-        dataType: 'json',
-        global: false,
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) {
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            }
-            $('#mod_chargerNameAndModel select').empty();
-            labels = json_decode(data.result);
-            for (model in labels) {
-                option = '<option value="' + model + '">' + labels[model] + '</option>';
-                $('#mod_chargerNameAndModel select').append(option);
-            }
-        },
-    });
+function mod_nameAndModel_init() {
 }
 
-function mod_chargerNameAndModel(action) {
-    if (action = 'result') {
-        return $('#mod_chargerNameAndModel').getValues('.eqLogicAttr');
+function mod_nameAndModel(action) {
+    if (action == 'result') {
+        return $('#mod_nameAndModel').getValues('.eqLogicAttr');
+    }
+
+    if (action == 'init') {
+        $.ajax({
+            type: 'POST',
+            url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+            data: {
+                action: 'modelLabels',
+                onlyEnable: 1,
+            },
+            dataType: 'json',
+            global: false,
+            error: function (request, status, error) {
+                handleAjaxError(request, status, error);
+            },
+            success: function (data) {
+                if (data.state != 'ok') {
+                    $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                    return;
+                }
+                $('#mod_nameAndModel select').empty();
+                labels = json_decode(data.result);
+                for (model in labels) {
+                    option = '<option value="' + model + '">' + labels[model] + '</option>';
+                    $('#mod_nameAndModel select').append(option);
+                }
+            },
+        });
     }
 }
-
-$('#mod_chargerNameAndModel').dialog({
-    focus: function (event, ui) {
-	    $('.eqLogicAttr[data-l1key=name]').val("");
-	    mod_chargerNameAndModel_actualizeModels();
-    }
-})
 
 </script>

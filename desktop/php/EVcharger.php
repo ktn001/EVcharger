@@ -4,13 +4,14 @@ if (!isConnect('admin')) {
 }
 //  Déclaration des variables obligatoires
 $plugin = plugin::byId('EVcharger');
+$accounts = EVcharger_charger::byType('EVcharger_account%');
 $chargers = EVcharger_charger::byType('EVcharger_charger');
 $vehicles = EVcharger_vehicle::byType('EVcharger_vehicle');
-$accounts = account::all();
+//$accounts = account::all();
 
-log::add("EVcharger","info",print_r($chargers,true));
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
+sendVarToJS('accountType', $plugin->getId() . "_account");
 sendVarToJS('chargerType', $plugin->getId() . "_charger");
 sendVarToJS('vehicleType', $plugin->getId() . "_vehicle");
 sendVarToJs('confirmDelete',config::byKey('confirmDelete','EVcharger'));
@@ -66,7 +67,7 @@ sendVarToJS('modelLabels',model::labels());
 
 	<!-- Les chargeurs et véhicules -->
 	<!-- ========================== -->
-	<legend><i class="fas fa-charging-station"></i><i class="fas fa-car"></i> {{Mes chargeurs et véhicules}}</legend>
+	<legend><i class="fas fa-user"></i><i class="fas fa-charging-station"></i><i class="fas fa-car"></i> {{Mes comptes, chargeurs et véhicules}}</legend>
 	<!-- Champ de recherche des chargeurs -->
 	<div class="input-group">
 	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic"/>
@@ -77,6 +78,14 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- Liste des chargeurs -->
 	<div class="eqLogicThumbnailContainer">
 	    <?php
+            foreach ($accounts as $account) {
+		$opacity = ($account->getIsEnable()) ? '' : 'disableCard';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $account->getId() . '" data-eqLogic_type="EVcharger_account" data-eqLogic_model="' . $account->getconfiguration('model') . '">';
+		echo '<img src="' . $account->getImage() . '" style="width:unset !important"/>';
+		echo '<br>';
+		echo '<span class="name">' . $account->getHumanName(true, true) . '</span>';
+		echo '</div>';
+	    }
 	    foreach ($chargers as $charger) {
 		$opacity = ($charger->getIsEnable()) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '" data-eqLogic_type="EVcharger_charger" data-eqLogic_model="' . $charger->getconfiguration('model') . '">';
@@ -86,6 +95,7 @@ sendVarToJS('modelLabels',model::labels());
 		echo '</div>';
 	    }
 	    foreach ($vehicles as $vehicle) {
+		$opacity = ($vehicle->getIsEnable()) ? '' : 'disableCard';
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $vehicle->getId() . '" data-eqLogic_type="EVcharger_vehicle">';
 		echo '<div style="position:absolute; bottom:26px">';
 		echo '<img src="' . $vehicle->getImage() . '"/>';
@@ -103,7 +113,7 @@ sendVarToJS('modelLabels',model::labels());
     <!-- ================================================= -->
     <!-- Pages de configuration des chargeurs et véhicules -->
     <!-- ================================================= -->
-    <div class="col-xs-12 eqLogic EVcharger_charger EVcharger_vehicle" style="display: none;">
+    <div class="col-xs-12 eqLogic EVcharger_account EVcharger_charger EVcharger_vehicle" style="display: none;">
 
 	<!-- barre de gestion des chargeurs et véhicules -->
 	<!-- =========================================== -->
@@ -122,8 +132,10 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- ====================================== -->
 	<ul class="nav nav-tabs" role="tablist">
 	    <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
+	    <li role="presentation" class="tab-EVcharger_account"><a href="#accounttab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Compte}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_charger"><a href="#chargertab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-charging-station"></i><span class="hidden-xs"> {{Chargeur}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_vehicle"><a href="#vehicletab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-car"></i><span class="hidden-xs"> {{Véhicule}}</span></a></li>
+	    <li role="presentation" class="tab-EVcharger_account"><a href="#accountcommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_charger"><a href="#chargercommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	    <li role="presentation" class="tab-EVcharger_vehicle"><a href="#vehiclecommandtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-list"></i><span class="hidden-xs"> {{Commandes}}</span></a></li>
 	</ul>
@@ -131,6 +143,12 @@ sendVarToJS('modelLabels',model::labels());
 	<!-- Les panneaux -->
 	<!-- ============ -->
 	<div class="tab-content">
+	    <!-- Tab de configuration d'un compte -->
+	    <!-- ================================= -->
+	    <div role="tabpanel" class="tab-pane" id="accounttab">
+		ACCOUNT
+	    </div> <!-- Tab de configuration d'un compte -->
+
 	    <!-- Tab de configuration d'un chargeur -->
 	    <!-- ================================== -->
 	    <div role="tabpanel" class="tab-pane" id="chargertab">
@@ -316,8 +334,14 @@ sendVarToJS('modelLabels',model::labels());
 		</form>
 	    </div> <!-- Tab de configuration d'un véhicule -->
 
-	    <!-- Onglet des commandes du chargeur -->
+	    <!-- Onglet des commandes d'un compte -->
 	    <!-- ================================ -->
+	    <div role="tabpanel" class="tab-pane" id="accountcommandtab">
+		ACCOUNT CMD
+	    </div> <!-- Onglet des commandes d'un compte -->
+
+	    <!-- Onglet des commandes d'un chargeur -->
+	    <!-- ================================== -->
 	    <div role="tabpanel" class="tab-pane" id="chargercommandtab">
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="add" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Ajouter une commande}}</a>
 		<a class="btn btn-default btn-sm pull-right cmdAction" data-action="actualize" style="margin-top:5px;"><i class="fas fa-plus-circle"></i> {{Mettre à jour les commande par défaut}}</a>
@@ -339,7 +363,7 @@ sendVarToJS('modelLabels',model::labels());
 			</tbody>
 		    </table>
 		</div>
-	    </div> <!-- Onglet des commandes du chargeur -->
+	    </div> <!-- Onglet des commandes d'un chargeur -->
 
 
 	    <!-- Onglet des commandes d'un véhicule -->

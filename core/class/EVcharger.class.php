@@ -22,6 +22,24 @@ require_once __DIR__  . '/account.class.php';
 
 class EVcharger extends eqLogic {
 
+	public static function byType($_eqType_name, $onlyEnable = false) {
+		if (strpos($_eqType_name, '%') === false) {
+			return parent::byType($_eqType_name, $onlyEnable);
+		}
+		$values = array(
+			'eqType_name' => $_eqType_name,
+		);
+		$sql =  'SELECT DISTINCT eqType_name';
+		$sql .= '   FROM eqLogic';
+		$sql .= '   WHERE eqType_name like :eqType_name';
+		$eqTypes = DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL);
+		$eqLogics = array ();
+		foreach ($eqTypes[0] as $eqType) {
+			 $eqLogics = array_merge($eqLogics,parent::byType($eqType, $onlyEnable));
+		}
+		return $eqLogics;
+	}
+
     /*     * ********************** Gestion du daemon ************************* */
 
     /*
@@ -195,5 +213,6 @@ class EVchargerCmd extends cmd {
 
 }
 
+require_once __DIR__  . '/EVcharger_account.class.php';
 require_once __DIR__  . '/EVcharger_charger.class.php';
 require_once __DIR__  . '/EVcharger_vehicle.class.php';
