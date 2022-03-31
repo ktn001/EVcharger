@@ -198,6 +198,8 @@ sendVarToJS('modelLabels',model::labels());
 			    <br>
 
 			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
+			    <div id="AccountSpecificsParams">
+			    </div>
 			</div> <!-- Partie gauche de l'onglet "Equipements" -->
 
 			<!-- Partie droite de l'onglet "Équipement" -->

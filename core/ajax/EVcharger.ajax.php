@@ -38,12 +38,16 @@ try {
 		ajax::success(json_encode(model::images($model, 'charger')));
 	}
 
-	if (init('action') == 'chargerParamsHtml') {
+	if (init('action') == 'ParamsHtml') {
 		$model = init('model');
 		if ($model == '') {
 			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		$file = realpath (__DIR__.'/../config/'.$model.'/charger_params.inc.php');
+		$object = init('object');
+		if ($object == '') {
+			throw new Exception(__("L'objet n'est pas indiqué",__FILE__));
+		}
+		$file = realpath (__DIR__.'/../../desktop/php/'.$model.'/' . $object . '_params.inc.php');
 		if (file_exists($file)) {
 			ob_start();
 			require_once $file;

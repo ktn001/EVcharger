@@ -771,8 +771,32 @@ function prePrintEqLogic (id) {
 	$('.tab-EVcharger_account, .tab-EVcharger_vehicle, .tab-EVcharger_charger').hide()
 	$('.EVcharger_accountAttr, .EVcharger_vehicleAttr, .EVcharger_chargerAttr').removeClass('eqLogicAttr')
 	if (type =='EVcharger_account') {
+		model = displayCard.attr('data-eqlogic_model');
 		$('.tab-EVcharger_account').show()
 		$('.EVcharger_accountAttr').addClass('eqLogicAttr')
+		$.ajax({
+			type: 'POST',
+			url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+			data: {
+				action: 'ParamsHtml',
+				object: 'account',
+				model: model
+			},
+			dataType: 'json',
+			global: false,
+			error: function(request, status, error) {
+				handleAjaxError(request, status, error);
+			},
+			success: function(data) {
+				if (data.state != 'ok') {
+					$('#div_alert').showAlert({message: data.result, level: 'danger'});
+					return;
+				}
+				let html = data.result;
+				$('#AccountSpecificsParams').html(html);
+			}
+		});
+	} else if (type == 'EVcharger_vehicle') {
 	} else if (type =='EVcharger_charger') {
 		$('.tab-EVcharger_charger').show()
 		$('.EVcharger_chargerAttr').addClass('eqLogicAttr')
@@ -781,7 +805,8 @@ function prePrintEqLogic (id) {
 			type: 'POST',
 			url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 			data: {
-				action: 'chargerParamsHtml',
+				action: 'ParamsHtml',
+				object: 'charger',
 				model: model
 			},
 			dataType: 'json',
@@ -805,7 +830,7 @@ function prePrintEqLogic (id) {
 }
 
 function printEqLogic (configs) {
-	if (configs.eqType_name == 'EVcharger_account') {
+	if (configs.eqType_name.startsWith('EVcharger_account')) {
 		loadSelectAccountImg(configs.configuration.image);
 	} else if (configs.eqType_name == 'EVcharger_charger') {
 		$('.nav-tabs .tab-EVcharger_charger a').first().click()
