@@ -156,8 +156,12 @@ function getNameAndModelAndSave (title, eqLogicType) {
 		},
 		"{{Valider}}": function () {
 			let chargers = mod_nameAndModel('result');
+			console.log(chargers[0]);
 			if ( chargers[0].name != '') {
 				$(this).dialog("close");
+				if (eqLogicType == 'EVcharger_account') {
+					eqLogicType += '_' + chargers[0].configuration.model;
+				}
 			 	jeedom.eqLogic.save({
 					type: eqLogicType,
 					eqLogics: chargers,

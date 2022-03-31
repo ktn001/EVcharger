@@ -16,19 +16,10 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class EVcharger_account extends EVcharger {
-	public function getImage() {
-		$image = $this->getConfiguration('image');
-		if ($image == '') {
-			$image = "/plugins/EVcharger/desktop/img/account.png";
-		}
-		return $image;
-	}
+class EVcharger_account_easee extends EVcharger_account {
 
 }
 
-class EVcharger_accountCmd extends EVchargerCmd  {
+class EVcharger_account_easeeCmd extends EVcharger_accountCmd  {
 
 }
-
-require_once __DIR__ . '/EVcharger_account_easee.class.php';

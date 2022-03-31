@@ -34,8 +34,8 @@ class EVcharger extends eqLogic {
 		$sql .= '   WHERE eqType_name like :eqType_name';
 		$eqTypes = DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL);
 		$eqLogics = array ();
-		foreach ($eqTypes[0] as $eqType) {
-			 $eqLogics = array_merge($eqLogics,parent::byType($eqType, $onlyEnable));
+		foreach ($eqTypes as $eqType) {
+			 $eqLogics = array_merge($eqLogics,parent::byType($eqType['eqType_name'], $onlyEnable));
 		}
 		return $eqLogics;
 	}

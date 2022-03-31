@@ -4,7 +4,7 @@ if (!isConnect('admin')) {
 }
 //  Déclaration des variables obligatoires
 $plugin = plugin::byId('EVcharger');
-$accounts = EVcharger_charger::byType('EVcharger_account%');
+$accounts = EVcharger_account::byType('EVcharger_account%');
 $chargers = EVcharger_charger::byType('EVcharger_charger');
 $vehicles = EVcharger_vehicle::byType('EVcharger_vehicle');
 //$accounts = account::all();
