@@ -18,7 +18,11 @@
 
 class EVcharger_account extends EVcharger {
 	public function getImage() {
-		return "/plugins/EVcharger/desktop/img/account.png";
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			$image = "/plugins/EVcharger/desktop/img/account.png";
+		}
+		return $image;
 	}
 
 }

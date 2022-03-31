@@ -26,6 +26,14 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
+	if (init('action') == 'images') {
+		$model = init('model');
+		if (model == '') {
+			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
+		}
+		ajax::success(json_encode(model::images($model, 'account')));
+	}
+
 	if (init('action') == 'save') {
 		try {
 			$data = json_decode(init('account'),true);

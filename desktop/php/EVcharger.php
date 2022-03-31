@@ -146,7 +146,75 @@ sendVarToJS('modelLabels',model::labels());
 	    <!-- Tab de configuration d'un compte -->
 	    <!-- ================================= -->
 	    <div role="tabpanel" class="tab-pane" id="accounttab">
-		ACCOUNT
+		<!-- Paramètres généraux de l'équipement -->
+		<form class="form-horizontal">
+		    <fieldset>
+
+			<!-- Partie gauche de l'onglet "Equipements" -->
+			<div class="col-lg-6">
+			    <legend><i class="fas fa-wrench"></i> {{Général}}</legend>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label">{{Nom du compte}}</label>
+				<div class="col-sm-7">
+				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="id" style="display : none;"/>
+				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
+				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="name" placeholder="{{Nom du compte}}"/>
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label" >{{Objet parent}}</label>
+				<div class="col-sm-7">
+				    <select id="sel_object" class="EVcharger_accountAttr form-control" data-l1key="object_id">
+					<option value="">{{Aucun}}</option>
+					<?php
+					$options = '';
+					foreach ((jeeObject::buildTree(null, false)) as $object) {
+					    $options .= '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
+					}
+					echo $options;
+					?>
+				    </select>
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label">{{Catégorie}}</label>
+				<div class="col-sm-7">
+				    <?php
+				    foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+					echo '<label class="checkbox-inline">';
+					echo '<input type="checkbox" class="EVcharger_accountAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+					echo '</label>';
+				    }
+				    ?>
+				</div>
+			    </div>
+			    <div class="form-group">
+				<label class="col-sm-3 control-label">{{Options}}</label>
+				<div class="col-sm-7">
+				    <label class="checkbox-inline"><input type="checkbox" class="EVcharger_accountAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
+				    <label class="checkbox-inline"><input type="checkbox" class="EVcharger_accountAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+				</div>
+			    </div>
+			    <br>
+
+			    <legend><i class="fas fa-cogs"></i> {{Paramètres}}</legend>
+			</div> <!-- Partie gauche de l'onglet "Equipements" -->
+
+			<!-- Partie droite de l'onglet "Équipement" -->
+			<div class="col-lg-6">
+			    <!-- Informations des chargeurs -->
+			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
+			    <div class="form-group">
+				<div class="text-center">
+				    <img id="account_icon_visu" style="max-width:160px;"/>
+				    <select id="selectAccountImg" class="EVcharger_accountAttr" data-l1key="configuration" data-l2key="image">
+				    </select>
+				</div>
+			    </div>
+			</div> <!-- Partie droite de l'onglet "Équipement" -->
+
+		    </fieldset>
+		</form>
 	    </div> <!-- Tab de configuration d'un compte -->
 
 	    <!-- Tab de configuration d'un chargeur -->
@@ -243,7 +311,7 @@ sendVarToJS('modelLabels',model::labels());
 			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
 			    <div class="form-group">
 				<div class="text-center">
-				    <img name="icon_visu" style="max-width:160px;"/>
+				    <img id="charger_icon_visu" style="max-width:160px;"/>
 				    <select id="selectChargerImg" class="EVcharger_chargerAttr" data-l1key="configuration" data-l2key="image">
 				    </select>
 				</div>
@@ -313,7 +381,7 @@ sendVarToJS('modelLabels',model::labels());
 			    <legend><i class="fas fa-info"></i> {{Informations}}</legend>
 			    <div class="form-group">
 				<div class="text-center">
-				    <img name="vehicle_icon_visu" style="max-width:320px;"/>
+				    <img id="vehicle_icon_visu" style="max-width:320px;"/>
 				    <?php
 					$imgDir = str_replace('/var/www/html','',realpath(__DIR__ . "/../img/vehicle"));
 				    echo '<select id="selectVehicleImg" class="EVcharger_vehicleAttr" data-l1key="configuration" data-l2key="type" data-imgDir="' . $imgDir . '">';

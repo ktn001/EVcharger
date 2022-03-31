@@ -141,7 +141,7 @@ class EVcharger_charger extends EVcharger {
 	public function getPathImg() {
 		$image = $this->getConfiguration('image');
 		if ($image == '') {
-			return "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
+			$image = "/plugins/EVcharger/plugin_info/EVcharger_icon.png";
 		}
 		return $image;
 	}

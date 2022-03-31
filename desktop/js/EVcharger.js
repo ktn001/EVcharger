@@ -18,8 +18,15 @@
 /*
  * Permet la réorganisation des commandes dans l'équipement et des accounts
  */
-$('#table_cmd').sortable({axis: 'y', cursor: 'move', items: '.cmd', placeholder: 'ui-state-highlight', tolerance: 'intersect', forcePlaceholderSize: true});
-$('#table_cmd').on('sortupdate',function(event,ui){
+$('#table_cmd_account, #table_cmd_charger, #table_cmd_vehicle').sortable({
+	axis: 'y',
+	cursor: 'move',
+	items: '.cmd',
+	placeholder: 'ui-state-highlight',
+	tolerance: 'intersect',
+	forcePlaceholderSize: true
+});
+$('#table_cmd_account, #table_cmd_charger, #table_cmd_vehicle').on('sortupdate',function(event,ui){
 		modifyWithoutSave = true;
 });
 
@@ -62,7 +69,7 @@ function loadAccountCards() {
 /*
  * Suppression d'un compte
  */
-function deleteAccount (accountId) { 
+function deleteAccount (accountId) {
 	$.ajax({
 		type: 'POST',
 		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
@@ -150,7 +157,6 @@ function getNameAndModelAndSave (title, eqLogicType) {
 		"{{Valider}}": function () {
 			let chargers = mod_nameAndModel('result');
 			if ( chargers[0].name != '') {
-				console.log(chargers)
 				$(this).dialog("close");
 			 	jeedom.eqLogic.save({
 					type: eqLogicType,
@@ -425,10 +431,17 @@ $('.vehicleAction[data-action=add').off('click').on('click',function () {
 });
 
 /*
+ * Action sur modification d'image d'un compte
+ */
+$('#selectAccountImg').on('change',function(){
+	$('#account_icon_visu').attr('src', $(this).value());
+});
+
+/*
  * Action sur modification d'image d'un chargeur
  */
 $('#selectChargerImg').on('change',function(){
-	$('[name=icon_visu]').attr('src', $(this).value());
+	$('#charger_icon_visu').attr('src', $(this).value());
 });
 
 /*
@@ -436,7 +449,7 @@ $('#selectChargerImg').on('change',function(){
  */
 $('#selectVehicleImg').on('change',function(){
 	path = '/plugins/EVcharger/desktop/img/vehicle/' + $(this).value() + '.png';
-	$('[name=vehicle_icon_visu]').attr('src', path);
+	$('#vehicle_icon_visu').attr('src', path);
 });
 
 /*
@@ -472,7 +485,6 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 				}
 			}
 			url += 'saveSuccessFull=1' + document.location.hash
-			console.log(url)
 			loadPage(url)
 		}
 	});
@@ -631,7 +643,6 @@ function addCmdToVehicleTable(_cmd) {
 }
 
 function addCmdToTable(_cmd) {
-	console.log(_cmd)
 	if (!isset(_cmd)) {
 		var _cmd = {configuration: {}};
 	}
@@ -679,7 +690,42 @@ function loadSelectAccount(defaut) {
 	});
 }
 
-function loadSelectImg(defaut) {
+function loadSelectAccountImg(defaut) {
+	$.ajax({
+		type: 'POST',
+		url: 'plugins/EVcharger/core/ajax/account.ajax.php',
+		data: {
+			action: 'images',
+			model: $('.eqLogicAttr[data-l1key=configuration][data-l2key=model]').value(),
+		},
+		dataType : 'json',
+		global:false,
+		error: function (request, status, error) {
+			handleAjaxError(request, status, error);
+		},
+		success: function (data) {
+			if (data.state != 'ok') {
+				$('#div_alert').showAlert({message: data.result, level: 'danger'});
+				return;
+			}
+			$('#selectAccountImg').empty();
+			let images = json_decode(data.result);
+			let options = "";
+			for (image of images) {
+				splitPath = image.split('/').reverse();
+				if (splitPath[1] != 'img') {
+					display = splitPath[1] + '/' + splitPath[0];
+				} else {
+					display = splitPath[0];
+				}
+				options += '<option value="' + image + '">' + display + '</option>';
+			}
+			$('#selectAccountImg').append(options).val(defaut).trigger('change');
+		}
+	})
+}
+
+function loadSelectChargerImg(defaut) {
 	$.ajax({
 		type: 'POST',
 		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
@@ -717,13 +763,9 @@ function loadSelectImg(defaut) {
 function prePrintEqLogic (id) {
 	let displayCard = $('.eqLogicDisplayCard[data-eqlogic_id=' + id + ']')
 	let type = displayCard.attr('data-eqlogic_type');
-	$('img[name=icon_visu]').attr('src','')
-	$('.tab-EVcharger_account').hide()
-	$('.tab-EVcharger_vehicle').hide()
-	$('.tab-EVcharger_charger').hide()
-	$('.EVcharger_accountAttr').removeClass('eqLogicAttr')
-	$('.EVcharger_vehicleAttr').removeClass('eqLogicAttr')
-	$('.EVcharger_chargerAttr').removeClass('eqLogicAttr')
+	$('#account_icon_visu, #charger_icon_visu, #vehicle_icon_visu').attr('src','')
+	$('.tab-EVcharger_account, .tab-EVcharger_vehicle, .tab-EVcharger_charger').hide()
+	$('.EVcharger_accountAttr, .EVcharger_vehicleAttr, .EVcharger_chargerAttr').removeClass('eqLogicAttr')
 	if (type =='EVcharger_account') {
 		$('.tab-EVcharger_account').show()
 		$('.EVcharger_accountAttr').addClass('eqLogicAttr')
@@ -759,10 +801,12 @@ function prePrintEqLogic (id) {
 }
 
 function printEqLogic (configs) {
-	if (configs.eqType_name == 'EVcharger_charger') {
+	if (configs.eqType_name == 'EVcharger_account') {
+		loadSelectAccountImg(configs.configuration.image);
+	} else if (configs.eqType_name == 'EVcharger_charger') {
 		$('.nav-tabs .tab-EVcharger_charger a').first().click()
 		loadSelectAccount(configs.configuration.accountId);
-		loadSelectImg(configs.configuration.image);
+		loadSelectChargerImg(configs.configuration.image);
 	} else if  (configs.eqType_name == 'EVcharger_vehicle') {
 		$('.nav-tabs .tab-EVcharger_vehicle a').first().click()
 	}
