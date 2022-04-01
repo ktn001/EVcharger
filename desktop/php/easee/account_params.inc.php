@@ -9,7 +9,8 @@
 	<div class="col-sm-7">
 		<div class="input-group" style="display:flex">
 			<input type="password" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="password" placeholder="{{password}}"/>
-			<button class="btn btn-outline-secondary" type="button"><i class="fas fa-eye "></i></button>
+			<button class="btn btn-outline-secondary show-pwd" type="button"><i class="fas fa-eye"></i></button>
+			<button class="btn btn-outline-secondary hide-pwd" type="button"><i class="fas fa-eye-slash" display="none"></i></button>
 		</div>
 	</div>
 </div>
