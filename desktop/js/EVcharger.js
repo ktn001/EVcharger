@@ -31,6 +31,20 @@ $('#table_cmd_account, #table_cmd_charger, #table_cmd_vehicle').on('sortupdate',
 });
 
 /*
+ * Montre ou cache le password saisi
+ */
+$('.show-pwd').off('click').on('click',function() {
+	$(this).closest('.input-group').find('input[type=password]').attr('type','text');
+	$(this).hide();
+	$(this).closest('.input-group').find('button.hide-pwd').show();
+});
+$('.hide-pwd').off('click').on('click',function() {
+	$(this).closest('.input-group').find('input[type=text]').attr('type','password');
+	$(this).hide();
+	$(this).closest('.input-group').find('button.show-pwd').show();
+});
+
+/*
  * Chargement des acountDisplayCards
  */
 function loadAccountCards() {
