@@ -118,11 +118,11 @@ class EVcharger_charger extends EVcharger {
 
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
 	public function postSave() {
-		if ($this->getIsEnable()){
-			$this->startListener();
-		} else {
-			$this->stopListener();
-		}
+		//if ($this->getIsEnable()){
+		//	$this->startListener();
+		//} else {
+		//	$this->stopListener();
+		//}
 	}
 
 	// Fonction exécutée automatiquement après la sauvegarde de l'eqLogid ET des commandes si sauvegarde lancée via un AJAX
@@ -147,7 +147,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getAccount() {
-		return account::byId($this->getAccountId());
+		return EVcharger_account::byId($this->getAccountId());
 	}
 
 	public function getIdentifiant() {

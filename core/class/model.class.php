@@ -49,12 +49,6 @@ class model {
 		return $result;
 	}
 
-	public static function models() {
-		$modelsFile = __DIR__ . "/../config/models.ini";
-		$models = parse_ini_file($modelsFile,true);
-		return array_keys($models);
-	}
-
 	public static function labels($onlyEnabled = true) {
 		$labels = array();
 		foreach (model::all($onlyEnabled) as $modelName => $model) {

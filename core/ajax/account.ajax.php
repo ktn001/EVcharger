@@ -34,6 +34,8 @@ try {
 		ajax::success(json_encode(model::images($model, 'account')));
 	}
 
+	log::add("EVcharger","debug","┌─Ajax Account: action: " . init('action'));
+
 	if (init('action') == 'save') {
 		try {
 			$data = json_decode(init('account'),true);
@@ -81,18 +83,20 @@ try {
 			);
 			$cards[] = $data;
 		}
+		log::add("EVcharger","debug","└─Ajax Account: SUCCESS");
 		ajax::success(json_encode($cards));
 	}
 
 	if (init('action') == 'getAccountToSelect') {
 		$result = array();
-		foreach (account::byModel(init('model')) as $account) {
+		foreach (EVcharger_account::byModel(init('model')) as $account) {
 			$data = array(
 				'id' => $account->getId(),
 				'value' => $account->getHumanName(),
 			);
 			$result[] = $data;
 		}
+		log::add("EVcharger","debug","└─Ajax Account: SUCCESS");
 		ajax::success(json_encode($result));
 	}
 
