@@ -31,6 +31,58 @@ class EVcharger_account extends EVcharger {
 		return $image;
 	}
 
+	/*
+	 * Envoi d'un message au deamon
+	 */
+	public function send2Deamon($message) {
+		if (is_array($message)) {
+			$message = json_encode($message);
+		}
+		if (EVcharger::deamon_info()['state'] != 'ok'){
+			log::add('EVcharger','debug',__("Le démon n'est pas démarré!",__FILE__));
+			return;
+		}
+		$params['apikey'] = jeedom::getApiKey('EVcharger');
+		$params['model'] = $this->getModel();
+		$params['id'] = $this->getId();
+		$params['message'] = $message;
+		$payLoad = json_encode($params);
+		$socket = socket_create(AF_NET, SOCK_STREAM,0);
+		socket_connect($socket,'127.0.0.1',config::kyKey('deamon::port','EVcharger'));
+		socket_write($socket, $payLoad, strlen($payLoad));
+		socket_close($socket);
+	}
+
+	/*
+	 * Lancement d'un thread du deamon pour l'account
+	 */
+	public function startDeamonThread() {
+		if ($this->getIsEnable()){
+			$message = array('cmd' => 'start');
+			if (method_exists($this,'msgToStartDeamonThread')){
+				$message = $this->msgToStartDeamonThread();
+			}
+			$this->send2Deamon($message);
+		}
+	}
+
+	/*
+	 * Arrêt du thread dédié au compte
+	 */
+	public function stopDeamonThread() {
+		foreach (EVcharger_charger::byAccountId($this->Id()) as $charger){
+			if ($charger->getIsEnable()) {
+				$message = array(
+					'cmd' => 'stop',
+					'charger' => $charger->getIdentifiant(),
+				);
+				$this->sen2Deamon($message);
+			}
+		}
+		$message = array('cmd' => 'stop_account');
+		$this->sen2Deamon($message);
+	}
+
 	public function execute ($charger_cmd) {
 		try {
 			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $charger_cmd->getLogicalId())); 

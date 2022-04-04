@@ -4,8 +4,7 @@ try {
 
 	function process_deamon_message($message) {
 		if ($message['info'] == 'started'){
-			account::startAllDeamon();
-			die();
+			EVcharger_account::startAllDeamon();
 		}
 	}
 
