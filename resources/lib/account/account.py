@@ -24,7 +24,7 @@ import json
 import configparser
 
 class account():
-    """Class de base pour les differents model d'account"""
+    """Class de base pour les differents modèles d'account"""
 
     def __init__(self, id, model, queue, jeedom_com):
         self._id = id
@@ -35,6 +35,7 @@ class account():
         self._transforms = configparser.ConfigParser()
         self._transforms.read(f"{configDir}/transforms.ini")
         self._transforms.read(f"{configDir}/{model}/transforms.ini")
+        self.log_info(f'Account créé')
 
     def log_debug(self,txt):
         logging.debug(f'[account][{self._model}][{self._id}] {txt}')
@@ -72,20 +73,22 @@ class account():
                 function = eval(f"self.{commande}")
                 if callable(function):
                     function(message)
+                else:
+                    self.log_error(f'Fonction "{function}" introuvable!')
 
     def listen_jeedom(self):
         self._stop = False
         while 1:
             time.sleep(0.5)
             if self._stop:
-                self.log_info(f'arrêt de thread')
+                self.log_info(f'arrêt du thread.')
                 return
             self.read_jeedom_queue()
 
     def run(self):
         thread = threading.Thread(target=self.listen_jeedom, args=())
         thread.start()
-        self.log_info('Thread started')
+        self.log_info('Thread démarré.')
         return thread
 
     def do_stop(self,msg):
