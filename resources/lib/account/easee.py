@@ -44,9 +44,10 @@ class easee(account):
         while serial in self.connections and i > 0:
             time.sleep(1)
             i -= 1
-        if i > 0:
+        if i == 0:
             self.log_error(f"Timeout while stopping {serial}")
-        return
+            return false
+        return true
 
     def on_error(self,data):
         self.log_error(data.error)
