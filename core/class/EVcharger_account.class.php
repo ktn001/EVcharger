@@ -32,6 +32,15 @@ class EVcharger_account extends EVcharger {
 	}
 
 	/*
+	 * Démarre le thread du démon pour chaque account actif
+	 */
+	public static function startAllDeamonThread(){
+		foreach (EVcharger::byType("EVcharger_account_%",true) as $account) {
+			$account->startDeamonThread();
+		}
+	}
+
+	/*
 	 * Envoi d'un message au deamon
 	 */
 	public function send2Deamon($message) {
