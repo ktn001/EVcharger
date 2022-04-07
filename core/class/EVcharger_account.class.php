@@ -46,7 +46,8 @@ class EVcharger_account extends EVcharger {
 	 * Envoi d'un message au deamon
 	 */
 	public function send2Deamon($message) {
-		if ($this->getIsEnable() and self::$_haveDeamon){
+		if ($this->getIsEnable() and $this::$_haveDeamon){
+			log::add("EVcharger","debug","CCCC " . print_r($message,true));
 			if (is_array($message)) {
 				$message = json_encode($message);
 			}
@@ -60,7 +61,7 @@ class EVcharger_account extends EVcharger {
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
 			$socket = socket_create(AF_NET, SOCK_STREAM,0);
-			socket_connect($socket,'127.0.0.1',config::kyKey('deamon::port','EVcharger'));
+			socket_connect($socket,'127.0.0.1',config::byKey('deamon::port','EVcharger'));
 			socket_write($socket, $payLoad, strlen($payLoad));
 			socket_close($socket);
 		}
@@ -70,7 +71,8 @@ class EVcharger_account extends EVcharger {
 	 * Lancement d'un thread du deamon pour l'account
 	 */
 	public function startDeamonThread() {
-		if ($this->getIsEnable() and self::$_haveDeamon){
+		if ($this->getIsEnable() and $this::$_haveDeamon){
+			log::add("EVcharger","info",$this->getHumanName() . ": " . __("Lancement du thread",__FILE__));
 			$message = array('cmd' => 'start');
 			if (method_exists($this,'msgToStartDeamonThread')){
 				$message = $this->msgToStartDeamonThread();
@@ -89,7 +91,7 @@ class EVcharger_account extends EVcharger {
 					'cmd' => 'stop',
 					'charger' => $charger->getIdentifiant(),
 				);
-				$this->sen2Deamon($message);
+				$this->send2Deamon($message);
 			}
 		}
 		$message = array('cmd' => 'stop_account');
@@ -114,6 +116,10 @@ class EVcharger_account extends EVcharger {
 			log::add("EVcharger","debug","└─" . __("ERROR",__FILE__));
 			return;
 		}
+	}
+
+	public function getModel() {
+		return $this->getConfiguration('model');
 	}
 }
 

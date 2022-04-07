@@ -91,11 +91,11 @@ class EVcharger_account_easee extends EVcharger_account {
 		return json_decode($reponse, true);
 	}
 
-	private function msgToStartDeamonThread() {
+	protected function msgToStartDeamonThread() {
 		$message = array(
 			'cmd' => 'start',
-			'url' => $this->url,
-			'token' => $this->token['accessToken']
+			'url' => $this->getUrl(),
+			'token' => $this->getToken()
 		);
 		return $message;
 	}

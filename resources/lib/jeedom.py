@@ -51,7 +51,7 @@ class jeedom_com():
 			start_time = datetime.datetime.now()
 			changes = self.changes
 			self.changes = {}
-			logging.debug('Send to jeedom : '+str(changes))
+			logging.info('Send to jeedom : '+str(changes))
 			i=0
 			while i < self.retry:
 				try:
@@ -101,7 +101,7 @@ class jeedom_com():
 		threading.Thread( target=self.thread_change,args=(change,)).start()
 
 	def thread_change(self,change):
-		logging.debug('Send to jeedom :  %s' % (str(change),))
+		logging.info('Send to jeedom :  %s' % (str(change),))
 		i=0
 		while i < self.retry:
 			try:
