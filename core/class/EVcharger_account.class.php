@@ -18,7 +18,7 @@
 
 class EVcharger_account extends EVcharger {
 
-	protected static $haveDaemon = false;
+	protected static $_haveDeamon = false;
 
 	public static function byModel($_model){
 		$eqType_name = "EVcharger_account_" . $_model;
@@ -46,7 +46,7 @@ class EVcharger_account extends EVcharger {
 	 * Envoi d'un message au deamon
 	 */
 	public function send2Deamon($message) {
-		if ($this->getIsEnable() and self::$haveDeamon){
+		if ($this->getIsEnable() and self::$_haveDeamon){
 			if (is_array($message)) {
 				$message = json_encode($message);
 			}
@@ -70,7 +70,7 @@ class EVcharger_account extends EVcharger {
 	 * Lancement d'un thread du deamon pour l'account
 	 */
 	public function startDeamonThread() {
-		if ($this->getIsEnable() and self::$haveDeamon){
+		if ($this->getIsEnable() and self::$_haveDeamon){
 			$message = array('cmd' => 'start');
 			if (method_exists($this,'msgToStartDeamonThread')){
 				$message = $this->msgToStartDeamonThread();

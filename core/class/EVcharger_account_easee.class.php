@@ -19,7 +19,8 @@
 
 class EVcharger_account_easee extends EVcharger_account {
 
-	protected static $haveDeamon = true;
+	protected static $_haveDeamon = true;
+
 	public function decrypt() {
 		$this->setConfiguration('password', utils::decrypt($this->getConfiguration('password')));
 	}
@@ -70,16 +71,20 @@ class EVcharger_account_easee extends EVcharger_account {
 		}
 		log::add("EVcharger","debug", "  " . __("Requête: URL :",__FILE__) . $this->getUrl() . $path);
 		$data = json_decode($data,true);
-		if (array_key_exists('password',$data)) {
+		if (array_key_exists('password',$data) and ($data['password'] != '')) {
 			$data['password'] = "**********";
 		}
 		$data = json_encode($data);
 		log::add("EVcharger","debug", "           " . __("data:",__FILE__) . $data);
 		if (substr($httpCode,0,1) != '2') {
-			//$reponse = json_decode($reponse,true);
-			$msg= sprintf(__("Code retour http: %s - %s",__FILE__) , $httpCode, $reponse);
-			log::add("EVcharger","error", $msg);
-			throw new Exception ($msg);
+			$txt = $reponse;
+			$msg = json_decode($reponse,true);
+			if (array_key_exists('title',$msg)) {
+				$txt = $msg['title'];
+			}
+			$txt= sprintf(__("Code retour http: %s - %s",__FILE__) , $httpCode, $txt);
+			log::add("EVcharger","warning", $txt);
+			throw new Exception ($txt);
 		}
 		log::add("EVcharger","debug", "  " . __("Code retour http: ",__FILE__) . $httpCode);
 		log::add("EVcharger","info", "Requête envoyée");
@@ -95,29 +100,41 @@ class EVcharger_account_easee extends EVcharger_account {
 		return $message;
 	}
 
-	public function postSave() {
-		$this->getToken();
+	public function preSave() {
+		if ($this->getisEnable()) {
+			if ($this->getConfiguration('login') == '') {
+				throw new Exception (__("Le login n'est pas défini!",__FILE__));
+			}
+			if ($this->getConfiguration('password') == '') {
+				throw new Exception (__("Le password n'est pas défini!",__FILE__));
+			}
+			if ($this->getConfiguration('url') == '') {
+				throw new Exception (__("L'URL n'est pas définie!",__FILE__));
+			}
+			$this->getToken(true);
+		}
 	}
 
-	private function getToken () {
-		$token = $this->getCache('token');
-		$getNew = false;
+	private function getToken ($getNew = false) {
 		$changed = false;
-		if ($token == '') {
-			$getNew = true;
-		} else {
-			$token = json_decode($token,true);
-			if ($token['expiresAt'] < time() ) {
+		if (! $getNew){
+			$token = $this->getCache('token');
+			if ($token == '') {
 				$getNew = true;
-			} else if (($token['expiresAt'] - 12*3600) < time() ) {
-				$data = array(
-					'accessToken' => $token['accessToken'],
-					'refreshToken' => $token['refreshToken']
-				);
-				$token = $this->sendRequest('/api/accounts/refresh_token', $data, $token['accessToken']);
-				$token['expiresAt'] = time() + $token['expiresIn'];
-				$this->setCache('token',json_encode($token));
-				$changed = true;
+			} else {
+				$token = json_decode($token,true);
+				if ($token['expiresAt'] < time() ) {
+					$getNew = true;
+				} else if (($token['expiresAt'] - 12*3600) < time() ) {
+					$data = array(
+						'accessToken' => $token['accessToken'],
+						'refreshToken' => $token['refreshToken']
+					);
+					$token = $this->sendRequest('/api/accounts/refresh_token', $data, $token['accessToken']);
+					$token['expiresAt'] = time() + $token['expiresIn'];
+					$this->setCache('token',json_encode($token));
+					$changed = true;
+				}
 			}
 		}
 		if ($getNew) {
@@ -125,10 +142,23 @@ class EVcharger_account_easee extends EVcharger_account {
 				'userName' => $this->getConfiguration('login'),
 				'password' => $this->getConfiguration('password')
 			);
-			$token = $this->sendRequest('/api/accounts/token', $data, "X");
-			$token['expiresAt'] = time() + $token['expiresIn'];
-			$this->setCache('token',json_encode($token));
-			$changed = true;
+			try {
+				$token = $this->sendRequest('/api/accounts/login', $data, "X");
+				$token['expiresAt'] = time() + $token['expiresIn'];
+				$this->setCache('token',json_encode($token));
+				$changed = true;
+			} catch (Exception $e) {
+				$txt = $e->getMessage();
+				$msg = json_decode($e->getMessage(),true);
+				if (array_key_exists('errorCode',$msg)) {
+					if ($msg['errorCode'] == '100') {
+						$txt = __("Login ou password invalide!",__FILE__);
+					} else {
+						$txt = $msg['title'];
+					}
+				} 
+				throw new Exception($txt);
+			}
 		}
 		return $token['accessToken'];
 	}
