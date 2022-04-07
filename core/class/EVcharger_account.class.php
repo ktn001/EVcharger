@@ -47,7 +47,6 @@ class EVcharger_account extends EVcharger {
 	 */
 	public function send2Deamon($message) {
 		if ($this->getIsEnable() and $this::$_haveDeamon){
-			log::add("EVcharger","debug","CCCC " . print_r($message,true));
 			if (is_array($message)) {
 				$message = json_encode($message);
 			}
@@ -60,8 +59,8 @@ class EVcharger_account extends EVcharger {
 			$params['id'] = $this->getId();
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
-			$socket = socket_create(AF_NET, SOCK_STREAM,0);
-			socket_connect($socket,'127.0.0.1',config::byKey('deamon::port','EVcharger'));
+			$socket = socket_create(AF_NET, SOCK_STREAM, SOL_TCP);
+			socket_connect($socket,'127.0.0.1',(int)config::byKey('deamon::port','EVcharger'));
 			socket_write($socket, $payLoad, strlen($payLoad));
 			socket_close($socket);
 		}

@@ -119,7 +119,11 @@ def read_socket():
     if not JEEDOM_SOCKET_MESSAGE.empty():
         # jeedom_socket a reçu un message qu'il a mis en queue que l'on récupère ici
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
-        payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
+        #payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
+        payload = JEEDOM_SOCKET_MESSAGE.get().decode()
+        log.debug(payload)
+        payload = json.loads(payload)
+
 
         # Vérification de la clé API
         if payload['apikey'] != _apiKey:
@@ -178,9 +182,6 @@ def shutdown():
         if len(accounts) == 0:
             break
         time.sleep(1)
-
-        
-
     logging.debug("Removing PID file " + str(_pidfile))
     try:
         os.remove(_pidfile)

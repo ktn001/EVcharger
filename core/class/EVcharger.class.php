@@ -74,7 +74,7 @@ class EVcharger extends eqLogic {
 		$path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
 		$cmd = 'python3 ' . $path . '/EVchargerd.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-		$cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
+		$cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/EVcharger/core/php/jeeEVcharger.php';
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
 		$cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
