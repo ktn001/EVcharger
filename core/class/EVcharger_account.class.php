@@ -59,7 +59,7 @@ class EVcharger_account extends EVcharger {
 			$params['id'] = $this->getId();
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
-			$socket = socket_create(AF_NET, SOCK_STREAM, SOL_TCP);
+			$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 			socket_connect($socket,'127.0.0.1',(int)config::byKey('deamon::port','EVcharger'));
 			socket_write($socket, $payLoad, strlen($payLoad));
 			socket_close($socket);
