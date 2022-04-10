@@ -97,18 +97,42 @@ class EVcharger_account extends EVcharger {
 		$this->sen2Deamon($message);
 	}
 
+	protected function getMapping() {
+		$mappingFile = __DIR__ . '/../../core/config/' . $this->getModel() . '/mapping.ini';
+		if (! file_exists($mappingFile)) {
+			return false;
+		}
+		$mapping = parse_ini_file($mappingFile,true);
+		if ($mapping == false) {
+			throw new Exception (sprintf(__('Erreur lors de la lecture de %s',__FILE__),$mappingFile));
+		}
+		return $mapping['API'];
+	}
+
+	protected function getTransforms() {
+		$transformsFile = __DIR__ . '/../../core/config/' . $this->getModel() . '/transforms.ini';
+		if (! file_exists($transformsFile)) {
+			return false;
+		}
+		$transforms = parse_ini_file($transformsFile,true);
+		if ($transforms == false) {
+			throw new Exception (sprintf(__('Erreur lors de la lecture de %s',__FILE__),$transformsFile));
+		}
+		return $transforms;
+	}
+
 	public function execute ($charger_cmd) {
 		try {
 			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $charger_cmd->getLogicalId())); 
 			if (! is_a($charger_cmd, "EVcharger_chargerCmd")){
-				throw new Exception (sprintf(__("La commande %s n'est pas une commande de type %s",__FILE__),$charger_cmd->getId(), "EVcharger_chargerCmd"));
+				throw new Exception (sprintf(__("| La commande %s n'est pas une commande de type %s",__FILE__),$charger_cmd->getId(), "EVcharger_chargerCmd"));
 			}
 			$method = 'execute_' . $charger_cmd->getLogicalId();
 			if ( ! method_exists($this, $method)){
-				throw new Exception (sprintf(__("%s: pas de méthode < %s >",__FILE__),$this->getHumanName(), $method));
+				throw new Exception (sprintf(__("| %s: pas de méthode < %s::%s >",__FILE__),$this->getHumanName(), get_class($this), $method));
 			}
 			$this->$method($charger_cmd);
-			log::add("EVcharger","debug","└─" . __("FIN",__FILE__));
+			log::add("EVcharger","debug","└─" . __("OK",__FILE__));
 			return;
 		} catch (Exception $e) {
 			log::add("EVcharger","error",$e->getMessage());

@@ -63,7 +63,7 @@ class model {
 
 	public static function allUsed() {
 		$used = array();
-		foreach (account::all() as $account) {
+		foreach (EVcharger_account::byType('EVcharger_account_%') as $account) {
 			$used[$account->getModel()] = 1;
 		}
 		return array_keys($used);

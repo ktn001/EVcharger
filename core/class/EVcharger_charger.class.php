@@ -165,7 +165,7 @@ class EVcharger_charger extends EVcharger {
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
-		account::byId($this->getAccountId())->send2Deamon($message);
+		EVcharger_account::byId($this->getAccountId())->send2Deamon($message);
 	}
 
 	public function stopListener() {
@@ -175,7 +175,7 @@ class EVcharger_charger extends EVcharger {
 			'identifiant' => $this->getIdentifiant()
 		);
 		if ($this->getAccountId()) {
-			account::byId($this->getAccountId())->send2Deamon($message);
+			EVcharger_account::byId($this->getAccountId())->send2Deamon($message);
 		}
 	}
 

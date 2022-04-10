@@ -18,7 +18,7 @@
 
 try {
 	require_once __DIR__ . '/../../../../core/php/core.inc.php';
-	require_once __DIR__ . '/../class/account.class.php';
+	require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 	include_file('core', 'authentification', 'php');
 

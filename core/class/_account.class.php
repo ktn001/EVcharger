@@ -37,41 +37,42 @@ class account {
     /**
      * Retourne le prochain Id disponible
      */
-	private static function nextId() {
-		$id = config::byKey ('accountId::next',self::$plugin_id,1,true);
-		config::save('accountId::next',$id+1,self::$plugin_id);
-		return($id);
-	}
+//	private static function nextId() {
+//		$id = config::byKey ('accountId::next',self::$plugin_id,1,true);
+//		config::save('accountId::next',$id+1,self::$plugin_id);
+//		return($id);
+//	}
 
     /**
      * retourne l'account dont l'id est donné en argument
      */
-	public static function byId($id) {
-		$account =  unserialize (config::byKey('account::' . $id, 'EVcharger' ));
-		$account->resetModified();
-		return $account;
-	}
+//	public static function byId($id) {
+//		$account =  unserialize (config::byKey('account::' . $id, 'EVcharger' ));
+//		$account->resetModified();
+//		return $account;
+//	}
 
     /**
      * Recherche d'accounts selon le modèle
      */
-	public static function byModel ($model) {
-		$configs = config::searchKey('account::', self::$plugin_id);
-		$accounts = array();
-		foreach ($configs as $config) {
-			$account = unserialize ($config['value']);
-			$account->resetModified();
-			if ($account->getModel() == $model) {
-				$accounts[] = $account;
-			}
-		}
-		return $accounts;
-	}
+//	public static function byModel ($model) {
+//		$configs = config::searchKey('account::', self::$plugin_id);
+//		$accounts = array();
+//		foreach ($configs as $config) {
+//			$account = unserialize ($config['value']);
+//			$account->resetModified();
+//			if ($account->getModel() == $model) {
+//				$accounts[] = $account;
+//			}
+//		}
+//		return $accounts;
+//	}
 
     /**
      * Recherche les objets qui ont le modèle et le nom donnés en argument
      */
 	public static function byModelAndName ($model, $name) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$configs = config::searchKey('account::', self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
@@ -88,6 +89,7 @@ class account {
      * Retourne une liste contenant tous les accounts
      */
 	public static function all ( $enabled=false ) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$configs = config::searchKey("account::", self::$plugin_id);
 		$accounts = array();
 		foreach ($configs as $config) {
@@ -108,6 +110,7 @@ class account {
      * du modal d'édition
      */
 	public static function paramsToEdit() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		return array(
 			'login' => 0,
 			'password' => 0,
@@ -119,6 +122,7 @@ class account {
      * Lancement de threads du deamon pour cahque account actif
      */
 	public static function startAllDeamon(){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		foreach (account::all() as $account) {
 			$account->startDeamonThread();
 		}
@@ -128,6 +132,7 @@ class account {
      * Method appelée chaque heure via le cron du plugin
      */
 	public static function cronHourly() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		easeeAccount::cronHourly();
 	}
 
@@ -137,6 +142,7 @@ class account {
      * Constructeur
      */
 	public function __construct() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$this->model = substr_replace(get_class($this),'',-7);
 		$this->image = model::images($this->model,'account')[0];
 	}
@@ -145,6 +151,7 @@ class account {
      * Wrapper pour les logs
      */
 	protected function log($level, $message){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		log::add('EVcharger',$level,'[' . get_class($this) . '][' . $this->name . '] ' . $message);
 	}
 
@@ -152,6 +159,7 @@ class account {
      * Retient qu'une propriété a été modififée mais pas sauvegardée
      */
 	protected function setModified($name){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if (! in_array($name, $this->modified)) {
 			log::add("EVcharger","debug", $this->getHumanName() . " " . $name . __(" est modifié.",__FILE__));
 			$this->modified[] = $name;
@@ -162,6 +170,7 @@ class account {
      * Indique si une propriéré a été modifiée depuis la derinère sauvegarde
      */
 	protected function isModified($name){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if (is_array($name)){
 			foreach ($name as $n){
 				if ($this->isModified($n)){
@@ -177,6 +186,7 @@ class account {
      * Remet à zéro la liste de propriétés modifiées
      */
 	protected function resetModified(){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$this->modified = array();
 	}
 
@@ -184,6 +194,7 @@ class account {
      * Enregistrement de l'account
      */
 	public function save($options = null) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if (trim($this->name) == "") {
 			throw new Exception (__("Le nom n'est pas défini!",__FILE__));
 		}
@@ -239,6 +250,7 @@ class account {
      * suppression de l'account
      */
 	public function remove() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if (EVcharger::byAccountId($this->id)) {
 			throw new Exception (__("Au moins un chargeur est liée à l'account",__FILE__));
 		}
@@ -258,6 +270,7 @@ class account {
      * Envoi d'un message au démon
      */
 	public function send2Deamon($message) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$this->log('debug','send2Deamon: ' . print_r($message,true));
 		if (EVcharger::deamon_info()['state'] != 'ok'){
 			$this->log('warning', __("Le démon n'est pas démarré!",__FILE__));
@@ -278,6 +291,7 @@ class account {
      * lancement d'un thread de démon pour l'account
      */
 	public function startDeamonThread() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($this->isEnabled()){
 			$message = array('cmd' => 'start');
 			if (method_exists($this,'msgToStartDeamonThread')){
@@ -291,6 +305,7 @@ class account {
      * Arrêt du thread dédié à l'account 
      */
 	public function stopDeamonThread() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		foreach (EVcharger::byAccountId($this->getId()) as $charger) {
 			if ($charger->getIsEnable()) {
 				$message = array(
@@ -308,6 +323,7 @@ class account {
      * Nom de l'account à afficher dans l'interface utilisateur
      */
 	public function getHumanName($_tag = false, $_prettify = false) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$name = '';
 		$model = model::byName($this->getModel());
 		if ($_tag) {
@@ -341,6 +357,7 @@ class account {
      * Execution d'une commande
      */
 	public function execute ($cmd){
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if (! is_a($cmd, 'EVchargerCMD')){
 			$this->log('error', sprintf(__("La commande n'est pas de la class %s",__FILE__),"EVchargerCMD"));
 			return;
@@ -358,16 +375,19 @@ class account {
 
     /** id **/
 	public function getId() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		return $this->id;
 	}
 
 	public function setId($_id) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		$this->id = $_id;
 		return $this;
 	}
 
     /** enabled **/
 	public function getEnabled() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($this->enabled == ''){
 			return 0;
 		}
@@ -375,6 +395,7 @@ class account {
 	}
 
 	public function isEnabled() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($this->getEnabled() == 0) {
 			return false;
 		}
@@ -382,6 +403,7 @@ class account {
 	}
 
 	public function setEnabled($_enabled) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($_enabled != $this->enabled) {
 			$this->setModified('enabled');
 		}
@@ -391,6 +413,7 @@ class account {
 
     /** image **/
 	public function getImage() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($this->image == "") {
 			return "plugins/" . self::$plugin_id . "/desktop/img/account.png";
 		}
@@ -398,6 +421,7 @@ class account {
 	}
 
 	public function setImage($_image) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($_image != $this->image){
 			$this->setModified('image');
 		}
@@ -407,10 +431,12 @@ class account {
 
     /** name **/
 	public function getName() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		return $this->name;
 	}
 
 	public function setName($_name) {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		if ($_name != $this->name){
 			$this->setModified('name');
 		}
@@ -420,6 +446,7 @@ class account {
 
     /** modèle **/
 	public function getModel() {
+		log::add("EVcharger","info","XXXXXXXXXXXXXXXXXXX " . __METHOD__);
 		return $this->model;
 	}
 

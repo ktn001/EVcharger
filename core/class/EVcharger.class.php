@@ -18,7 +18,6 @@
 
 /* * *************************** Includes ********************************* */
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
-require_once __DIR__  . '/account.class.php';
 
 class EVcharger extends eqLogic {
 
@@ -160,7 +159,7 @@ class EVcharger extends eqLogic {
      * Fonction exécutée automatiquement toutes les heures par Jeedom
      */
 	public static function cronHourly() {
-		account::cronHourly();
+		// EVcharger_account::cronHourly();
 	}
 
 	public function getLinkToConfiguration() {
@@ -183,6 +182,7 @@ class EVchargerCmd extends cmd {
 
 }
 
+require_once __DIR__  . '/model.class.php';
 require_once __DIR__  . '/EVcharger_account.class.php';
 require_once __DIR__  . '/EVcharger_charger.class.php';
 require_once __DIR__  . '/EVcharger_vehicle.class.php';

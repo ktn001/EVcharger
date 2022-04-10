@@ -23,7 +23,7 @@ class easee(account):
         connection = HubConnectionBuilder().with_url(url,options)\
                 .with_automatic_reconnect({
                     "type": "raw",
-                    "keep_alive_interval": 30,
+                    "keep_alive_interval": 10,
                     "interval_reconnect": 5,
                     "max_attemps": 5
                 }).build()
@@ -58,6 +58,7 @@ class easee(account):
         self.connections[serial].send("SubscribeWithCurrentState", [serial, True])
 
     def on_close(self,serial):
+        self.log_debug("on_close, serial: " + serial)
         if serial in self.connections:
             if not hasattr(self.connections[serial],'stopping'):
                 del self.connections[serial]

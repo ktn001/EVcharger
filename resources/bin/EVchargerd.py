@@ -119,39 +119,42 @@ def read_socket():
     if not JEEDOM_SOCKET_MESSAGE.empty():
         # jeedom_socket a reçu un message qu'il a mis en queue que l'on récupère ici
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
-        #payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
-        payload = JEEDOM_SOCKET_MESSAGE.get().decode()
-        log.debug(payload)
-        payload = json.loads(payload)
-
+        payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
 
         # Vérification de la clé API
+        if not 'apikey' in payload:
+            logging.error("apikey missing from socket : " + str(payload))
+            return
+
         if payload['apikey'] != _apiKey:
             logging.error("Invalid apikey from socket : " + str(payload))
             return
 
-        if 'model' in payload:
-            accountModel = payload['model']
+        if not 'model' in payload:
+            logging.error("Message without accountModel")
+            return
+        accountModel = payload['model']
 
-            if not 'id' in payload:
-                logging.error(f"Message for accountModel ({accountModel}) but with no 'id'")
-                return
-            accountId = payload['id']
+        if not 'id' in payload:
+            logging.error(f"Message for accountModel ({accountModel}) but with no 'id'")
+            return
+        accountId = payload['id']
 
-            if not 'message' in payload:
-                logging.error(f"Message for accountModel ({accountModel}) and id ({accountId}) but with no 'message'")
-            message = payload['message']
+        if not 'message' in payload:
+            logging.error(f"Message for accountModel ({accountModel}) and id ({accountId}) but with no 'message'")
+            return
+        message = json.loads(payload['message'])
 
-            if 'cmd' in message and message['cmd'] == 'start':
-                start_account(accountModel, accountId);
+        if 'cmd' in message and message['cmd'] == 'start':
+            start_account(accountModel, accountId);
 
-            # Envoi du message dans la queue de traitement de l'account
-            accounts[accountId]['queue'].put(json.dumps(message))
+        # Envoi du message dans la queue de traitement de l'account
+        accounts[accountId]['queue'].put(json.dumps(message))
 
-            # Si la commande était l'arrêt de l'account...
-            if 'cmd' in message and message['cmd'] == 'stop':
-                # on retire l'account de la liste
-                del accounts[accountId]
+        # Si la commande était l'arrêt de l'account...
+        if 'cmd' in message and message['cmd'] == 'stop':
+            # on retire l'account de la liste
+            del accounts[accountId]
 
 def listen_jeedom():
     try:

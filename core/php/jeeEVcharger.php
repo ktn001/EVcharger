@@ -1,6 +1,8 @@
 <?php
 try {
 	require_once __DIR__ . '/../../../../core/php/core.inc.php';
+	require_once __DIR__ . '/../class/EVcharger.class.php';
+	require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 	function process_deamon_message($message) {
 		if ($message['info'] == 'started'){
@@ -34,6 +36,7 @@ try {
 			log::add('EVcharger','error',"[jeeEVcharger] " . __("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
 		foreach (EVcharger_charger::byModelAndIdentifiant($message['model'],$message['charger']) as $charger){
+			log::add("EVcharger","debug",__("Traitement pour :",__FILE__) . $charger->getHumanName());
 			$charger->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}

@@ -18,7 +18,6 @@
 
 try {
 	require_once __DIR__ . '/../../../../core/php/core.inc.php';
-	require_once __DIR__ . '/../class/account.class.php';
 
 	include_file('core', 'authentification', 'php');
 
@@ -26,65 +25,14 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
+	log::add("EVcharger","debug","┌─Ajax Account: action: " . init('action'));
+
 	if (init('action') == 'images') {
 		$model = init('model');
 		if (model == '') {
 			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
 		}
 		ajax::success(json_encode(model::images($model, 'account')));
-	}
-
-	log::add("EVcharger","debug","┌─Ajax Account: action: " . init('action'));
-
-	if (init('action') == 'save') {
-		try {
-			$data = json_decode(init('account'),true);
-			log::add("EVcharger",'debug',"Ajax: save: " . init('account'));
-			$options = json_decode(init('options'),true);
-			if ($data['model'] == ''){
-				throw new Exception(__("Le modèle de compte n'est pas indiqué",__FILE__));
-			}
-			if ($data['id'] == '') {
-				$classe = $data['model'] . 'Account';
-				$account = new $classe();
-			} else {
-				$account = account::byId($data['id']);
-			}
-			utils::a2o($account,$data);
-			$account->save($options);
-			ajax::success();
-		} catch (Exception $e) {
-			if ($e->getCode() == 1) {
-				$response['account'] = init('account');
-				$response['message'] = $e->getMessage();
-				ajax::error(json_encode($response), $e->getCode());
-			} else {
-				ajax::error(displayException($e), $e->getCode());
-			}
-		}
-	}
-
-	if (init('action') == 'remove') {
-		$id = init('accountId');
-		$account = account::byId($id);
-		$account->remove();
-		ajax::success();
-	}
-
-	if (init('action') == 'displayCards') {
-		$cards = array ();
-		foreach (account::all() as $account) {
-			$data = array(
-				'enabled' => $account->IsEnabled(),
-				'id' => $account->getId(),
-				'model' => $account->getModel(),
-				'humanName' => $account->getHumanName(true,true),
-				'image' => $account->getImage(),
-			);
-			$cards[] = $data;
-		}
-		log::add("EVcharger","debug","└─Ajax Account: SUCCESS");
-		ajax::success(json_encode($cards));
 	}
 
 	if (init('action') == 'getAccountToSelect') {
@@ -97,31 +45,6 @@ try {
 			$result[] = $data;
 		}
 		log::add("EVcharger","debug","└─Ajax Account: SUCCESS");
-		ajax::success(json_encode($result));
-	}
-
-	if (init('action') == 'byIdToEdit'){
-		$model = init('model');
-		$id = init('id');
-		if ($model == ''){
-			throw new Exception(__("Le modèle de compte n'est pas indiqué",__FILE__));
-		}
-		if ($id == '') {
-			$classe = $model . 'Account';
-			$account = new $classe();
-		} else {
-			$account = account::byId($id);
-		}
-		if (!is_object($account)) {
-			throw new Exception(__('Compte inconnu: ',__FILE__) . $id);
-		}
-		if ($account->getModel() != $model) {
-			throw new Exception(sprintf(__("Le modèle du compte n'est pas %s (%s)",__FILE__), $model, $account->getModel()));
-		}
-		
-		$result['account'] = utils::o2a($account);
-		$result['params'] = ($model . "Account")::paramsToEdit();
-		$result['images'] = model::images($model, 'account');
 		ajax::success(json_encode($result));
 	}
 

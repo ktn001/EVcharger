@@ -170,6 +170,43 @@ class EVcharger_account_easee extends EVcharger_account {
 	public function getUrl() {
 		return $this->getConfiguration('url');
 	}
+
+	public function execute_refresh($cmd){
+		$charger = EVcharger_charger::byId($cmd->getEqLogic()->getId());
+		$serial = $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/' . $serial . '/state';
+		$response = $this->sendRequest($path);
+		$mapping = $this->getMapping();
+		$transforms = $this->getTransforms();
+		foreach (array_keys($response) as $key){
+			log::add('EVcharger','debug',sprintf(__("Traitement de : %s",__FILE__),$key));
+			if ( ! array_key_exists($key,$mapping)){
+				continue;
+			}
+			foreach (explode(',',$mapping[$key]) as $logicalId){
+				$value = $response[$key];
+				if (array_key_exists($logicalId, $transforms)) {
+					$value = $transforms[$logicalId][$value];
+				}
+				log::add("EVcharger","info",sprintf("  LogicalId: %s, value: %s", $logicalId, $value));
+				$charger->checkAndUpdateCmd($logicalId,$value);
+			}
+		}
+	}
+
+	public function execute_cable_lock($cmd) {
+		$serial = $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/' . $serial . '/commands/lock_state';
+		$data = array ( 'state' => 'true');
+		$this->sendRequest($path, $data);
+	}
+
+	public function execute_cable_unlock($cmd) {
+		$serial = $cmd->getEqLogic()->getConfiguration("serial");
+		$path = '/api/chargers/' . $serial . '/commands/lock_state';
+		$data = array ( 'state' => 'false');
+		$this->sendRequest($path, $data);
+	}
 }
 class EVcharger_account_easeeCmd extends EVcharger_accountCmd  {
 

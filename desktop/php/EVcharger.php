@@ -7,7 +7,6 @@ $plugin = plugin::byId('EVcharger');
 $accounts = EVcharger_account::byType('EVcharger_account%');
 $chargers = EVcharger_charger::byType('EVcharger_charger');
 $vehicles = EVcharger_vehicle::byType('EVcharger_vehicle');
-//$accounts = account::all();
 
 // Déclaration de variables pour javasctipt
 sendVarToJS('eqType', $plugin->getId());
@@ -49,21 +48,6 @@ sendVarToJS('modelLabels',model::labels());
 		<span>{{Configuration}}</span>
 	    </div>
 	</div> <!-- Boutons de gestion du plugin -->
-
-	<!-- Les accounts -->
-	<!-- ============ -->
-	<legend><i class="fas fa-user"></i> {{Mes comptes}}</legend>
-	<!-- Champs de recherche des accounts -->
-	<div class="input-group">
-	    <input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchAccount"/>
-	    <div class="input-group-btn">
-		<a id="bt_resetSearchAccount" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-	    </div>
-	</div> <!-- Champs de recherche des accounts -->
-	<!-- Liste des accounts -->
-	<div id="accounts-div" class="eqLogicThumbnailContainer">
-	</div> <!-- Liste des accounts -->
-	<!-- Les accounts -->
 
 	<!-- Les chargeurs et véhicules -->
 	<!-- ========================== -->
