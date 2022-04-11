@@ -106,6 +106,22 @@ class EVcharger_charger extends EVcharger {
 		}
 	}
 
+    // Fonction exécutée automatiquement avant la sauvegarde de l'équipement
+	public function preSave() {
+		if ($this->getIsEnable()) {
+			if ($this->getAccountId() == '') {
+				throw new Exception (__("Le compte n'est pas défini",__FILE__));
+			}
+		}
+		$accountId = $this->getAccountId();
+		if ($accountId != '') {
+			$account = EVcharger_account::byId($accountId);
+			if (! is_a($account, "EVcharger_account")) {
+				throw new Exception (sprintf(__("L'account %s est introuvable!",__FILE__), $accountId));
+			}
+		}
+
+	}
     // Fonction exécutée automatiquement avant la création de l'équipement
 	public function preInsert() {
 		$this->setConfiguration('image',model::images($this->getConfiguration('model'),'charger')[0]);
