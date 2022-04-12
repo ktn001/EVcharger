@@ -118,14 +118,17 @@ class EVcharger_account_easee extends EVcharger_account {
 	private function getToken ($getNew = false) {
 		$changed = false;
 		if (! $getNew){
+			log::add("EVcharger","debug",__("Token en cache: ",__FILE__) . $token);
 			$token = $this->getCache('token');
 			if ($token == '') {
 				$getNew = true;
 			} else {
 				$token = json_decode($token,true);
 				if ($token['expiresAt'] < time() ) {
+					log::add("EVcharger","debug",__("Le token a expiré",__FILE__));
 					$getNew = true;
 				} else if (($token['expiresAt'] - 12*3600) < time() ) {
+					log::add("EVcharger","debug",__("Renouvellement du token",__FILE__));
 					$data = array(
 						'accessToken' => $token['accessToken'],
 						'refreshToken' => $token['refreshToken']
@@ -138,12 +141,13 @@ class EVcharger_account_easee extends EVcharger_account {
 			}
 		}
 		if ($getNew) {
+			log::add("EVcharger","debug",__("Obtention d'un nouveau token",__FILE__));
 			$data = array(
 				'userName' => $this->getConfiguration('login'),
 				'password' => $this->getConfiguration('password')
 			);
 			try {
-				$token = $this->sendRequest('/api/accounts/login', $data, "X");
+				$token = $this->sendRequest('/api/accounts/login', $data, "Token pas nécessaire");
 				$token['expiresAt'] = time() + $token['expiresIn'];
 				$this->setCache('token',json_encode($token));
 				$changed = true;
@@ -159,6 +163,11 @@ class EVcharger_account_easee extends EVcharger_account {
 				} 
 				throw new Exception($txt);
 			}
+		}
+		if ($changed) {
+			log::add("EVcharger","debug",__("Relance du thread",__FILE__));
+			$this->stopDeamonThread();
+			$this->startDeamonThread();
 		}
 		return $token['accessToken'];
 	}
