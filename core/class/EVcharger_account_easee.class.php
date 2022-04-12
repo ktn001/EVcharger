@@ -118,8 +118,8 @@ class EVcharger_account_easee extends EVcharger_account {
 	private function getToken ($getNew = false) {
 		$changed = false;
 		if (! $getNew){
-			log::add("EVcharger","debug",__("Token en cache: ",__FILE__) . $token);
 			$token = $this->getCache('token');
+			log::add("EVcharger","debug",__("Token en cache: ",__FILE__) . $token);
 			if ($token == '') {
 				$getNew = true;
 			} else {
