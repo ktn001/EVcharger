@@ -82,6 +82,7 @@ class model {
 		if (count($images) == 0){
 			$images[] = strchr(realpath(__DIR__.'/../../desktop/img/'.$objet.'.png'),'/plugins/');
 		}
+		sort ($images);
 		return $images;
 	}
 
