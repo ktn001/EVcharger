@@ -151,3 +151,4 @@ class EVcharger_accountCmd extends EVchargerCmd  {
 }
 
 require_once __DIR__ . '/EVcharger_account_easee.class.php';
+require_once __DIR__ . '/EVcharger_account_virtual.class.php';
