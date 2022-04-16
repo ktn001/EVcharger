@@ -86,17 +86,16 @@ class model {
 		return $images;
 	}
 
-	public static function commands($model, $mandatoryOnly = false) {
+	public static function commands($model, $requiredOnly = false) {
 
 		$parameters = array(
 			'calcul',
-			'disabled',
 			'display::graphStep',
 			'displayName',
 			'group',
-			'mandatory',
 			'name',
 			'order',
+			'required',
 			'rounding',
 			'subType',
 			'template',
@@ -157,26 +156,41 @@ class model {
 				}
 				foreach ($parameters as $parameter) {
 					if (array_key_exists($parameter,$groupConfigs[$group])) {
-						$cmdConfigs[$cmd][$parameter] = $groupConfigs[$group][$parameter];
+						if (! array_key_exists($parameter,$cmdConfigs[$cmd])){
+							$cmdConfigs[$cmd][$parameter] = $groupConfigs[$group][$parameter];
+						}
 					}
 				}
 			}
 		}
 
 		foreach (array_keys($cmdConfig) as $cmd) {
-			if (array_key_exists($cmdConfigs[$cmd]['disabled']) && $cmdConfigs[$cmd]['disabled'] == 1) {
+			if (! array_key_exists('required',$cmdConfigs[$cmd])) {
+				throw new Exception (sprintf(__("Le paramètre 'required' n'est pas défini pour la commande %s!",__FILE__),$cmd));
+			}
+			if ($cmdConfigs[$cmd]['required'] == 'no') {
 				unset ($cmdConfigs[$cmd]);
+			} elseif ($cmdConfigs[$cmd]['required'] == 'optional' and ! $requiredOnly) {
+				unset ($cmdConfigs[$cmd]);
+			} 
+			if ($cmdConfigs[$cmd]['required'] != 'yes') {
+				throw new Exception (sprintf(__("Le paramètre 'required' a une valeur non reconnue (%s) pour la commande %s!",__FILE__),$cmd['required'],$cmd));
 			}
 		}
-
-		if ($mandatoryOnly){
-			foreach (array_keys($cmdConfig) as $cmd) {
-				if (! array_key_exists('mandatory', $cmdConfigs[$cmd]) || $cmdConfigs[$cmd]['mandatory'] == 0) {
-					unset ($cmdConfigs[$cmd]);
-				}
+		foreach (array_keys($cmdConfig) as $cmd) {
+			if (! array_key_exists('name',$cmdConfig[$cmd])) {
+				throw new Exception (sprintf(__("Le nom n'est pas défini pour la commande %s!",__FILE__),$cmd));
+			}
+			if (! array_key_exists('order',$cmdConfig[$cmd])) {
+				throw new Exception (sprintf(__("Le classement n'est pas défini pour la commande %s!",__FILE__),$cmd));
+			}
+			if (! array_key_exists('subType',$cmdConfig[$cmd])) {
+				throw new Exception (sprintf(__("Le sous-type n'est pas défini pour la commande %s!",__FILE__),$cmd));
+			}
+			if (! array_key_exists('type',$cmdConfig[$cmd])) {
+				throw new Exception (sprintf(__("Le type n'est pas défini pour la commande %s!",__FILE__),$cmd));
 			}
 		}
-
 		return $cmdConfigs;
 	}
 

@@ -57,23 +57,18 @@ try {
 		ajax::success();
 	}
 
-	if (init('action') == 'updateCmds') {
+	if (init('action') == 'recreateCmds') {
 		$id = init('id');
 		if ($id == ''){
 			throw new Exception(__("L'Id du chargeur n'est pas indiqué",__FILE__));
 		}
-		$mandatoryOnly = init('mandatoryOnly');
 		$charger = EVcharger::byId($id);
 		if (!is_object($charger)){
 			throw new Exception(sprintf(__("Chargeur %s introuvable.",__FILE__),$id));
 			ajax::error();
 		}
 		try {
-			if ($mandatoryOnly == ''){
-				$charger->updateCmds();
-			} else {
-				$charger->updateCmds($mandatoryOnly);
-			}
+			$charger->updateCmds();
 			ajax::success();
 		} catch (Exception $e){
 			ajax::error(displayException($e), $e->getCode());

@@ -41,56 +41,89 @@ class EVcharger_charger extends EVcharger {
     /*     * *********************Méthodes d'instance************************* */
 
     // Création/mise à jour des commande prédéfinies
-	public function UpdateCmds($mandatoryOnly = false) {
+	public function updateCmds($requiredOnly = false) {
 		$ids = array();
-		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
+		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
+		foreach (model::commands($this->getConfiguration('model'),$requiredOnly) as $logicalId => $config) {
 			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
+				log::add("EVcharger","debug","  " . sprintf(__("Création de la commande %s",__FILE__), $logicalId));
 				$cmd = new EVcharger_chargerCMD();
-				$cmd->setName(__($config['name'],__FILE__));
-			}
-			$cmd->setConfiguration('mandatory',$config['mandatory']);
-			$cmd->setEqLogic_id($this->getId());
-			$cmd->setLogicalId($logicalId);
-			$cmd->setType($config['type']);
-			$cmd->setSubType($config['subType']);
-			$cmd->setOrder($config['order']);
-			if (array_key_exists('template', $config)) {
-				$cmd->setTemplate('dashboard',$config['template']);
-				$cmd->setTemplate('mobile',$config['template']);
-			}
-			if (array_key_exists('visible', $config)) {
-				$cmd->setIsVisible($config['visible']);
-			}
-			if (array_key_exists('displayName', $config)) {
-				$cmd->setDisplay('showNameOndashboard', $config['displayName']);
-				$cmd->setDisplay('showNameOnmobile', $config['displayName']);
-			}
-			if (array_key_exists('unite', $config)) {
-				$cmd->setUnite($config['unite']);
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setLogicalId($logicalId);
 			}
 			if (array_key_exists('display::graphStep', $config)) {
-				$cmd->setDisplay('graphStep', $config['display::graphStep']);
+				if ($cmd->getDisplay('graphStep') != $config['display::graphStep']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'display::graphStep'",__FILE__), $logicalId));
+					$cmd->setDisplay('graphStep', $config['display::graphStep']);
+				}
+			}
+			if (array_key_exists('displayName', $config)) {
+				if ($cmd->getDisplay('showNameOndashboard') !=  $config['displayName']){
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'display::NameOndashboard'",__FILE__), $logicalId));
+					$cmd->setDisplay('showNameOndashboard', $config['displayName']);
+				}
+				if ($cmd->getDisplay('showNameOnmobile') !=  $config['displayName']){
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'display::NameOnmobile'",__FILE__), $logicalId));
+					$cmd->setDisplay('showNameOndashboard', $config['displayName']);
+				}
+			}
+			if ($cmd->getName() != $config['name']){
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'name'",__FILE__), $logicalId));
+				$cmd->setName($config['name']);
+			}
+			if ($cmd->getOrder() != $config['order']){
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'order'",__FILE__), $logicalId));
+				$cmd->setOrder($config['order']);
+			}
+			if ($cmd->getConfiguration('required') != $config['required']) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'required'",__FILE__), $logicalId));
+				$cmd->setConfiguration('required',$config['required']);
 			}
 			if (array_key_exists('rounding', $config)) {
-				$cmd->setConfiguration('historizeRound', $config['rounding']);
+				if ($cmd->getConfiguration('historizeRound') != $config['rounding']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'roundig'",__FILE__), $logicalId));
+					$cmd->setConfiguration('historizeRound', $config['rounding']);
+				}
 			}
+			if ($cmd->getSubType() != $config['subType']) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'subType'",__FILE__), $logicalId));
+				$cmd->setSubType($config['subType']);
+			}
+			if (array_key_exists('template', $config)) {
+				if ($cmd->getTemplate('dashboard') != $config['template']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'template::dashboard'",__FILE__), $logicalId));
+					$cmd->setTemplate('dashboard',$config['template']);
+				}
+				if ($cmd->getTemplate('mobile') != $config['template']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'template::mobile'",__FILE__), $logicalId));
+					$cmd->setTemplate('mobile',$config['template']);
+				}
+			}
+			if ($cmd->getType() != $config['type']) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'type'",__FILE__), $logicalId));
+				$cmd->setType($config['type']);
+			}
+			if (array_key_exists('unite', $config)) {
+				if ($cmd->getUnite() != $config['unite']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'unite'",__FILE__), $logicalId));
+					$cmd->setUnite($config['unite']);
+				}
+			}
+			if (array_key_exists('visible', $config)) {
+				if ($cmd->getIsVisible() != $config['visible']) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'visible'",__FILE__), $logicalId));
+					$cmd->setIsVisible($config['visible']);
+				}
+			}
+
 			$cmd->save();
 		}
 		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
-			if (array_key_exists('value',$config)){
-				$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
-				if (!is_object($cmd)){
-					log::add("EVcharger","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
-					continue;
-				}
-				$value = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value'])->getId();
-				$cmd->setValue($value);
-				$cmd->save();
-			}
+			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			$needSave = false;
 			if (array_key_exists('calcul',$config)){
 				$calcul = $config['calcul'];
-				$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 				if (!is_object($cmd)){
 					log::add("EVcharger","error",(sprintf(__("Commande avec logicalIs=%s introuvable",__FILE__),$logicalId)));
 					continue;
@@ -100,7 +133,25 @@ class EVcharger_charger extends EVcharger {
 					$id = cmd::byEqLogicIdAndLogicalId($this->getId(), $logicalId)->getId();
 					$calcul = str_replace('#' . $logicalId . '#', '#' . $id . '#', $calcul);
 				}
-				$cmd->setConfiguration('calcul', $calcul);
+				if ($cmd->getConfiguration('calcul') !=  $calcul) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'calcul'",__FILE__), $logicalId));
+					$cmd->setConfiguration('calcul', $calcul);
+					$needSave = true;
+				}
+			}
+			if (array_key_exists('value',$config)){
+				if (!is_object($cmd)){
+					log::add("EVcharger","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
+					continue;
+				}
+				$value = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value'])->getId();
+				if ($cmd->getValue() != $value) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'value'",__FILE__), $logicalId));
+					$cmd->setValue($value);
+					$needSave = true;
+				}
+			}
+			if ($needSave) {
 				$cmd->save();
 			}
 		}
@@ -129,7 +180,7 @@ class EVcharger_charger extends EVcharger {
 
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
-		$this->UpdateCmds(false);
+		$this->updateCmds(false);
 	}
 
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
@@ -230,6 +281,13 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
     /*     * ***********************Methode static*************************** */
 
     /*     * *********************Methode d'instance************************* */
+
+	public function dontRemoveCmd() {
+		if ($this->getConfiguration('required') == 'yes') {
+			return true;
+		}
+		return false;
+	}
 
 	public function preSave() {
 		if ($this->getLogicalId() == 'refresh') {

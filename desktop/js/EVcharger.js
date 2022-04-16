@@ -55,7 +55,6 @@ function getNameAndModelAndSave (title, eqLogicType) {
 		},
 		"{{Valider}}": function () {
 			let results = mod_nameAndModel('result');
-			console.log(results[0]);
 			if ( results[0].name != '') {
 				$(this).dialog("close");
 				if (eqLogicType == 'EVcharger_account') {
@@ -175,7 +174,7 @@ $('#selectVehicleImg').on('change',function(){
 /*
  * Action sur mise à jour des commandes
  */
-$('.cmdAction[data-action=actualize]').on('click',function() {
+$('.cmdAction[data-action=createMissing]').on('click',function() {
 	if (checkPageModified()) {
 		return;
 	}
@@ -183,7 +182,7 @@ $('.cmdAction[data-action=actualize]').on('click',function() {
 		type: 'POST',
 		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
-			action: 'updateCmds',
+			action: 'recreateCmds',
 			id:  $('.eqLogicAttr[data-l1key=id]').value(),
 		},
 		dataType : 'json',
@@ -228,10 +227,8 @@ function addCmdToChargerTable(_cmd) {
 		return;
 	}
 	let isStandard = false;
-	let isMandatory
-	if ('mandatory' in _cmd.configuration) {
+	if ('required' in _cmd.configuration) {
 		isStandard = true;
-		isMandatory = (_cmd.configuration.mandatory == '1');
 	}
 	let  tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
 	tr += '<td class="hidden-xs">';
@@ -279,7 +276,7 @@ function addCmdToChargerTable(_cmd) {
 		tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
 		tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> Tester</a>';
 	}
-	if (!isMandatory) {
+	if (!isStandard || _cmd.configuration.required == 'optional') {
 		tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>';
 	}
 	tr += '</td>';

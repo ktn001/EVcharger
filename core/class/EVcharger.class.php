@@ -173,13 +173,6 @@ class EVcharger extends eqLogic {
 
 class EVchargerCmd extends cmd {
 
-	public function dontRemoveCmd() {
-		if ($this->getLogicalId() == "refresh") {
-			return true;
-		}
-		return false;
-	}
-
 }
 
 require_once __DIR__  . '/model.class.php';
