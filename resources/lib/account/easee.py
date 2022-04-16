@@ -47,7 +47,7 @@ class easee(account):
         if i == 0:
             self.log_error(f"Timeout while stopping {serial}")
             return false
-        return true
+        return True
 
     def on_error(self,data):
         self.log_error(data.error)

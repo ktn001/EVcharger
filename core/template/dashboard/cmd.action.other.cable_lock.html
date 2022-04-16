@@ -49,10 +49,6 @@
       jeedom.cmd.execute({id: '#id#'})
     })
 
-    $('.cmd[data-cmd_uid=#uid#] .iconCmd').on('click', function() {
-        jeedom.cmd.execute({id: '#id#'})
-    })
-
     $(function() {
       if ($('body').attr('data-coloredicons') == "1") {
         permanentlyLockedColor='blue'

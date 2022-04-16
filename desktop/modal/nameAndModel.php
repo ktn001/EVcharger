@@ -47,6 +47,7 @@ function mod_nameAndModel(action) {
     }
 
     if (action == 'init') {
+	$('#mod_nameAndModel input[data-l1key=name]').value("");
         $.ajax({
             type: 'POST',
             url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',

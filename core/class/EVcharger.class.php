@@ -135,7 +135,7 @@ class EVcharger extends eqLogic {
 				)
 			),
 			'info' => array(
-				'string' => array(
+				'numeric' => array(
 					'etat' => array(
 						'template' => 'etat',
 						'replace' => array(

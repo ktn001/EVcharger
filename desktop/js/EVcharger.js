@@ -35,7 +35,7 @@ $('#table_cmd_account, #table_cmd_charger, #table_cmd_vehicle').on('sortupdate',
  */
 function getNameAndModelAndSave (title, eqLogicType) {
 	if ($('#modContainer_nameAndModel').length == 0) {
-		$('body').append('<div id="modContainer_nameAndModel" title="' + title + '"></div>');
+		$('body').append('<div id="modContainer_nameAndModel"></div>');
 		jQuery.ajaxSetup({async: false});
 		$('#modContainer_nameAndModel').load('index.php?v=d&plugin=EVcharger&modal=nameAndModel');
 		jQuery.ajaxSetup({async: true});
@@ -47,6 +47,8 @@ function getNameAndModelAndSave (title, eqLogicType) {
 			width:400
 		});
 	}
+	$('#modContainer_nameAndModel').dialog({title: title});
+	mod_nameAndModel('init');
 	$('#modContainer_nameAndModel').dialog('option', 'buttons', {
 		"{{Annuler}}": function () {
 			$(this).dialog("close");
@@ -81,7 +83,6 @@ function getNameAndModelAndSave (title, eqLogicType) {
 			}
 		}
 	});
-	mod_nameAndModel('init');
 	$('#modContainer_nameAndModel').dialog('open');
 }
 

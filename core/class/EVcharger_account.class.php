@@ -84,7 +84,7 @@ class EVcharger_account extends EVcharger {
 	 * Arrêt du thread dédié au compte
 	 */
 	public function stopDeamonThread() {
-		foreach (EVcharger_charger::byAccountId($this->Id()) as $charger){
+		foreach (EVcharger_charger::byAccountId($this->getId()) as $charger){
 			if ($charger->getIsEnable()) {
 				$message = array(
 					'cmd' => 'stop',
@@ -94,7 +94,7 @@ class EVcharger_account extends EVcharger {
 			}
 		}
 		$message = array('cmd' => 'stop_account');
-		$this->sen2Deamon($message);
+		$this->send2Deamon($message);
 	}
 
 	protected function getMapping() {
