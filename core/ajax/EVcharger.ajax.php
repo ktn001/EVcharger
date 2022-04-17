@@ -68,7 +68,7 @@ try {
 			ajax::error();
 		}
 		try {
-			$charger->updateCmds();
+			$charger->updateCmds(array("createOnly" => true));
 			ajax::success();
 		} catch (Exception $e){
 			ajax::error(displayException($e), $e->getCode());

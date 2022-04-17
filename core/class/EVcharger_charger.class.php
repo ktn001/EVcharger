@@ -41,17 +41,24 @@ class EVcharger_charger extends EVcharger {
     /*     * *********************Méthodes d'instance************************* */
 
     // Création/mise à jour des commande prédéfinies
-	public function updateCmds($requiredOnly = false) {
+	public function updateCmds($options = array()) {
+		$createOnly = false;
+		if (array_key_exists('createOnly', $options)) {
+			$createOnly = $options['createOnly'];
+		}
 		$ids = array();
 		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
-		foreach (model::commands($this->getConfiguration('model'),$requiredOnly) as $logicalId => $config) {
+		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
 			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				log::add("EVcharger","debug","  " . sprintf(__("Création de la commande %s",__FILE__), $logicalId));
 				$cmd = new EVcharger_chargerCMD();
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId($logicalId);
+			} elseif ($createOnly) {
+				continue;
 			}
+				
 			if (array_key_exists('display::graphStep', $config)) {
 				if ($cmd->getDisplay('graphStep') != $config['display::graphStep']) {
 					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'display::graphStep'",__FILE__), $logicalId));

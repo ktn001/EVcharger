@@ -172,17 +172,14 @@ $('#selectVehicleImg').on('change',function(){
 });
 
 /*
- * Action sur mise à jour des commandes
+ * mise à jour ou création des commandes
  */
-$('.cmdAction[data-action=createMissing]').on('click',function() {
-	if (checkPageModified()) {
-		return;
-	}
+function updateCmds ( action = "") {
 	$.ajax({
 		type: 'POST',
 		url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
 		data: {
-			action: 'recreateCmds',
+			action: action,
 			id:  $('.eqLogicAttr[data-l1key=id]').value(),
 		},
 		dataType : 'json',
@@ -206,7 +203,18 @@ $('.cmdAction[data-action=createMissing]').on('click',function() {
 			url += 'saveSuccessFull=1' + document.location.hash
 			loadPage(url)
 		}
-	});
+	})
+}
+
+
+/*
+ * Action sur recéation des commandes
+ */
+$('.cmdAction[data-action=createMissing]').on('click',function() {
+	if (checkPageModified()) {
+		return;
+	}
+	updateCmds ('recreateCmds')
 })
 
 $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'click', function(){
