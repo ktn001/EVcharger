@@ -46,15 +46,34 @@ class EVcharger_charger extends EVcharger {
 		if (array_key_exists('createOnly', $options)) {
 			$createOnly = $options['createOnly'];
 		}
+		$updateOnly = false;
+		if (array_key_exists('updateOnly', $options)) {
+			$updateOnly = $options['updateOnly'];
+		}
 		$ids = array();
 		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
 		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
 			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
+				if ($updateOnly) {
+					continue;
+				}
 				log::add("EVcharger","debug","  " . sprintf(__("Création de la commande %s",__FILE__), $logicalId));
 				$cmd = new EVcharger_chargerCMD();
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setLogicalId($logicalId);
+				if ($createOnly and array_key_exists('order',$config)) {
+					foreach (cmd::byEqLogicId($this->getId()) as $otherCmd) {
+						if ($otherCmd->getOrder() >= $config['order']) {
+							$otherCmd->setOrder($otherCmd->getOrder()+1);
+							$otherCmd->save();
+						}
+					}
+					if ($cmd->getOrder() != $config['order']){
+						log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'order'",__FILE__), $logicalId));
+						$cmd->setOrder($config['order']);
+					}
+				}
 			} elseif ($createOnly) {
 				continue;
 			}

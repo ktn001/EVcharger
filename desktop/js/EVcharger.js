@@ -206,15 +206,24 @@ function updateCmds ( action = "") {
 	})
 }
 
-
 /*
- * Action sur recéation des commandes
+ * Action sur recréation des commandes
  */
 $('.cmdAction[data-action=createMissing]').on('click',function() {
 	if (checkPageModified()) {
 		return;
 	}
-	updateCmds ('recreateCmds')
+	updateCmds ('createCmds')
+})
+
+/*
+ * Action sur configuration des commandes
+ */
+$('.cmdAction[data-action=reconfigure]').on('click',function() {
+	if (checkPageModified()) {
+		return;
+	}
+	updateCmds ('updateCmds')
 })
 
 $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'click', function(){

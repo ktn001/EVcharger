@@ -57,7 +57,7 @@ try {
 		ajax::success();
 	}
 
-	if (init('action') == 'recreateCmds') {
+	if (init('action') == 'createCmds' || init('action') == 'updateCmds')  {
 		$id = init('id');
 		if ($id == ''){
 			throw new Exception(__("L'Id du chargeur n'est pas indiqué",__FILE__));
@@ -68,7 +68,13 @@ try {
 			ajax::error();
 		}
 		try {
-			$charger->updateCmds(array("createOnly" => true));
+			$option = array();
+			if (init('action') == 'createCmds') {
+				$options["createOnly"] = true;
+			} elseif (init('action') == 'updateCmds')  {
+				$options["updateOnly"] = true;
+			}
+			$charger->updateCmds($options);
 			ajax::success();
 		} catch (Exception $e){
 			ajax::error(displayException($e), $e->getCode());
