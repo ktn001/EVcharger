@@ -97,6 +97,7 @@ class model {
 			'order',
 			'required',
 			'rounding',
+			'source',
 			'subType',
 			'template',
 			'type',
@@ -164,7 +165,7 @@ class model {
 			}
 		}
 
-		foreach (array_keys($cmdConfig) as $cmd) {
+		foreach (array_keys($cmdConfigs) as $cmd) {
 			if (! array_key_exists('required',$cmdConfigs[$cmd])) {
 				throw new Exception (sprintf(__("Le paramètre 'required' n'est pas défini pour la commande %s!",__FILE__),$cmd));
 			}
@@ -172,23 +173,25 @@ class model {
 				unset ($cmdConfigs[$cmd]);
 			} elseif ($cmdConfigs[$cmd]['required'] == 'optional' and ! $requiredOnly) {
 				unset ($cmdConfigs[$cmd]);
-			} 
-			if ($cmdConfigs[$cmd]['required'] != 'yes') {
+			} elseif ($cmdConfigs[$cmd]['required'] != 'yes') {
 				throw new Exception (sprintf(__("Le paramètre 'required' a une valeur non reconnue (%s) pour la commande %s!",__FILE__),$cmd['required'],$cmd));
 			}
 		}
-		foreach (array_keys($cmdConfig) as $cmd) {
-			if (! array_key_exists('name',$cmdConfig[$cmd])) {
+		foreach (array_keys($cmdConfigs) as $cmd) {
+			if (! array_key_exists('name',$cmdConfigs[$cmd])) {
 				throw new Exception (sprintf(__("Le nom n'est pas défini pour la commande %s!",__FILE__),$cmd));
 			}
-			if (! array_key_exists('order',$cmdConfig[$cmd])) {
+			if (! array_key_exists('order',$cmdConfigs[$cmd])) {
 				throw new Exception (sprintf(__("Le classement n'est pas défini pour la commande %s!",__FILE__),$cmd));
 			}
-			if (! array_key_exists('subType',$cmdConfig[$cmd])) {
+			if (! array_key_exists('subType',$cmdConfigs[$cmd])) {
 				throw new Exception (sprintf(__("Le sous-type n'est pas défini pour la commande %s!",__FILE__),$cmd));
 			}
-			if (! array_key_exists('type',$cmdConfig[$cmd])) {
+			if (! array_key_exists('type',$cmdConfigs[$cmd])) {
 				throw new Exception (sprintf(__("Le type n'est pas défini pour la commande %s!",__FILE__),$cmd));
+			}
+			if (! array_key_exists('source',$cmdCondif[$cmd])) {
+				throw new Exception (sprintf(__("La source de la commande %s n'est pas définie!",__FILE__),$cmd));
 			}
 		}
 		return $cmdConfigs;

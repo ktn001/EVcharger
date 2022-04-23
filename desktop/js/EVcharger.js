@@ -240,9 +240,9 @@ $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'c
 * Fonction permettant l'affichage des commandes dans l'équipement
 */
 function addCmdToChargerTable(_cmd) {
-	if (init(_cmd.logicalId) == 'refresh'){
-		return;
-	}
+	//if (init(_cmd.logicalId) == 'refresh'){
+	//	return;
+	//}
 	let isStandard = false;
 	if ('required' in _cmd.configuration) {
 		isStandard = true;
@@ -274,8 +274,14 @@ function addCmdToChargerTable(_cmd) {
 	}
 	tr += '</td>';
 	tr += '<td>';
-	if (!isStandard || _cmd.configuration.hasOwnProperty('calcul')) {
+	if (_cmd.configuration.hasOwnProperty('source')) {
+		source = _cmd.configuration.source
+		if (source == 'calcul') {
+			tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
+		}
+	} else if (!isStandard) {
 		tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
+		tr += '<a class="btn btn-default listEquipementInfo btn-xs" data-input="calcul" style="width:100%;margin-top:20px"><i class="fas fa-list-alt"></i> {{Rechercher équipement}}</a>'
 	}
 	tr += '</td>';
 	tr += '<td>';

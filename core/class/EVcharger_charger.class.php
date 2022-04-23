@@ -112,6 +112,10 @@ class EVcharger_charger extends EVcharger {
 					$cmd->setConfiguration('historizeRound', $config['rounding']);
 				}
 			}
+			if ($cmd->getConfiguration('source') != $config['source']) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'source'",__FILE__), $logicalId));
+				$cmd->setConfiguration('source',$config['source']);
+			}
 			if ($cmd->getSubType() != $config['subType']) {
 				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'subType'",__FILE__), $logicalId));
 				$cmd->setSubType($config['subType']);
@@ -145,7 +149,7 @@ class EVcharger_charger extends EVcharger {
 
 			$cmd->save();
 		}
-		foreach (model::commands($this->getConfiguration('model'),$mandatoryOnly) as $logicalId => $config) {
+		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
 			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			$needSave = false;
 			if (array_key_exists('calcul',$config)){
@@ -170,11 +174,16 @@ class EVcharger_charger extends EVcharger {
 					log::add("EVcharger","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
 					continue;
 				}
-				$value = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value'])->getId();
-				if ($cmd->getValue() != $value) {
-					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'value'",__FILE__), $logicalId));
-					$cmd->setValue($value);
-					$needSave = true;
+				$cmdValue = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value']);
+				if (! $cmdValue) {
+					log::add("EVcharger","error",sprintf(__("La commande '%s' pour la valeur de '%s' est introuvable",__FILE__),$config['value'],$cmd->getLogicalId()));
+				} else {
+					$value = $cmdValue->getId();
+					if ($cmd->getValue() != $value) {
+						log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'value'",__FILE__), $logicalId));
+						$cmd->setValue($value);
+						$needSave = true;
+					}
 				}
 			}
 			if ($needSave) {

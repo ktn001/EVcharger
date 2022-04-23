@@ -40,12 +40,12 @@ class EVcharger_account_easee extends EVcharger_account {
 			"Content-Type: application/*+json"
 		];
 		if (is_array($data)) {
-			if (array_key_exists('userName',$data) and array_key_exists('password',$data)) {
-				$header = [
-					"Accept: application/json",
-					"Content-Type: application/*+json"
-				];
-			}
+		//	if (array_key_exists('userName',$data) and array_key_exists('password',$data)) {
+		//		$header = [
+		//			"Accept: application/json",
+		//			"Content-Type: application/*+json"
+		//		];
+		//	}
 			$data = json_encode($data);
 		}
 		 
@@ -69,7 +69,8 @@ class EVcharger_account_easee extends EVcharger_account {
 			log::add("EVcharger","error", "CURL Error : " . $err);
 			throw new Exception($err);
 		}
-		log::add("EVcharger","debug", "  " . __("Requête: URL :",__FILE__) . $this->getUrl() . $path);
+		log::add("EVcharger","debug", "  " . __("Requête: URL: ",__FILE__) . $this->getUrl() . $path);
+		log::add("EVcharger","debug", "  " . "Header: " . print_r($header,true));
 		$data = json_decode($data,true);
 		if (array_key_exists('password',$data) and ($data['password'] != '')) {
 			$data['password'] = "**********";
@@ -133,10 +134,14 @@ class EVcharger_account_easee extends EVcharger_account {
 						'accessToken' => $token['accessToken'],
 						'refreshToken' => $token['refreshToken']
 					);
-					$token = $this->sendRequest('/api/accounts/refresh_token', $data, $token['accessToken']);
-					$token['expiresAt'] = time() + $token['expiresIn'];
-					$this->setCache('token',json_encode($token));
-					$changed = true;
+					try {
+						$token = $this->sendRequest('/api/accounts/refresh_token', $data, $token['accessToken']);
+						$token['expiresAt'] = time() + $token['expiresIn'];
+						$this->setCache('token',json_encode($token));
+						$changed = true;
+					} catch (Exception $e) {
+						$getNew = true;
+					}
 				}
 			}
 		}
@@ -147,7 +152,7 @@ class EVcharger_account_easee extends EVcharger_account {
 				'password' => $this->getConfiguration('password')
 			);
 			try {
-				$token = $this->sendRequest('/api/accounts/login', $data, "Token pas nécessaire");
+				$token = $this->sendRequest('/api/accounts/login', $data, "Token pas necessaire");
 				$token['expiresAt'] = time() + $token['expiresIn'];
 				$this->setCache('token',json_encode($token));
 				$changed = true;
