@@ -94,15 +94,24 @@ foreach ($commands as $cmd) {
 	}
 	$parameters = array_unique($parameters);
 	sort($parameters);
-	$format = "    %-20s |%-25s |%-25s |%-25s |%-25s\n";
-	print (sprintf($format,"Parametre","Commande modele","Commande Plugin","Groupe modele","Groupe plugin"));
-	print (sprintf($format,"~~~~~~~~~","~~~~~~~~~~~~~~~","~~~~~~~~~~~~~~~","~~~~~~~~~~~~~","~~~~~~~~~~~~~"));
+	$format = "    %-20s |%-25s |%-25s |%-25s |%-25s |%-1s\n";
+	print (sprintf($format,"Parametre","Valeur finale","Commande modele","Commande Plugin","Groupe modele","Groupe plugin"));
+	print (sprintf($format,"~~~~~~~~~","~~~~~~~~~~~~~","~~~~~~~~~~~~~~~","~~~~~~~~~~~~~~~","~~~~~~~~~~~~~","~~~~~~~~~~~~~"));
 	foreach ($parameters as $parameter) {
 		$mc = $model_cmds[$cmd][$parameter] ?? "-";
 		$pc = $plugin_cmds[$cmd][$parameter] ?? "-";
 		$mg = $model_groups[$group][$parameter] ?? "-";
 		$pg = $plugin_groups[$group][$parameter] ?? "-";
-		$line = sprintf($format,$parameter,$mc,$pc,$mg,$pg);
+		if ($mc != '-') {
+			$final = $mc;
+		} else if ($pc != '-') {
+			$final = $pc;
+		} else if ($mg != '-') {
+			$final = $mg;
+		} else if ($pg != '-') {
+			$final = $pg;
+		}
+		$line = sprintf($format,$parameter,$final,$mc,$pc,$mg,$pg);
 		print ($line);
 	}
 }

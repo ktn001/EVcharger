@@ -70,7 +70,7 @@ class EVcharger extends eqLogic {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
 
-		$path = realpath(dirname(__FILE__) . '/../../resources/bin'); // répertoire du démon
+		$path = realpath(dirname(__FILE__) . '/../../ressources/bin'); // répertoire du démon
 		$cmd = 'python3 ' . $path . '/EVchargerd.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
 		$cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port

@@ -53,6 +53,7 @@ class EVcharger_charger extends EVcharger {
 		$ids = array();
 		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
 		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
+			log::add("EVcharger","debug","XXXX " . $logicalId);
 			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				if ($updateOnly) {
