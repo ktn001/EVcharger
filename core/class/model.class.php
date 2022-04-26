@@ -90,6 +90,7 @@ class model {
 
 		$parameters = array(
 			'calcul',
+			'destination',
 			'display::graphStep',
 			'displayName',
 			'group',
