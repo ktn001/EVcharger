@@ -79,6 +79,10 @@ class EVcharger_charger extends EVcharger {
 				continue;
 			}
 				
+			if ($cmd->getConfiguration('destination') != $config['destination']) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'destination'",__FILE__), $logicalId));
+				$cmd->setConfiguration('destination',$config['destination']);
+			}
 			if (array_key_exists('display::graphStep', $config)) {
 				if ($cmd->getDisplay('graphStep') != $config['display::graphStep']) {
 					log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'display::graphStep'",__FILE__), $logicalId));

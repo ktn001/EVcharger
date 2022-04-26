@@ -228,10 +228,18 @@ $('.cmdAction[data-action=reconfigure]').on('click',function() {
 
 $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'click', function(){
 	var el = $(this)
-	var subtype = $(this).closest('.cmd').find('.cmdAttr[data-l1key=subType]').value()
 	var type = $(this).closest('.cmd').find('.cmdAttr[data-l1key=type]').value()
 	jeedom.cmd.getSelectModal({cmd: {type: type}}, function(result) {
 		var calcul = el.closest('tr').find('.cmdAttr[data-l1key=configuration][data-l2key=' + el.attr('data-input') + ']')
+		//calcul.atCaret('insert',result.human)
+		calcul.value(result.human)
+	})
+})
+
+$('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementInfo', 'click', function(){
+	var el = $(this)
+	jeedom.cmd.getSelectModal({cmd: {type: 'info'}},function (result) {
+		var calcul = el.closest('tr').find('.cmdAttr[data-l1key=configuration][data-l2key=' + el.data('input') + ']')
 		calcul.atCaret('insert',result.human)
 	})
 })
@@ -240,9 +248,6 @@ $('#table_cmd_charger, #table_cmd_vehicle').delegate('.listEquipementAction', 'c
 * Fonction permettant l'affichage des commandes dans l'équipement
 */
 function addCmdToChargerTable(_cmd) {
-	//if (init(_cmd.logicalId) == 'refresh'){
-	//	return;
-	//}
 	let isStandard = false;
 	if ('required' in _cmd.configuration) {
 		isStandard = true;
@@ -278,10 +283,20 @@ function addCmdToChargerTable(_cmd) {
 		source = _cmd.configuration.source
 		if (source == 'calcul') {
 			tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
+			tr += '<a class="btn btn-default listEquipementInfo btn-xs" data-input="calcul" style="width:100%;margin-top:5px"><i class="fas fa-list-alt"></i> {{Rechercher équipement}}</a>'
+		}
+		if (source == 'info') {
+			tr += '<div class="input-group" style="margin-bottom:5px">';
+			tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul"></input>'
+			tr += '   <span class="input-group-btn">';
+			tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
+			tr += '      <i class="fas fa-list-alt"></i>';
+			tr += '    </a>';
+			tr += '  </span>';
+			tr += '</div>';
 		}
 	} else if (!isStandard) {
 		tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
-		tr += '<a class="btn btn-default listEquipementInfo btn-xs" data-input="calcul" style="width:100%;margin-top:20px"><i class="fas fa-list-alt"></i> {{Rechercher équipement}}</a>'
 	}
 	tr += '</td>';
 	tr += '<td>';
@@ -310,7 +325,6 @@ function addCmdToChargerTable(_cmd) {
 		tr.find('.cmdAttr[data-l1key=unite]:visible').prop('disabled',true);
 		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=minValue]:visible').prop('disabled',true);
 		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=maxValue]:visible').prop('disabled',true);
-		tr.find('.cmdAttr[data-l1key=configuration][data-l2key=calcul]').prop('disabled',true);
 	}
 	jeedom.eqLogic.buildSelectCmd({
 		id:  $('.eqLogicAttr[data-l1key=id]').value(),
