@@ -279,24 +279,49 @@ function addCmdToChargerTable(_cmd) {
 	}
 	tr += '</td>';
 	tr += '<td>';
-	if (_cmd.configuration.hasOwnProperty('source')) {
-		source = _cmd.configuration.source
-		if (source == 'calcul') {
+	if (_cmd.type == 'info') {
+		if (_cmd.configuration.hasOwnProperty('source')) {
+			source = _cmd.configuration.source
+			if (source == 'calcul') {
+				tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
+				tr += '<a class="btn btn-default listEquipementInfo btn-xs" data-input="calcul" style="width:100%;margin-top:5px"><i class="fas fa-list-alt"></i> {{Rechercher équipement}}</a>'
+			} else  if (source == 'info') {
+				tr += '<div class="input-group" style="margin-bottom:5px">';
+				tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul"></input>'
+				tr += '   <span class="input-group-btn">';
+				tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
+				tr += '      <i class="fas fa-list-alt"></i>';
+				tr += '    </a>';
+				tr += '  </span>';
+				tr += '</div>';
+			}
+		} else if (!isStandard) {
 			tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
 			tr += '<a class="btn btn-default listEquipementInfo btn-xs" data-input="calcul" style="width:100%;margin-top:5px"><i class="fas fa-list-alt"></i> {{Rechercher équipement}}</a>'
 		}
-		if (source == 'info') {
+	} else if (_cmd.type == 'action') {
+		if (_cmd.configuration.hasOwnProperty('destination')) {
+			destination = _cmd.configuration.destination
+			if (destination == 'cmd') {
+				tr += '<div class="input-group" style="margin-bottom:5px">';
+				tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="cmd"></input>'
+				tr += '   <span class="input-group-btn">';
+				tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="cmd">';
+				tr += '      <i class="fas fa-list-alt"></i>';
+				tr += '    </a>';
+				tr += '  </span>';
+				tr += '</div>';
+			}
+		} else if (!isStandard) {
 			tr += '<div class="input-group" style="margin-bottom:5px">';
-			tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul"></input>'
+			tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="cmd"></input>'
 			tr += '   <span class="input-group-btn">';
-			tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="calcul">';
+			tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="cmd">';
 			tr += '      <i class="fas fa-list-alt"></i>';
 			tr += '    </a>';
 			tr += '  </span>';
 			tr += '</div>';
 		}
-	} else if (!isStandard) {
-		tr += '<textarea class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="calcul" style="height:35px"></textarea>';
 	}
 	tr += '</td>';
 	tr += '<td>';
