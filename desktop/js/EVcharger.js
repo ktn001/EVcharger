@@ -304,9 +304,9 @@ function addCmdToChargerTable(_cmd) {
 			destination = _cmd.configuration.destination
 			if (destination == 'cmd') {
 				tr += '<div class="input-group" style="margin-bottom:5px">';
-				tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="cmd"></input>'
+				tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="destId"></input>'
 				tr += '   <span class="input-group-btn">';
-				tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="cmd">';
+				tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="destId">';
 				tr += '      <i class="fas fa-list-alt"></i>';
 				tr += '    </a>';
 				tr += '  </span>';
@@ -314,9 +314,9 @@ function addCmdToChargerTable(_cmd) {
 			}
 		} else if (!isStandard) {
 			tr += '<div class="input-group" style="margin-bottom:5px">';
-			tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="cmd"></input>'
+			tr += '  <input type="text" class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="destId"></input>'
 			tr += '   <span class="input-group-btn">';
-			tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="cmd">';
+			tr += '    <a class="btn btn-default btn-sm listEquipementAction roundedRight" data-input="destId">';
 			tr += '      <i class="fas fa-list-alt"></i>';
 			tr += '    </a>';
 			tr += '  </span>';

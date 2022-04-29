@@ -127,13 +127,34 @@ class EVcharger_account extends EVcharger {
 			if (! is_a($charger_cmd, "EVcharger_chargerCmd")){
 				throw new Exception (sprintf(__("| La commande %s n'est pas une commande de type %s",__FILE__),$charger_cmd->getId(), "EVcharger_chargerCmd"));
 			}
-			$method = 'execute_' . $charger_cmd->getLogicalId();
-			if ( ! method_exists($this, $method)){
-				throw new Exception (sprintf(__("| %s: pas de méthode < %s::%s >",__FILE__),$this->getHumanName(), get_class($this), $method));
+			if ($charger_cmd->getConfiguration('destination') == 'deamon') {
+				$method = 'execute_' . $charger_cmd->getLogicalId();
+				if ( ! method_exists($this, $method)){
+					throw new Exception ("| " . sprintf(__("%s: pas de méthode < %s::%s >",__FILE__),$this->getHumanName(), get_class($this), $method));
+				}
+				$this->$method($charger_cmd);
+				log::add("EVcharger","debug","└─" . __("OK",__FILE__));
+				return;
+			} else if ($charger_cmd->getConfiguration('destination') == 'cmd') {
+				log::add("EVcharger","debug","| " . __("Transfert vers une CMD",__FILE__));
+				log::add("EVcharger","debug","AAAAA " . $charger_cmd->getConfiguration('destId'));
+				$cmds = explode('&&', $charger_cmd->getConfiguration('destId'));
+				log::add("EVcharger","debug","BBBBBB ");
+				if (is_array($cmds)) {
+					foreach ($cmds as $cmd_id) {
+						$cmd = cmd::byId(str_replace('#', '', $cmd_id));
+						if (is_object($cmd)) {
+							$cmd->execCmd();
+						}
+					}
+					return;
+				} else {
+					$cmd = cmd::byId(str_replace('#', '', $cmd_id));
+					$cmd->execCmd();
+				}
+			} else {
+				throw new Exception (sprintf(__("La destination de la commande %s est inconnue!",__FILE__),$cmd_charger->getLogicalId()));
 			}
-			$this->$method($charger_cmd);
-			log::add("EVcharger","debug","└─" . __("OK",__FILE__));
-			return;
 		} catch (Exception $e) {
 			log::add("EVcharger","error",$e->getMessage());
 			log::add("EVcharger","debug","└─" . __("ERROR",__FILE__));

@@ -334,6 +334,15 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
                         return;
                 }
 		if ($this->getType() == 'info') {
+			if ($this->getConfiguration('source') == 'calcul') {
+				if ($this->getConfiguration('calcul') == '') {
+					throw new Exception (sprintf(__("La formule de calcul pour la commande %s n'est pas définie!",__FILE__),$this->getLogicalId()));
+				}
+			} else if ($this->getConfiguration('source') == 'info') {
+				if ($this->getConfiguration('calcul') == '') {
+					throw new Exception (sprintf(__("L'info source pour la commande %s n'est pas définie!",__FILE__),$this->getLogicalId()));
+				}
+			}
 			$calcul = $this->getConfiguration('calcul');
 			if (strpos($calcul, '#' . $this->getId() . '#') !== false) {
 				throw new Exception(__('Vous ne pouvez appeler la commande elle-même (boucle infinie) sur',__FILE__) . ' : '.$this->getName());
@@ -360,6 +369,12 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 				$added_value['#variable(' . $variable . ')#'] = '#variable(' . $variable . ')#';
 			}
 			$this->setValue($value);
+		} else if ($this->getType() == 'action') {
+			if ($this->getConfiguration('destination') == 'cmd') {
+				if ($this->getConfiguration('destId') == '') {
+					throw new Exception (sprintf(__("La desitnation de %s n'est pas définie!",__FILE__),$this->getLogicalId()));
+				}
+			}
 		}
 	}
 
