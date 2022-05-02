@@ -40,12 +40,6 @@ class EVcharger_account_easee extends EVcharger_account {
 			"Content-Type: application/*+json"
 		];
 		if (is_array($data)) {
-		//	if (array_key_exists('userName',$data) and array_key_exists('password',$data)) {
-		//		$header = [
-		//			"Accept: application/json",
-		//			"Content-Type: application/*+json"
-		//		];
-		//	}
 			$data = json_encode($data);
 		}
 		 

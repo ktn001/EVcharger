@@ -614,3 +614,16 @@ function printEqLogic (configs) {
 		$('.nav-tabs .tab-EVcharger_vehicle a').first().click()
 	}
 }
+
+$('#AccountSpecificsParams').delegate('.show-txt','click',function() {
+	$(this).closest('.input-group').find('input[type=password]').attr('type','text');
+	$(this).hide();
+	$(this).closest('.input-group').find('button.hide-pwd').show();
+})
+
+$('#AccountSpecificsParams').delegate('.hide-pwd','click',function() {
+	$(this).closest('.input-group').find('input[type=text]').attr('type','password');
+	$(this).hide();
+	$(this).closest('.input-group').find('button.show-txt').show();
+})
+
