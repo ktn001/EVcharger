@@ -121,24 +121,24 @@ class EVcharger_account extends EVcharger {
 		return $transforms;
 	}
 
-	public function execute ($charger_cmd) {
+	public function execute ($cmd_charger) {
 		try {
-			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $charger_cmd->getLogicalId())); 
-			if (! is_a($charger_cmd, "EVcharger_chargerCmd")){
-				throw new Exception (sprintf(__("| La commande %s n'est pas une commande de type %s",__FILE__),$charger_cmd->getId(), "EVcharger_chargerCmd"));
+			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $cmd_charger->getLogicalId())); 
+			if (! is_a($cmd_charger, "EVcharger_chargerCmd")){
+				throw new Exception (sprintf(__("| La commande %s n'est pas une commande de type %s",__FILE__),$cmd_charger->getId(), "EVcharger_chargerCmd"));
 			}
-			if ($charger_cmd->getConfiguration('destination') == 'deamon') {
-				$method = 'execute_' . $charger_cmd->getLogicalId();
+			if ($cmd_charger->getConfiguration('destination') == 'charger') {
+				$method = 'execute_' . $cmd_charger->getLogicalId();
 				if ( ! method_exists($this, $method)){
 					throw new Exception ("| " . sprintf(__("%s: pas de méthode < %s::%s >",__FILE__),$this->getHumanName(), get_class($this), $method));
 				}
-				$this->$method($charger_cmd);
+				$this->$method($cmd_charger);
 				log::add("EVcharger","debug","└─" . __("OK",__FILE__));
 				return;
-			} else if ($charger_cmd->getConfiguration('destination') == 'cmd') {
+			} else if ($cmd_charger->getConfiguration('destination') == 'cmd') {
 				log::add("EVcharger","debug","| " . __("Transfert vers une CMD",__FILE__));
-				log::add("EVcharger","debug","AAAAA " . $charger_cmd->getConfiguration('destId'));
-				$cmds = explode('&&', $charger_cmd->getConfiguration('destId'));
+				log::add("EVcharger","debug","AAAAA " . $cmd_charger->getConfiguration('destId'));
+				$cmds = explode('&&', $cmd_charger->getConfiguration('destId'));
 				log::add("EVcharger","debug","BBBBBB ");
 				if (is_array($cmds)) {
 					foreach ($cmds as $cmd_id) {

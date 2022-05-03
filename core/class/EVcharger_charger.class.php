@@ -329,7 +329,7 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 		return false;
 	}
 
-	public function preSave() {
+	public function preUpdate() {
 		if ($this->getLogicalId() == 'refresh') {
                         return;
                 }
@@ -372,7 +372,7 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 		} else if ($this->getType() == 'action') {
 			if ($this->getConfiguration('destination') == 'cmd') {
 				if ($this->getConfiguration('destId') == '') {
-					throw new Exception (sprintf(__("La desitnation de %s n'est pas définie!",__FILE__),$this->getLogicalId()));
+					throw new Exception (sprintf(__("La destination de %s n'est pas définie!",__FILE__),$this->getLogicalId()));
 				}
 			}
 		}
