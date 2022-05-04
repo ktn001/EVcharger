@@ -14,6 +14,9 @@ from account import account
 
 class easee(account):
 
+    def getToken(self):
+        return self.token
+
     def start_charger_listener(self,identifiant):
         url = self._url + '/hubs/chargers'
         options = {'access_token_factory': self.getToken}
@@ -30,6 +33,7 @@ class easee(account):
         self.connections[identifiant] = connection
         connection.on_open(lambda: self.on_open(identifiant))
         connection.on_close(lambda: self.on_close(identifiant))
+        connection.on_reconnect(lambda: self.on_reconnect(identifiant))
         connection.on_error(lambda data: self.on_error(data))
         connection.on('ProductUpdate', self.on_Update)
         connection.on('ChargerUpdate', self.on_Update)
@@ -48,10 +52,6 @@ class easee(account):
             self.log_error(f"Timeout while stopping {serial}")
             return false
         return True
-
-    def on_error(self,data):
-        self.log_error(data.error)
-        self.log_error(data)
 
     def on_open(self,serial):
         self.log_debug("openning connection " + serial)
@@ -76,6 +76,13 @@ class easee(account):
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
                 self.send2Jeedom(msg2Jeedom)
                 del self.connections[serial]
+
+    def on_reconnect(self,serial):
+        self.log_warning("reconnecting to serial " + serial)
+
+    def on_error(self,data):
+        self.log_error(data.error)
+        self.log_error(data)
 
     def on_Update(self,messages):
         for message in messages:
@@ -129,9 +136,6 @@ class easee(account):
                 self.start_charger_listener(serial)
         return
 
-    def getToken(self):
-        return self.token
-
     def do_start_charger_listener(self,message):
         msg = json.loads(message)
         if not 'identifiant' in msg:
@@ -155,4 +159,14 @@ class easee(account):
             return
         self.stop_charger_listener(msg['identifiant'])
 
+    def test(self, level = 'debug'):
+        ok = True
+        if not hasattr(self,'_url') or self._url == '':
+            self.log_error("l'URL n'est pas définie")
+            ok = False
+        if ok:
+            eval ("self.log_" + level)("RUNNING")
+        for serial in self.connections:
+            eval ("self.log_" + level)(serial + " is running")
+        return ok
 

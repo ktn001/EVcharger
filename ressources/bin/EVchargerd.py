@@ -83,13 +83,12 @@ def options():
 
 def start_account(accountModel, accountId):
     global accounts
-    logging.debug(f'starting account thread: id={accountId} modèle: {accountModel}')
+    logging.info(f'starting account thread: id={accountId} modèle: {accountModel}')
 
     if accountId in accounts:
-        logging.debug(f"Thread for account {accountId} is already running!")
+        logging.info(f"Thread for account {accountId} is already running!")
         return
 
-    logging.info(f"Creating account <{accountModel}> id:{accountId}")
     queue = Queue()
     account = eval("account." + accountModel)(accountId, accountModel, queue, jeedom_com)
     accounts[accountId] = {
@@ -99,7 +98,6 @@ def start_account(accountModel, accountId):
             'thread' : account.run()
             }
     logging.debug(f"Thread for account {accountId} started")
-    logging.debug(accounts)
 
     # On informe Jeedon du démarrage
     jeedom_com.send_change_immediate({
@@ -110,14 +108,14 @@ def start_account(accountModel, accountId):
             
     return
 
-# -------- Lecture du socket ------------------------------------------------
+# -------- Lecture du socket (les messages provenant du plugin)-----------------
 
 def read_socket():
     global JEEDOM_SOCKET_MESSAGE
     global accounts
 
     if not JEEDOM_SOCKET_MESSAGE.empty():
-        # jeedom_socket a reçu un message qu'il a mis en queue que l'on récupère ici
+        # jeedom_socket a reçu un message qu'il a mis en queue. On récupère ici
         logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
         payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
 
@@ -130,21 +128,25 @@ def read_socket():
             logging.error("Invalid apikey from socket : " + str(payload))
             return
 
+        # Le model de l'account qui a envoyé le message
         if not 'model' in payload:
             logging.error("Message without accountModel")
             return
         accountModel = payload['model']
 
+        # L'id de l'account qui a envoyé le message
         if not 'id' in payload:
             logging.error(f"Message for accountModel ({accountModel}) but with no 'id'")
             return
         accountId = payload['id']
 
+        # Y-a-t-il un message?
         if not 'message' in payload:
             logging.error(f"Message for accountModel ({accountModel}) and id ({accountId}) but with no 'message'")
             return
         message = json.loads(payload['message'])
 
+        # Lancement du thread si le message le demande
         if 'cmd' in message and message['cmd'] == 'start':
             start_account(accountModel, accountId);
 
@@ -156,18 +158,17 @@ def read_socket():
             # on retire l'account de la liste
             del accounts[accountId]
 
-def listen_jeedom():
-    try:
-        while 1:
-            time.sleep(0.5)
-            read_socket()
-    except KeyboardInterrupt:
-        shutdown()
-
+def showThreads(level = 'debug'):
+    eval ('logging.' + level)("Threads en cours:")
+    for accountId in accounts:
+        accounts[accountId]['account'].test(level)
 
 # ----------- procédures d'arrêt -------------------------------------------
 
 def handler(signum=None, frame=None):
+    if (signum == signal.SIGUSR1):
+        showThreads('info');
+        return;
     logging.debug("Signal %i caught, exiting..." % int(signum))
     shutdown()
 
@@ -213,20 +214,35 @@ options()
 
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
+signal.signal(signal.SIGUSR1, handler)
 
 try:
     jeedom_utils.write_pid(str(_pidfile))
+
+    # Configuration du canal pour l'envoi de messages au plugin
     jeedom_com = jeedom_com(apikey = _apiKey, url=_callback)
     if (not jeedom_com.test()):
         logging.error('Network communication issue. Please fixe your Jeedom network configuration.')
         shutdown()
+
+    # Réception des messages du plugin qui seront mis en queue dans JEEDOM_SOCKET_MESSAGE
     jeedom_socket = jeedom_socket(port=_socketPort,address=_socketHost)
     jeedom_socket.open()
+
+    # Envoi d'un message au plugin
     jeedom_com.send_change_immediate({
         'object' : 'deamon',
         'info'   : 'started'
     })
-    listen_jeedom()
+
+    # Boucle de traitement des messages mis en queue par jeedom_socket
+    try:
+        while 1:
+            time.sleep(0.5)
+            read_socket()
+    except KeyboardInterrupt:
+        shutdown()
+
 except Exception as e:
     logging.error('Fatal error : '+str(e))
     logging.info(traceback.format_exc())

@@ -15,6 +15,7 @@
 #
 
 import sys
+from os.path import exists
 import threading
 import time
 from queue import Queue
@@ -35,7 +36,6 @@ class account():
         self._transforms = configparser.ConfigParser()
         self._transforms.read(f"{configDir}/transforms.ini")
         self._transforms.read(f"{configDir}/{model}/transforms.ini")
-        self.log_info(f'Account créé')
 
     def log_debug(self,txt):
         logging.debug(f'[account][{self._model}][{self._id}] {txt}')
