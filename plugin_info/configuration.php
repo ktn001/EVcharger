@@ -57,6 +57,7 @@ $defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon
               <th style='text-align:center'>{{Couleurs personnalisées}}</th>
               <th style='text-align:center'>{{Couleur du tag}}</th>
               <th style='text-align:center'>{{Couleur du texte du tag}}</th>
+              <th style='text-align:center'>{{options}}</th>
             </tr>
           </thead>
           <tbody>
@@ -71,12 +72,17 @@ $defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon
                 $cfg['tagTextColor'] = $defaultTextTagColor;
                 config::save('model::' . $modelName,$cfg,'EVcharger');
               }
-              echo '<tr>';
+              echo '<tr data-model="' . $modelName . '">';
               echo '<td>' . $model['label'] . '</td>';
               echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="enabled"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="customColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagColor"/></td>';
               echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagTextColor"/></td>';
+	      if (file_exists(__DIR__ . "/../desktop/modal/" . $modelName . "/config.php")) {
+	        echo '<td style="text-align:center"><a class="btn btn-default btn-xs" action="configModel"><i class="fas fa-cogs"</i></a></td>';
+	      } else {
+	        echo '<td></td>';
+	      }
               echo '</tr>';
             }
             ?>
@@ -92,11 +98,16 @@ $(".configKey[data-l1key^='model::'][data-l2key='enabled']").on('change',functio
 	if ($(this).value() == 1) {
 		return;
 	}
-	model = $(this).attr('data-l1key').slice(6);
+	model = $(this).closest('tr').data('model');
 	if (usedTypes.indexOf(model) != -1) {
 		$(this).value(1);
 		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte pour ce modèle.}}"});
 	}
 
+});
+
+$('.btn[action=configModel]').off('click').on('click',function(){
+	model = $(this).closest('tr').data('model');
+	console.log('MODEL: ' + model);
 });
 </script>
