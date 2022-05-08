@@ -52,8 +52,8 @@ class EVcharger_charger extends EVcharger {
 		}
 		$ids = array();
 		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
-		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
-			log::add("EVcharger","debug","XXXX " . $logicalId);
+		$model = $this->getModel();
+		foreach ($model->commands() as $logicalId => $config) {
 			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			if (!is_object($cmd)){
 				if ($updateOnly) {
@@ -154,7 +154,7 @@ class EVcharger_charger extends EVcharger {
 
 			$cmd->save();
 		}
-		foreach (model::commands($this->getConfiguration('model')) as $logicalId => $config) {
+		foreach ($model->commands() as $logicalId => $config) {
 			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
 			$needSave = false;
 			if (array_key_exists('calcul',$config)){
@@ -213,9 +213,10 @@ class EVcharger_charger extends EVcharger {
 		}
 
 	}
+
     // Fonction exécutée automatiquement avant la création de l'équipement
 	public function preInsert() {
-		$this->setConfiguration('image',model::images($this->getConfiguration('model'),'charger')[0]);
+		$this->setConfiguration('image',$this->getModel()->images('charger')[0]);
 	}
 
     // Fonction exécutée automatiquement après la création de l'équipement
@@ -286,6 +287,10 @@ class EVcharger_charger extends EVcharger {
 		}
 	}
 
+	public function getModel() {
+		return model::byName($this->getConfiguration('model'));
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 	public function getAccountId() {
@@ -309,6 +314,7 @@ class EVcharger_charger extends EVcharger {
 		$this->setConfiguration('image',$_image);
 		return $this;
 	}
+
 }
 
 class EVcharger_chargerCmd extends EVchargerCmd  {

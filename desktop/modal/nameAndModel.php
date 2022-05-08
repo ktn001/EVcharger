@@ -67,6 +67,7 @@ function mod_nameAndModel(action) {
                 }
                 $('#mod_nameAndModel select').empty();
                 labels = json_decode(data.result);
+		console.log(labels);
                 for (model in labels) {
                     option = '<option value="' + model + '">' + labels[model] + '</option>';
                     $('#mod_nameAndModel select').append(option);

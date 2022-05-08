@@ -23,9 +23,9 @@ if (!isConnect()) {
 }
 include_file('core', 'EVcharger', 'class', 'EVcharger');
 sendVarToJS('usedTypes',model::allUsed());
-$defaultTagColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor'];
-$defaultTextTagColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor'];
-$defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon::port'];
+sendVarToJS('defaultTagColor', config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor']);
+sendVarToJS('defaultTagTextColor', config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor']);
+sendVarToJS('defaultPort', config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon::port']);
 ?>
 
 <form class="form-horizontal">
@@ -49,7 +49,7 @@ $defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon
       </div>
       <div class='col-sm-6'>
         <legend><i class="fas fa-charging-station"></i> {{Les modèles de chargeurs}}:</legend>
-        <table class='table table-bordered'>
+        <table id='models' class='table table-bordered'>
           <thead>
             <tr>
               <th>{{Type}}</th>
@@ -60,33 +60,7 @@ $defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon
               <th style='text-align:center'>{{options}}</th>
             </tr>
           </thead>
-          <tbody>
-            <?php
-            foreach (model::all(false) as $modelName => $model) {
-              if ($modelName[0] == '_') {
-                continue;
-              }
-              $config = config::byKey('model::' . $modelName,'EVcharger');
-              if ($config == '') {
-                $cfg['tagColor'] = $defaultTagColor;
-                $cfg['tagTextColor'] = $defaultTextTagColor;
-                config::save('model::' . $modelName,$cfg,'EVcharger');
-              }
-              echo '<tr data-model="' . $modelName . '">';
-              echo '<td>' . $model['label'] . '</td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="enabled"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="checkbox" data-l1key="model::' . $modelName . '" data-l2key="customColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagColor"/></td>';
-              echo '<td style="text-align:center"><input class="configKey" type="color" data-l1key="model::' . $modelName . '" data-l2key="tagTextColor"/></td>';
-	      if (file_exists(__DIR__ . "/../desktop/modal/" . $modelName . "/config.php")) {
-	        echo '<td style="text-align:center"><a class="btn btn-default btn-xs" action="configModel"><i class="fas fa-cogs"</i></a></td>';
-	      } else {
-	        echo '<td></td>';
-	      }
-              echo '</tr>';
-            }
-            ?>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </div>
@@ -94,20 +68,130 @@ $defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon
 </form>
 
 <script>
+
+$.ajax({
+  type: 'POST',
+  url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+  data: {
+    action: 'models',
+  },
+  dataType: 'json',
+  global: false,
+  error: function (request, status, error) {
+    handleAjaxError(request, status, error);
+  },
+  success: function (data) {
+    if (data.state != 'ok') {
+      $('#div_alert').showAlert({message: data.result, level: 'danger'});
+      return;
+    }
+    $('.model').remove();
+    for (var _model of data.result) {
+	    console.log(_model);
+      tr = '<tr class="model" data-model="' + _model.name + '">';
+      tr += '<td><input class="modelAttr" data-l1key="label" disabled></input><input class="modelAttr", data-l1key="name" style="display:none"</td>';
+      tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="enabled"/></td>';
+      tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="customColor"/></td>';
+      tr += '<td style="text-align:center"><input class="modelAttr" type="color" data-l1key="configuration" data-l2key="tagColor" value="' + defaultTagColor + '"/></td>';
+      tr += '<td style="text-align:center"><input class="modelAttr" type="color" data-l1key="configuration" data-l2key="tagTextColor" value="' + defaultTagTextColor + '"/></td>';
+      if (_model.haveModalOptions) {
+        tr += '<td style="text-align:center"><a class="btn btn-default btn-xs" action="configModel"><i class="fas fa-cogs"</i></a></td>';
+      } else {
+        tr += '<td></td>';
+      }
+      tr += '</tr>';
+      $('table#models tbody').append(tr);
+      $('table#models tbody tr').last().setValues(_model,'.modelAttr');
+    }
+
+  }
+});
+
 $(".configKey[data-l1key^='model::'][data-l2key='enabled']").on('change',function(){
-	if ($(this).value() == 1) {
-		return;
-	}
-	model = $(this).closest('tr').data('model');
-	if (usedTypes.indexOf(model) != -1) {
-		$(this).value(1);
-		bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte pour ce modèle.}}"});
-	}
+  if ($(this).value() == 1) {
+    return;
+  }
+  model = $(this).closest('tr').data('model');
+  if (usedTypes.indexOf(model) != -1) {
+    $(this).value(1);
+    bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte pour ce modèle.}}"});
+  }
 
 });
 
-$('.btn[action=configModel]').off('click').on('click',function(){
-	model = $(this).closest('tr').data('model');
-	console.log('MODEL: ' + model);
+$('table#models tbody').delegate('.btn[action=configModel]','click',function(){
+  model = $(this).closest('tr').data('model');
+  modelLabel = $(this).closest('tr').find('[data-l1key=label]').value();
+  contName = 'modContainer_Config_' + model;
+  contId = '#' + contName;
+  if ($(contId).length == 0) {
+    $('body').append('<div id="' + contName + '"></div>');
+    $.ajaxSetup({async: false});
+    $(contId).load('index.php?v=d&plugin=EVcharger&modal=' + model + '/config');
+    $.ajaxSetup({async: true});
+    $('#' + contName).dialog({
+      closeText: '',
+      autoOpen: false,
+      modal: true,
+      height: 200,
+      width: 400
+    });
+  }
+  $(contId).dialog({title: '{{Modèle}}' + ': ' + modelLabel});
+  $(contId).dialog('option', 'buttons', {
+    "{{Annuler}}": function() {
+      $(this).dialog("close");
+    },
+    "{{Valider}}": function() {
+      configs = json_encode($(contId).getValues('.configKey'));
+      $.ajax({
+        type: 'POST',
+        url: '/plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+        data: {
+          action: 'saveModels',
+          configs : configs
+        },
+        dataType : 'json',
+        global: false,
+        error: function (request, status, error) {
+          handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+          if (data.state != 'ok') {
+            $('#div_alert').showAlert({message: data.result, level: 'danger'});
+            return;
+          }
+        }
+
+      })
+      configs = $(contId).getValues('.configKey');
+      $(this).dialog("close");
+    }
+  })
+  $(contId).dialog('open');
 });
+
+function EVcharger_postSaveConfiguration () {
+  models = $('table#models tbody').find('.model').getValues('.modelAttr');
+  console.log(models);
+  $.ajax({json_encode(models)
+    type: 'POST',
+    url: '/plugins/EVcharger/core/ajax/EVcharger.ajax.php',
+    data: {
+      action: 'saveModels',
+      models : json_encode(models)
+    },
+    dataType : 'json',
+    global: false,
+    error: function (request, status, error) {
+      handleAjaxError(request, status, error);
+    },
+    success: function (data) {
+      if (data.state != 'ok') {
+        $('#div_alert').showAlert({message: data.result, level: 'danger'});
+        return;
+      }
+    }
+  })
+}
 </script>

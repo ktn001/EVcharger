@@ -21,59 +21,21 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div id="mod_nameAndModel">
+<div id="easee_config">
   <form class="form-horizontal">
     <fieldset>
       <div class="form-group">
-        <label class="control-label col-sm-3">{{Nom}}:</label>
-        <input class="eqLogicAttr col-sm-8" data-l1key='name' type="text" placeholder="{{Nom}}"></input>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-3">{{Model}}:</label>
-        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='model'>
-        </select>
+        <legend class"cal-sm-12"><i class="fas fa-university"></i> {{Démon}}:</legend>
+        <label class="control-label col-sm-5">{{log complet}}:</label>
+        <input class="configKey" data-l1key='TOTO' type="checkbox"></input>
+        <sup><i class="fas fa-question-circle" title="{{Le deamon log aussi la communication avec le cloud (très verbeux en mode debug)}}"></i></sup>
       </div>
     </fieldset>
   </form>
 </div>
 
 <script>
-function mod_nameAndModel_init() {
-}
 
-function mod_nameAndModel(action) {
-    if (action == 'result') {
-        return $('#mod_nameAndModel').getValues('.eqLogicAttr');
-    }
-
-    if (action == 'init') {
-	$('#mod_nameAndModel input[data-l1key=name]').value("");
-        $.ajax({
-            type: 'POST',
-            url: 'plugins/EVcharger/core/ajax/EVcharger.ajax.php',
-            data: {
-                action: 'modelLabels',
-                onlyEnable: 1,
-            },
-            dataType: 'json',
-            global: false,
-            error: function (request, status, error) {
-                handleAjaxError(request, status, error);
-            },
-            success: function (data) {
-                if (data.state != 'ok') {
-                    $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                    return;
-                }
-                $('#mod_nameAndModel select').empty();
-                labels = json_decode(data.result);
-                for (model in labels) {
-                    option = '<option value="' + model + '">' + labels[model] + '</option>';
-                    $('#mod_nameAndModel select').append(option);
-                }
-            },
-        });
-    }
-}
+$("#easee_config sup i").tooltipster();
 
 </script>

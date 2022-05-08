@@ -22,43 +22,61 @@ require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 class model {
 
-    /*     * ***********************Methodes static************************** */
+	private $name;
+	private $label;
+	private $configuration;
+	private static $_modelsFile = __DIR__ . "/../config/models.ini";
+
+    /*     * *********************** Constructeur ***************************** */
+
+	function __construct($name) {
+		$this->name = $name;
+		$models = parse_ini_file(self::$_modelsFile,true);
+		if ($models == false) {
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),self::$_modelsFile);
+			// log::add("EVcharger","error",$msg);
+			throw new Exception($msg);
+		}
+		if (!array_key_exists($name,$models)) {
+			throw new Exception (sprintf(__('%s est introuvable dans %s',__FILE__),$name, self::$_modelsFile));
+		}
+		if (array_key_exists('label',$models[$name])) {
+			$this->label = translate::exec($models[$name]['label'],__FILE__);
+		} else {
+			$this->label = $name;
+		}
+		$this->configuration = config::byKey('model::' . $name, 'EVcharger');
+	}
+
+    /*     * *********************** Methodes static ************************** */
 
 	public static function all($onlyEnabled = true ) {
-		$modelsFile = __DIR__ . "/../config/models.ini";
-		$models = parse_ini_file($modelsFile,true);
+		$models = parse_ini_file(self::$_modelsFile,true);
 		if ($models == false) {
-			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),$modelsFile);
+			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),self::$_modelsFile);
 			log::add("EVcharger","error",$msg);
 			throw new Exception($msg);
 		}
 		$result = array();
-		foreach ($models as $modelName => $config){
-			$config['label'] = translate::exec($config['label'],__FILE__);
-			$model = config::byKey('model::' . $modelName, 'EVcharger');
-			if (is_array($model)){
-				$model = array_merge($config, $model);
-			} else {
-				$model = $config;
-				$model['enabled'] = 0;
-			}
-			if ($onlyEnabled == false or $model['enabled'] == 1) {
+		foreach (array_keys($models) as $modelName){
+			$model = new self($modelName);
+			if ($onlyEnabled == false or $model->isEnabled()) {
 				$result[$modelName] = $model;
 			}
 		}
 		return $result;
 	}
 
+	public static function byName($modelName ) {
+		return new self($modelName);
+	}
+
 	public static function labels($onlyEnabled = true) {
 		$labels = array();
 		foreach (model::all($onlyEnabled) as $modelName => $model) {
-			$labels[$modelName] = $model['label'];
+			$labels[$modelName] = $model->getLabel();
 		}
 		return $labels;
-	}
-
-	public static function byName($modelName ) {
-		return self::all()[$modelName];
 	}
 
 	public static function allUsed() {
@@ -69,9 +87,27 @@ class model {
 		return array_keys($used);
 	}
 
-	public static function images($model, $objet) {
+	private static function getConfigs($model) {
+		return parse_ini_file(__DIR__ . '/../config/' . $model . '/config.ini' ,true);
+	}
+
+	public static function getIdentifiantCharger($model) {
+		return model::getConfigs($model)['charger']['identifiant'];
+	}
+
+    /*     * *********************** Méthodes d'instance ********************** */
+
+	public function save() {
+		config::save('model::' . $this->name, $this->configuration, 'EVcharger');
+	}
+
+	public function isEnabled() {
+		return $this->getConfiguration('enabled',0);
+	}
+
+	public function images($objet) {
 		$images = array();
-		$path = realpath(__DIR__ . '/../../desktop/img/' . $model);
+		$path = realpath(__DIR__ . '/../../desktop/img/' . $this->name);
 		if ($dir = opendir($path)){
 			while (($fileName = readdir($dir)) !== false){
 				if (preg_match('/^' . $objet . '.*\.png$/', $fileName)){
@@ -86,7 +122,7 @@ class model {
 		return $images;
 	}
 
-	public static function commands($model, $requiredOnly = false) {
+	public function commands($requiredOnly = false) {
 
 		$parameters = array(
 			'calcul',
@@ -114,7 +150,7 @@ class model {
 		$configFile = 'cmd.config.ini';
 
 		$globalConfigs = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
-		$modelConfigs = parse_ini_file($configPath.'/'.$model.'/'.$configFile,true, INI_SCANNER_RAW);
+		$modelConfigs = parse_ini_file($configPath.'/' . $this->name . '/' . $configFile,true, INI_SCANNER_RAW);
 
 		$sections = array();
 		foreach (array_keys($globalConfigs) as $section) {
@@ -173,7 +209,7 @@ class model {
 			if ($cmdConfigs[$cmd]['required'] == 'no') {
 				unset ($cmdConfigs[$cmd]);
 			} elseif ($cmdConfigs[$cmd]['required'] == 'optional') {
-			       	if ( $requiredOnly) {
+				if ( $requiredOnly) {
 					unset ($cmdConfigs[$cmd]);
 				}
 			} elseif ($cmdConfigs[$cmd]['required'] != 'yes') {
@@ -200,14 +236,24 @@ class model {
 		return $cmdConfigs;
 	}
 
-	private static function getConfigs($model) {
-		return parse_ini_file(__DIR__ . '/../config/' . $model . '/config.ini' ,true);
+    /*     * *********************** Getteur Setteur ************************** */
+
+	public function getConfiguration($_key = '', $_default = '') {
+		return utils::getJsonAttr($this->configuration, $_key, $_default);
 	}
 
-	public static function getIdentifiantCharger($model) {
-		return model::getConfigs($model)['charger']['identifiant'];
+	public function setConfiguration($_key, $_value) {
+		$configuration = utils::setJsonAttr($this->configuration, $_key, $value);
+		$this->changed = utils::attrChanged($this->_changed, $this->configuration, $configuration);
+		$this->configuration = $configuration;
+		return $this;
 	}
 
-    /*     * **********************Getteur Setteur*************************** */
+	public function getLabel() {
+		return $this->label;
+	}
 
+	public function getName() {
+		return $this->name;
+	}
 }

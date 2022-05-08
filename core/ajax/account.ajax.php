@@ -29,11 +29,12 @@ try {
 	log::add("EVcharger","debug","┌─Ajax Account: action: " . init('action'));
 
 	if (init('action') == 'images') {
-		$model = init('model');
+		$modelName = init('model');
 		if (model == '') {
 			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
 		}
-		ajax::success(json_encode(model::images($model, 'account')));
+		$model = model::byName($modelName);
+		ajax::success(json_encode($model->images('account')));
 	}
 
 	if (init('action') == 'getAccountToSelect') {
