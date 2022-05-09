@@ -88,8 +88,8 @@ $.ajax({
     $('.model').remove();
     for (var _model of data.result) {
 	    console.log(_model);
-      tr = '<tr class="model" data-model="' + _model.name + '">';
-      tr += '<td><input class="modelAttr" data-l1key="label" disabled></input><input class="modelAttr", data-l1key="name" style="display:none"</td>';
+      tr = '<tr class="model" data-model="' + _model.modelId + '">';
+      tr += '<td><input class="modelAttr" data-l1key="label" disabled></input><input class="modelAttr", data-l1key="modelId" style="display:none"</td>';
       tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="enabled"/></td>';
       tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="customColor"/></td>';
       tr += '<td style="text-align:center"><input class="modelAttr" type="color" data-l1key="configuration" data-l2key="tagColor" value="' + defaultTagColor + '"/></td>';
@@ -174,7 +174,7 @@ $('table#models tbody').delegate('.btn[action=configModel]','click',function(){
 function EVcharger_postSaveConfiguration () {
   models = $('table#models tbody').find('.model').getValues('.modelAttr');
   console.log(models);
-  $.ajax({json_encode(models)
+  $.ajax({
     type: 'POST',
     url: '/plugins/EVcharger/core/ajax/EVcharger.ajax.php',
     data: {

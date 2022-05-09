@@ -31,11 +31,11 @@ try {
 	}
 
 	if (init('action') == 'images') {
-		$modelName = init('model');
-		if ($modelName == '') {
+		$modelId = init('model');
+		if ($modelId == '') {
 			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
-		$model = model::byName($modelName);
+		$model = model::byId($modelId);
 		ajax::success(json_encode($model->images('charger')));
 	}
 
@@ -92,9 +92,9 @@ try {
 	if (init('action') == 'models') {
 		$models = array();
 		foreach (model::all(false) as $model) {
-			$name = $model->getName();
+			$modelId = $model->getModelId();
 			$model = utils::o2a($model);
-			if (file_exists(__DIR__ . "/../../desktop/modal/" . $name . "/config.php")){
+			if (file_exists(__DIR__ . "/../../desktop/modal/" . $modelId . "/config.php")){
 				$model['haveModalOptions'] = 1;
 			} else {
 				$model['haveModalOptions'] = 0;
@@ -105,7 +105,12 @@ try {
 	}
 
 	if (init('action') == 'saveModels'){
-		$models = json_decode(init('models'));
+		$models = json_decode(init('models'),true);
+		foreach ($models as $model) {
+			$dbModel = model::byId($model['modelId']);
+			utils::a2o($dbModel,$model);
+			$dbModel->save();
+		}
 		ajax::success();
 	}
 	throw new Exception(__("Aucune méthode correspondante à : ", __FILE__) . init('action'));

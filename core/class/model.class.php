@@ -22,30 +22,30 @@ require_once __DIR__ . '/../php/EVcharger.inc.php';
 
 class model {
 
-	private $name;
+	private $modelId;
 	private $label;
 	private $configuration;
 	private static $_modelsFile = __DIR__ . "/../config/models.ini";
 
     /*     * *********************** Constructeur ***************************** */
 
-	function __construct($name) {
-		$this->name = $name;
+	function __construct($modelId) {
+		$this->modelId = $modelId;
 		$models = parse_ini_file(self::$_modelsFile,true);
 		if ($models == false) {
 			$msg = sprintf(__('Erreur lors de la lecture de %s',__FILE__),self::$_modelsFile);
 			// log::add("EVcharger","error",$msg);
 			throw new Exception($msg);
 		}
-		if (!array_key_exists($name,$models)) {
-			throw new Exception (sprintf(__('%s est introuvable dans %s',__FILE__),$name, self::$_modelsFile));
+		if (!array_key_exists($modelId,$models)) {
+			throw new Exception (sprintf(__('%s est introuvable dans %s',__FILE__),$modelId, self::$_modelsFile));
 		}
-		if (array_key_exists('label',$models[$name])) {
-			$this->label = translate::exec($models[$name]['label'],__FILE__);
+		if (array_key_exists('label',$models[$modelId])) {
+			$this->label = translate::exec($models[$modelId]['label'],__FILE__);
 		} else {
-			$this->label = $name;
+			$this->label = $modelId;
 		}
-		$this->configuration = config::byKey('model::' . $name, 'EVcharger');
+		$this->configuration = config::byKey('model::' . $modelId, 'EVcharger');
 	}
 
     /*     * *********************** Methodes static ************************** */
@@ -67,8 +67,8 @@ class model {
 		return $result;
 	}
 
-	public static function byName($modelName ) {
-		return new self($modelName);
+	public static function byId($modelId) {
+		return new self($modelId);
 	}
 
 	public static function labels($onlyEnabled = true) {
@@ -98,7 +98,7 @@ class model {
     /*     * *********************** Méthodes d'instance ********************** */
 
 	public function save() {
-		config::save('model::' . $this->name, $this->configuration, 'EVcharger');
+		config::save('model::' . $this->modelId, $this->configuration, 'EVcharger');
 	}
 
 	public function isEnabled() {
@@ -107,7 +107,7 @@ class model {
 
 	public function images($objet) {
 		$images = array();
-		$path = realpath(__DIR__ . '/../../desktop/img/' . $this->name);
+		$path = realpath(__DIR__ . '/../../desktop/img/' . $this->modelId);
 		if ($dir = opendir($path)){
 			while (($fileName = readdir($dir)) !== false){
 				if (preg_match('/^' . $objet . '.*\.png$/', $fileName)){
@@ -150,7 +150,7 @@ class model {
 		$configFile = 'cmd.config.ini';
 
 		$globalConfigs = parse_ini_file($configPath . "/" . $configFile,true, INI_SCANNER_RAW);
-		$modelConfigs = parse_ini_file($configPath.'/' . $this->name . '/' . $configFile,true, INI_SCANNER_RAW);
+		$modelConfigs = parse_ini_file($configPath.'/' . $this->modelId . '/' . $configFile,true, INI_SCANNER_RAW);
 
 		$sections = array();
 		foreach (array_keys($globalConfigs) as $section) {
@@ -239,21 +239,25 @@ class model {
     /*     * *********************** Getteur Setteur ************************** */
 
 	public function getConfiguration($_key = '', $_default = '') {
-		return utils::getJsonAttr($this->configuration, $_key, $_default);
+		if ($_key == ''){
+			return is_array($this->configuration) ? $this->configuration : array();
+		}
+		$configuration = $this->configuration;
+		if (array_key_exists($_key,$configuration)) {
+			return $configuration[$_key];
+		}
+		return $_default;
 	}
 
 	public function setConfiguration($_key, $_value) {
-		$configuration = utils::setJsonAttr($this->configuration, $_key, $value);
-		$this->changed = utils::attrChanged($this->_changed, $this->configuration, $configuration);
-		$this->configuration = $configuration;
-		return $this;
+		$this->configuration[$_key] = $_value;
 	}
 
 	public function getLabel() {
 		return $this->label;
 	}
 
-	public function getName() {
-		return $this->name;
+	public function getModelId() {
+		return $this->modelId;
 	}
 }

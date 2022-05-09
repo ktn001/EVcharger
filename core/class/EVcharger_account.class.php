@@ -20,8 +20,8 @@ class EVcharger_account extends EVcharger {
 
 	protected static $_haveDeamon = false;
 
-	public static function byModel($_model){
-		$eqType_name = "EVcharger_account_" . $_model;
+	public static function byModel($_modelId){
+		$eqType_name = "EVcharger_account_" . $_modelId;
 		return self::byType($eqType_name);
 	}
 

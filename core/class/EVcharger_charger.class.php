@@ -288,7 +288,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getModel() {
-		return model::byName($this->getConfiguration('model'));
+		return model::byId($this->getConfiguration('model'));
 	}
 
     /*     * **********************Getteur Setteur*************************** */

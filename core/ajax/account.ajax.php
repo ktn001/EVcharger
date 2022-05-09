@@ -33,7 +33,7 @@ try {
 		if (model == '') {
 			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
 		}
-		$model = model::byName($modelName);
+		$model = model::byId($modelName);
 		ajax::success(json_encode($model->images('account')));
 	}
 
