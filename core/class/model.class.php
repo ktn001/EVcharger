@@ -45,7 +45,7 @@ class model {
 		} else {
 			$this->label = $modelId;
 		}
-		$this->configuration = config::byKey('model::' . $modelId, 'EVcharger');
+		$this->configuration = config::byKey('model::' . $modelId, 'EVcharger', array());
 	}
 
     /*     * *********************** Methodes static ************************** */
@@ -234,6 +234,25 @@ class model {
 			}
 		}
 		return $cmdConfigs;
+	}
+
+	public function getHumanName($_tag = false, $_prettify = false) {
+		if ($_tag) {
+			if ($_prettify) {
+				if ($this->getConfiguration('customColor') == 1) {
+					$backgoundColor = $this->getConfiguration('tagColor');
+					$textColor = $this->getConfiguration('tagTextColor');
+				} else {
+					$backgoundColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor'];
+					$textColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor'];
+				}
+				return '<span class="label model" style="background-color:' . $backgroundColor . ';color:' . $texteColor . '">' . $this->getLabel() . '</span>';
+			} else {
+				return $this->getLabel();
+			}
+		} else {
+			return '[' . $this->getLabel() . ']';
+		}
 	}
 
     /*     * *********************** Getteur Setteur ************************** */

@@ -1,3 +1,14 @@
 div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_vehicle] img {
 	min-height: auto !important;
 }
+
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account] {
+	height: 190px !important;
+}
+
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account] .model {
+	position: relative;
+	top: -10px !important;
+	background-color: red;
+}
+

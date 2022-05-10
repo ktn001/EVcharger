@@ -55,7 +55,7 @@ class EVcharger_account extends EVcharger {
 				return;
 			}
 			$params['apikey'] = jeedom::getApiKey('EVcharger');
-			$params['model'] = $this->getModel();
+			$params['model'] = $this->getModelId();
 			$params['id'] = $this->getId();
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
@@ -98,7 +98,7 @@ class EVcharger_account extends EVcharger {
 	}
 
 	protected function getMapping() {
-		$mappingFile = __DIR__ . '/../../core/config/' . $this->getModel() . '/mapping.ini';
+		$mappingFile = __DIR__ . '/../../core/config/' . $this->getModelId() . '/mapping.ini';
 		if (! file_exists($mappingFile)) {
 			return false;
 		}
@@ -110,7 +110,7 @@ class EVcharger_account extends EVcharger {
 	}
 
 	protected function getTransforms() {
-		$transformsFile = __DIR__ . '/../../core/config/' . $this->getModel() . '/transforms.ini';
+		$transformsFile = __DIR__ . '/../../core/config/' . $this->getModelId() . '/transforms.ini';
 		if (! file_exists($transformsFile)) {
 			return false;
 		}
@@ -162,8 +162,12 @@ class EVcharger_account extends EVcharger {
 		}
 	}
 
-	public function getModel() {
+	public function getModelId() {
 		return $this->getConfiguration('model');
+	}
+
+	public function getModel() {
+		return model::byId($this->getModelId());
 	}
 }
 

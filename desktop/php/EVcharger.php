@@ -67,7 +67,11 @@ sendVarToJS('modelLabels',model::labels());
 		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $account->getId() . '" data-eqLogic_type="EVcharger_account" data-eqLogic_model="' . $account->getconfiguration('model') . '">';
 		echo '<img src="' . $account->getImage() . '" style="width:unset !important"/>';
 		echo '<br>';
-		echo '<span class="name">' . $account->getHumanName(true, true) . '</span>';
+		echo '<span class="name">';
+		echo $account->getHumanName(true, true);
+		echo '<br>';
+		echo $account->getModel()->getHumanName(true,true);
+		echo '</span>';
 		echo '</div>';
 	    }
 	    foreach ($chargers as $charger) {
