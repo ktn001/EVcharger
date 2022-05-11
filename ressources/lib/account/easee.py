@@ -70,7 +70,7 @@ class easee(account):
             else:
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'charger'
-                msg2Jeedom['model'] = 'easee'
+                msg2Jeedom['modelId'] = 'easee'
                 msg2Jeedom['charger'] = serial
                 msg2Jeedom['info'] = 'closed'
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
@@ -96,7 +96,7 @@ class easee(account):
             for logicalId in self._mapping['signalR_id'][cmd_id].split(','):
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'cmd'
-                msg2Jeedom['model'] = 'easee'
+                msg2Jeedom['modelId'] = 'easee'
                 msg2Jeedom['charger'] = message['mid']
                 msg2Jeedom['logicalId'] = logicalId
                 msg2Jeedom['value'] = message['value']

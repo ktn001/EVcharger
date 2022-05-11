@@ -64,7 +64,7 @@ sendVarToJS('modelLabels',model::labels());
 	    <?php
             foreach ($accounts as $account) {
 		$opacity = ($account->getIsEnable()) ? '' : 'disableCard';
-		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $account->getId() . '" data-eqLogic_type="EVcharger_account" data-eqLogic_model="' . $account->getconfiguration('model') . '">';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $account->getId() . '" data-eqLogic_type="EVcharger_account" data-eqLogic_modelId="' . $account->getconfiguration('modelId') . '">';
 		echo '<img src="' . $account->getImage() . '" style="width:unset !important"/>';
 		echo '<br>';
 		echo '<span class="name">';
@@ -76,7 +76,7 @@ sendVarToJS('modelLabels',model::labels());
 	    }
 	    foreach ($chargers as $charger) {
 		$opacity = ($charger->getIsEnable()) ? '' : 'disableCard';
-		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '" data-eqLogic_type="EVcharger_charger" data-eqLogic_model="' . $charger->getconfiguration('model') . '">';
+		echo '<div class="eqLogicDisplayCard cursor '.$opacity.'" data-eqLogic_id="' . $charger->getId() . '" data-eqLogic_type="EVcharger_charger" data-eqLogic_modelId="' . $charger->getconfiguration('modelId') . '">';
 		echo '<img src="' . $charger->getPathImg() . '" style="width:unset !important"/>';
 		echo '<br>';
 		echo '<span class="name">' . $charger->getHumanName(true, true) . '</span>';
@@ -145,7 +145,7 @@ sendVarToJS('modelLabels',model::labels());
 				<label class="col-sm-3 control-label">{{Nom du compte}}</label>
 				<div class="col-sm-7">
 				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="id" style="display : none;"/>
-				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
+				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="configuration" data-l2key="modelId" style="display : none;"/>
 				    <input type="text" class="EVcharger_accountAttr form-control" data-l1key="name" placeholder="{{Nom du compte}}"/>
 				</div>
 			    </div>
@@ -221,7 +221,7 @@ sendVarToJS('modelLabels',model::labels());
 				<label class="col-sm-3 control-label">{{Nom du chargeur}}</label>
 				<div class="col-sm-7">
 				    <input type="text" class="EVcharger_chargerAttr form-control" data-l1key="id" style="display : none;"/>
-				    <input type="text" class="EVcharger_chargerAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
+				    <input type="text" class="EVcharger_chargerAttr form-control" data-l1key="configuration" data-l2key="modelId" style="display : none;"/>
 				    <input type="text" class="EVcharger_chargerAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
 			    </div>
@@ -326,7 +326,7 @@ sendVarToJS('modelLabels',model::labels());
 				<label class="col-sm-3 control-label">{{Nom du chargeur}}</label>
 				<div class="col-sm-7">
 				    <input type="text" class="EVcharger_vehicleAttr form-control" data-l1key="id" style="display : none;"/>
-				    <input type="text" class="EVcharger_vehicleAttr form-control" data-l1key="configuration" data-l2key="model" style="display : none;"/>
+				    <input type="text" class="EVcharger_vehicleAttr form-control" data-l1key="configuration" data-l2key="modelId" style="display : none;"/>
 				    <input type="text" class="EVcharger_vehicleAttr form-control" data-l1key="name" placeholder="{{Nom du chargeur}}"/>
 				</div>
 			    </div>

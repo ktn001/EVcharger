@@ -55,7 +55,7 @@ class EVcharger_account extends EVcharger {
 				return;
 			}
 			$params['apikey'] = jeedom::getApiKey('EVcharger');
-			$params['model'] = $this->getModelId();
+			$params['modelId'] = $this->getModelId();
 			$params['id'] = $this->getId();
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
@@ -163,7 +163,7 @@ class EVcharger_account extends EVcharger {
 	}
 
 	public function getModelId() {
-		return $this->getConfiguration('model');
+		return $this->getConfiguration('modelId');
 	}
 
 	public function getModel() {

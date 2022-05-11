@@ -26,23 +26,25 @@ try {
 		throw new Exception(__('401 - Accès non autorisé', __FILE__));
 	}
 
+	log::add("EVcharger","debug","  Ajax EVcharger: action: " . init('action'));
+
 	if (init('action') == 'modelLabels') {
 		ajax::success(json_encode(model::labels()));
 	}
 
 	if (init('action') == 'images') {
-		$modelId = init('model');
+		$modelId = init('modelId');
 		if ($modelId == '') {
-			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
+			throw new Exception(__("2 Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
 		$model = model::byId($modelId);
 		ajax::success(json_encode($model->images('charger')));
 	}
 
 	if (init('action') == 'ParamsHtml') {
-		$model = init('model');
+		$model = init('modelId');
 		if ($model == '') {
-			throw new Exception(__("Le modèle de chargeur n'est pas indiqué",__FILE__));
+			throw new Exception(__("1 Le modèle de chargeur n'est pas indiqué",__FILE__));
 		}
 		$object = init('object');
 		if ($object == '') {

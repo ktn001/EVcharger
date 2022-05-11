@@ -29,17 +29,17 @@ try {
 	log::add("EVcharger","debug","┌─Ajax Account: action: " . init('action'));
 
 	if (init('action') == 'images') {
-		$modelName = init('model');
-		if (model == '') {
+		$modelId = init('modelId');
+		if (modelId == '') {
 			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
 		}
-		$model = model::byId($modelName);
-		ajax::success(json_encode($model->images('account')));
+		$modelId = model::byId($modelId);
+		ajax::success(json_encode($modelId->images('account')));
 	}
 
 	if (init('action') == 'getAccountToSelect') {
 		$result = array();
-		foreach (EVcharger_account::byModel(init('model')) as $account) {
+		foreach (EVcharger_account::byModel(init('modelId')) as $account) {
 			$data = array(
 				'id' => $account->getId(),
 				'value' => $account->getHumanName(),

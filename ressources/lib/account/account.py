@@ -27,31 +27,31 @@ import configparser
 class account():
     """Class de base pour les differents modèles d'account"""
 
-    def __init__(self, id, model, queue, jeedom_com):
+    def __init__(self, id, modelId, queue, jeedom_com):
         self._id = id
-        self._model = model
+        self._modelId = modelId
         self._jeedomQueue = queue
         self._jeedom_com = jeedom_com
         configDir = os.path.dirname(__file__) + '/../../../core/config'
         self._transforms = configparser.ConfigParser()
         self._transforms.read(f"{configDir}/transforms.ini")
-        self._transforms.read(f"{configDir}/{model}/transforms.ini")
+        self._transforms.read(f"{configDir}/{modelId}/transforms.ini")
 
     def log_debug(self,txt):
-        logging.debug(f'[account][{self._model}][{self._id}] {txt}')
+        logging.debug(f'[account][{self._modelId}][{self._id}] {txt}')
 
     def log_info(self,txt):
-        logging.info(f'[account][{self._model}][{self._id}] {txt}')
+        logging.info(f'[account][{self._modelId}][{self._id}] {txt}')
 
     def log_warning(self,txt):
-        logging.warning(f'[account][{self._model}][{self._id}] {txt}')
+        logging.warning(f'[account][{self._modelId}][{self._id}] {txt}')
 
     def log_error(self,txt):
-        logging.error(f'[account][{self._model}][{self._id}] {txt}')
+        logging.error(f'[account][{self._modelId}][{self._id}] {txt}')
 
     def send2Jeedom(self,msg):
         msgIsCmd = True
-        for key in ('object', 'model', 'charger', 'logicalId', 'value'):
+        for key in ('object', 'modelId', 'charger', 'logicalId', 'value'):
             if not key in msg:
                 msgIsCmd = False
                 break

@@ -88,7 +88,7 @@ $.ajax({
     $('.model').remove();
     for (var _model of data.result) {
 	    console.log(_model);
-      tr = '<tr class="model" data-model="' + _model.modelId + '">';
+      tr = '<tr class="model" data-modelId="' + _model.modelId + '">';
       tr += '<td><input class="modelAttr" data-l1key="label" disabled></input><input class="modelAttr", data-l1key="modelId" style="display:none"</td>';
       tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="enabled"/></td>';
       tr += '<td style="text-align:center"><input class="modelAttr" type="checkbox" data-l1key="configuration" data-l2key="customColor"/></td>';
@@ -111,8 +111,8 @@ $(".configKey[data-l1key^='model::'][data-l2key='enabled']").on('change',functio
   if ($(this).value() == 1) {
     return;
   }
-  model = $(this).closest('tr').data('model');
-  if (usedTypes.indexOf(model) != -1) {
+  modelId = $(this).closest('tr').data('modelId');
+  if (usedTypes.indexOf(modelId) != -1) {
     $(this).value(1);
     bootbox.alert({title: "{{Désactivation impossible.}}", message: "{{Il existe au moins un compte pour ce modèle.}}"});
   }
@@ -120,14 +120,14 @@ $(".configKey[data-l1key^='model::'][data-l2key='enabled']").on('change',functio
 });
 
 $('table#models tbody').delegate('.btn[action=configModel]','click',function(){
-  model = $(this).closest('tr').data('model');
+  modelId = $(this).closest('tr').data('modelId');
   modelLabel = $(this).closest('tr').find('[data-l1key=label]').value();
-  contName = 'modContainer_Config_' + model;
+  contName = 'modContainer_Config_' + modelId;
   contId = '#' + contName;
   if ($(contId).length == 0) {
     $('body').append('<div id="' + contName + '"></div>');
     $.ajaxSetup({async: false});
-    $(contId).load('index.php?v=d&plugin=EVcharger&modal=' + model + '/config');
+    $(contId).load('index.php?v=d&plugin=EVcharger&modal=' + modelId + '/config');
     $.ajaxSetup({async: true});
     $('#' + contName).dialog({
       closeText: '',

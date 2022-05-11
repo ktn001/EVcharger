@@ -52,8 +52,8 @@ function selectAccountModel_actualizeModels() {
             }
             $('#selectAccountModel select').empty();
             labels = json_decode(data.result);
-            for (model in labels) {
-                option = '<option value="' + model + '">' + labels[model] + '</option>';
+            for (modelId in labels) {
+                option = '<option value="' + modelId + '">' + labels[modelId] + '</option>';
                 $('#selectAccountModel select').append(option);
             }
         },

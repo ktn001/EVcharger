@@ -92,7 +92,7 @@ def start_account(accountModel, accountId):
     queue = Queue()
     account = eval("account." + accountModel)(accountId, accountModel, queue, jeedom_com)
     accounts[accountId] = {
-            'model' : accountModel,
+            'modelId' : accountModel,
             'queue' : queue,
             'account' : account,
             'thread' : account.run()
@@ -129,10 +129,10 @@ def read_socket():
             return
 
         # Le model de l'account qui a envoyé le message
-        if not 'model' in payload:
+        if not 'modelId' in payload:
             logging.error("Message without accountModel")
             return
-        accountModel = payload['model']
+        accountModel = payload['modelId']
 
         # L'id de l'account qui a envoyé le message
         if not 'id' in payload:

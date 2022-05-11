@@ -25,12 +25,12 @@ class EVcharger_charger extends EVcharger {
 		return self::byTypeAndSearchConfiguration(__CLASS__,'"accountId":"'.$accountId.'"');
 	}
 
-	public static function byModelAndIdentifiant($model, $identifiant) {
-		$identKey = model::getIdentifiantCharger($model);
+	public static function byModelAndIdentifiant($modelId, $identifiant) {
+		$identKey = model::getIdentifiantCharger($modelId);
 		$searchConf = sprintf('"%s":"%s"',$identKey,$identifiant);
 		$chargers = array();
 		foreach (self::byTypeAndSearchConfiguration(__CLASS__,$searchConf) as $charger){
-			if ($charger->getConfiguration('model') == $model){
+			if ($charger->getConfiguration('modelId') == $modelId){
 				$chargers[] = $charger;
 			}
 		}
@@ -259,8 +259,8 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getIdentifiant() {
-		$model = $this->getConfiguration('model');
-		$configName = model::getIdentifiantCharger($model);
+		$modelId = $this->getConfiguration('modelId');
+		$configName = model::getIdentifiantCharger($modelId);
 		return $this->getConfiguration($configName);
 	}
 

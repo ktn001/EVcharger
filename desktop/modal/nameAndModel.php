@@ -30,7 +30,7 @@ if (!isConnect('admin')) {
       </div>
       <div class="form-group">
         <label class="control-label col-sm-3">{{Model}}:</label>
-        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='model'>
+        <select class="eqLogicAttr col-sm-8" data-l1key='configuration' data-l2key='modelId'>
         </select>
       </div>
     </fieldset>
@@ -68,8 +68,8 @@ function mod_nameAndModel(action) {
                 $('#mod_nameAndModel select').empty();
                 labels = json_decode(data.result);
 		console.log(labels);
-                for (model in labels) {
-                    option = '<option value="' + model + '">' + labels[model] + '</option>';
+                for (modelId in labels) {
+                    option = '<option value="' + modelId + '">' + labels[modelId] + '</option>';
                     $('#mod_nameAndModel select').append(option);
                 }
             },

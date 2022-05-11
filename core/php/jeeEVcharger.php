@@ -21,7 +21,7 @@ try {
 
 	function process_charger_message($message) {
 		if ($message['info'] == 'closed'){
-			log::add('EVcharger','info','[jeeEVcharger] [' . $message['model'] . '][' . $message['charger'] . __('Connection du démon fermée',__FILE__));
+			log::add('EVcharger','info','[jeeEVcharger] [' . $message['modelId'] . '][' . $message['charger'] . __('Connection du démon fermée',__FILE__));
 		}
 	}
 
@@ -29,13 +29,13 @@ try {
 		if (!array_key_exists('charger',$message)) {
 			log::add('EVcharger','error',"[jeeEVcharger] " .  __("Message du demon de modèle <cmd> mais sans identifiant de chargeur!",__FILE__));
 		}
-		if (!array_key_exists('model',$message)) {
+		if (!array_key_exists('modelId',$message)) {
 			log::add('EVcharger','error',"[jeeEVcharger] " .  __("Message du demon de modèle <cmd> mais sans modèle de chargeur!",__FILE__));
 		}
 		if (!array_key_exists('logicalId',$message)) {
 			log::add('EVcharger','error',"[jeeEVcharger] " . __("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
-		foreach (EVcharger_charger::byModelAndIdentifiant($message['model'],$message['charger']) as $charger){
+		foreach (EVcharger_charger::byModelAndIdentifiant($message['modelId'],$message['charger']) as $charger){
 			log::add("EVcharger","debug",__("Traitement pour :",__FILE__) . $charger->getHumanName());
 			$charger->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
