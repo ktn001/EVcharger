@@ -152,6 +152,9 @@ class EVcharger_charger extends EVcharger {
 				}
 			}
 
+			if ($cmd->getType() == 'action' and $cmd->getConfiguration('destination') == 'cmd'){
+				$cmd->setConfiguration('destId','-');
+			}
 			$cmd->save();
 		}
 		foreach ($model->commands() as $logicalId => $config) {
@@ -288,7 +291,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getModel() {
-		return model::byId($this->getConfiguration('model'));
+		return model::byId($this->getConfiguration('modelId'));
 	}
 
     /*     * **********************Getteur Setteur*************************** */
@@ -379,6 +382,9 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 			if ($this->getConfiguration('destination') == 'cmd') {
 				if ($this->getConfiguration('destId') == '') {
 					throw new Exception (sprintf(__("La destination de %s n'est pas définie!",__FILE__),$this->getLogicalId()));
+				}
+				if ($this->getConfiguration('destId') == '-') {
+					$this->setConfiguration('destId','');
 				}
 			}
 		}

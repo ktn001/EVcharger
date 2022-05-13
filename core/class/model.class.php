@@ -240,13 +240,13 @@ class model {
 		if ($_tag) {
 			if ($_prettify) {
 				if ($this->getConfiguration('customColor') == 1) {
-					$backgoundColor = $this->getConfiguration('tagColor');
+					$backgroundColor = $this->getConfiguration('tagColor');
 					$textColor = $this->getConfiguration('tagTextColor');
 				} else {
-					$backgoundColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor'];
+					$backgroundColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor'];
 					$textColor = config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor'];
 				}
-				return '<span class="label model" style="background-color:' . $backgroundColor . ';color:' . $texteColor . '">' . $this->getLabel() . '</span>';
+				return '<span class="label labelModelHuman" style="background-color:' . $backgroundColor . ';color:' . $textColor . '">(' . $this->getLabel() . ')</span>';
 			} else {
 				return $this->getLabel();
 			}

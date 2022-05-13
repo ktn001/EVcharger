@@ -25,12 +25,8 @@ class EVcharger_account extends EVcharger {
 		return self::byType($eqType_name);
 	}
 
-	public function getImage() {
-		$image = $this->getConfiguration('image');
-		if ($image == '') {
-			$image = "/plugins/EVcharger/desktop/img/account.png";
-		}
-		return $image;
+	public static function _cron() {
+		log::add("EVcharger","debug","CRON ACCOUNT");
 	}
 
 	/*
@@ -95,6 +91,14 @@ class EVcharger_account extends EVcharger {
 		}
 		$message = array('cmd' => 'stop_account');
 		$this->send2Deamon($message);
+	}
+
+	public function getImage() {
+		$image = $this->getConfiguration('image');
+		if ($image == '') {
+			$image = "/plugins/EVcharger/desktop/img/account.png";
+		}
+		return $image;
 	}
 
 	protected function getMapping() {

@@ -2,13 +2,15 @@ div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_vehicle] img {
 	min-height: auto !important;
 }
 
-div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account] {
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account],
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_charger] {
 	height: 190px !important;
 }
 
-div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account] .model {
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_account] .labelModelHuman,
+div.eqLogicDisplayCard[data-eqLogic_type=EVcharger_charger] .labelModelHuman {
 	position: relative;
-	top: -10px !important;
+	top: -20px !important;
 	background-color: red;
 }
 

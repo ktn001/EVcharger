@@ -155,6 +155,10 @@ class EVcharger extends eqLogic {
 
     /*     * ************************ Les crons **************************** */
 
+	public static function cron() {
+		log::add("EVcharger","debug","CRON EVCHARGER");
+		EVcharger_account::_cron();
+	}
     /*
      * Fonction exécutée automatiquement toutes les heures par Jeedom
      */
