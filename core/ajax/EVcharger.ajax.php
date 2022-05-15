@@ -94,7 +94,7 @@ try {
 	if (init('action') == 'models') {
 		$models = array();
 		foreach (model::all(false) as $model) {
-			$modelId = $model->getModelId();
+			$modelId = $model->getId();
 			$model = utils::o2a($model);
 			if (file_exists(__DIR__ . "/../../desktop/modal/" . $modelId . "/config.php")){
 				$model['haveModalOptions'] = 1;

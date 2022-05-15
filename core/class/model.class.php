@@ -58,10 +58,10 @@ class model {
 			throw new Exception($msg);
 		}
 		$result = array();
-		foreach (array_keys($models) as $modelName){
-			$model = new self($modelName);
+		foreach (array_keys($models) as $modelId){
+			$model = new self($modelId);
 			if ($onlyEnabled == false or $model->isEnabled()) {
-				$result[$modelName] = $model;
+				$result[$modelId] = $model;
 			}
 		}
 		return $result;
@@ -73,8 +73,8 @@ class model {
 
 	public static function labels($onlyEnabled = true) {
 		$labels = array();
-		foreach (model::all($onlyEnabled) as $modelName => $model) {
-			$labels[$modelName] = $model->getLabel();
+		foreach (model::all($onlyEnabled) as $modelId => $model) {
+			$labels[$modelId] = $model->getLabel();
 		}
 		return $labels;
 	}
@@ -276,7 +276,7 @@ class model {
 		return $this->label;
 	}
 
-	public function getModelId() {
+	public function getId() {
 		return $this->modelId;
 	}
 }

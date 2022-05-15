@@ -21,9 +21,9 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class EVcharger extends eqLogic {
 
-	public static function byType($_eqType_name, $onlyEnable = false) {
+	public static function byType($_eqType_name, $_onlyEnable = false) {
 		if (strpos($_eqType_name, '%') === false) {
-			return parent::byType($_eqType_name, $onlyEnable);
+			return parent::byType($_eqType_name, $_onlyEnable);
 		}
 		$values = array(
 			'eqType_name' => $_eqType_name,
@@ -34,7 +34,7 @@ class EVcharger extends eqLogic {
 		$eqTypes = DB::Prepare($sql, $values, DB::FETCH_TYPE_ALL);
 		$eqLogics = array ();
 		foreach ($eqTypes as $eqType) {
-			 $eqLogics = array_merge($eqLogics,parent::byType($eqType['eqType_name'], $onlyEnable));
+			 $eqLogics = array_merge($eqLogics,parent::byType($eqType['eqType_name'], $_onlyEnable));
 		}
 		return $eqLogics;
 	}
@@ -156,15 +156,32 @@ class EVcharger extends eqLogic {
     /*     * ************************ Les crons **************************** */
 
 	public static function cron() {
-		log::add("EVcharger","debug","CRON EVCHARGER");
 		EVcharger_account::_cron();
 	}
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-     */
-	public static function cronHourly() {
-		// EVcharger_account::cronHourly();
-	}
+
+//	public static function cron5() {
+//		EVcharger_account::_cron5();
+//	}
+//
+//	public static function cron10() {
+//		EVcharger_account::_cron10();
+//	}
+//
+//	public static function cron15() {
+//		EVcharger_account::_cron15();
+//	}
+//
+//	public static function cron30() {
+//		EVcharger_account::_cron30();
+//	}
+//
+//	public static function cronHourly() {
+//		EVcharger_account::_cronHourly();
+//	}
+//
+//	public static function cronDaily() {
+//		EVcharger_account::_cron15();
+//	}
 
 	public function getLinkToConfiguration() {
 		if (isset($_SESSION['user']) && is_object($_SESSION['user']) && !isConnect('admin')) {

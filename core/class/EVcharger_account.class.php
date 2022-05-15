@@ -27,7 +27,55 @@ class EVcharger_account extends EVcharger {
 
 	public static function _cron() {
 		log::add("EVcharger","debug","CRON ACCOUNT");
+		log::add("EVcharger","debug","XXXX " . $class);
+		foreach (model::all(true) as $model){
+			$modelId = $model->getId();
+			$class='EVcharger_account_' . $modelId;
+			if (method_exists($class,'cron')) {
+//				$class::cron();
+//			}
+		}
 	}
+//
+//	public static function _cron5() {
+//		foreach (model::all(true) as $model){
+//			$modelId = $model->getId();
+//			$class='EVcharger_account_' . $modelId;
+//			if (method_exists($class,'cron5')) {
+//				$class::cron5();
+//			}
+//		}
+//	}
+//
+//	public static function _cron10() {
+//		foreach (model::all(true) as $model){
+//			$modelId = $model->getId();
+//			$class='EVcharger_account_' . $modelId;
+//			if (method_exists($class,'cron10')) {
+//				$class::cron10();
+//			}
+//		}
+//	}
+//
+//	public static function _cron15() {
+//		foreach (model::all(true) as $model){
+//			$modelId = $model->getId();
+//			$class='EVcharger_account_' . $modelId;
+//			if (method_exists($class,'cron15')) {
+//				$class::cron15();
+//			}
+//		}
+//	}
+//
+//	public static function _cronHourly() {
+//		foreach (model::all(true) as $model){
+//			$modelId = $model->getId();
+//			$class='EVcharger_account_' . $modelId;
+//			if (method_exists($class,'cronHourly')) {
+//				$class::cronHourly();
+//			}
+//		}
+//	}
 
 	/*
 	 * Démarre le thread du démon pour chaque account actif
