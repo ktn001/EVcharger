@@ -31,7 +31,7 @@ class EVcharger_account extends EVcharger {
 		foreach (model::all(true) as $model){
 			$modelId = $model->getId();
 			$class='EVcharger_account_' . $modelId;
-			if (method_exists($class,'cron')) {
+//			if (method_exists($class,'cron')) {
 //				$class::cron();
 //			}
 		}
