@@ -24,15 +24,17 @@ function EVcharger_install() {
 	config::save('api', config::genKey(), 'EVcharger');
 	config::save('api::EVcharger::mode', 'localhost');
 	config::save('api::EVcharger::restricted', '1');
+	log::add("EVcharger","info","Execution de EVcharger_install");
 }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
 function EVcharger_update() {
+	log::add("EVcharger","info","Execution de EVcharger_update");
 }
 
 // Fonction exécutée automatiquement après la suppression du plugin
   function EVcharger_remove() {
-
+	log::add("EVcharger","info","Execution de EVcharger_remove");
   }
 
 ?>

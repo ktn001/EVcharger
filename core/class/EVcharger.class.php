@@ -155,10 +155,10 @@ class EVcharger extends eqLogic {
 
     /*     * ************************ Les crons **************************** */
 
-	public static function cron() {
-		EVcharger_account::_cron();
-	}
-
+//	public static function cron() {
+//		EVcharger_account::_cron();
+//	}
+//
 //	public static function cron5() {
 //		EVcharger_account::_cron5();
 //	}

@@ -25,17 +25,17 @@ class EVcharger_account extends EVcharger {
 		return self::byType($eqType_name);
 	}
 
-	public static function _cron() {
-		log::add("EVcharger","debug","CRON ACCOUNT");
-		log::add("EVcharger","debug","XXXX " . $class);
-		foreach (model::all(true) as $model){
-			$modelId = $model->getId();
-			$class='EVcharger_account_' . $modelId;
+//	public static function _cron() {
+//		log::add("EVcharger","debug","CRON ACCOUNT");
+//		log::add("EVcharger","debug","XXXX " . $class);
+//		foreach (model::all(true) as $model){
+//			$modelId = $model->getId();
+//			$class='EVcharger_account_' . $modelId;
 //			if (method_exists($class,'cron')) {
 //				$class::cron();
 //			}
-		}
-	}
+//		}
+//	}
 //
 //	public static function _cron5() {
 //		foreach (model::all(true) as $model){
