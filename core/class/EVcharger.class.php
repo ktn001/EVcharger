@@ -153,6 +153,28 @@ class EVcharger extends eqLogic {
 		return $return;
 	}
 
+	public static function createEngine() {
+		$engine = self::getEngine();
+		if (is_object($engine)) {
+			return;
+		}
+		log::add("EVcharger","info","CCCCC " . print_r(self,true));
+		try {
+			$engine = new self();
+			$engine->setEqType_name("EVcharger");
+			$engine->setName('engine');
+			$engine->setLogicalId('engine');
+			$engine->setIsEnable(1);
+			$engine->save();
+		} catch (Exception $e) {
+			log::add("EVcharger","error","CreateEngine: " . $e->getMessage());
+		}
+	}
+
+	public static function getEngine() {
+		return self::byLogicalId('engine','EVcharger');
+	}
+
     /*     * ************************ Les crons **************************** */
 
 //	public static function cron() {
@@ -188,6 +210,22 @@ class EVcharger extends eqLogic {
 			return '#';
 		}
 		return 'index.php?v=d&p=EVcharger&m=EVcharger&id=' . $this->getId();
+	}
+
+	public function preRemove() {
+		if ($this->getLogicalId() != 'engine') {
+			return true;
+		}
+		$eqLogics = EVcharger::byType("EVcharger_%");
+		if (is_array($eqLogics)) {
+			foreach ($eqLogics as $eqLogic) {
+				try {
+					$eqLogic->remove();
+				} catch (Exception $e) {
+				} catch (Error $e) {
+				}
+			}
+		}
 	}
 
 }

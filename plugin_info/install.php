@@ -25,6 +25,11 @@ function EVcharger_install() {
 	config::save('api::EVcharger::mode', 'localhost');
 	config::save('api::EVcharger::restricted', '1');
 	log::add("EVcharger","info","Execution de EVcharger_install");
+	try {
+		EVcharger::createEngine();
+	} catch (Exception $e) {
+		log::add("EVcharger","error",$e->gerMessage());
+	}
 }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
