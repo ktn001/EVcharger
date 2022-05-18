@@ -21,6 +21,17 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class EVcharger extends eqLogic {
 
+    //========================================================================
+    //========================== METHODES STATIQUES ==========================
+    //========================================================================
+	
+	/*
+	 * Surcharge de la function "byType" pour permettre de chercher les
+	 * eqLogics du classe et des classes héritières.
+	 *
+	 * "byType('EVcharger_account_%')" par exemple pour avoir tous les
+	 * accounts quelque soit le modèle
+	 */
 	public static function byType($_eqType_name, $_onlyEnable = false) {
 		if (strpos($_eqType_name, '%') === false) {
 			return parent::byType($_eqType_name, $_onlyEnable);
@@ -39,11 +50,11 @@ class EVcharger extends eqLogic {
 		return $eqLogics;
 	}
 
-    /*     * ********************** Gestion du daemon ************************* */
+	/*     * ********************** Gestion du daemon ************************* */
 
-    /*
-     * Info sur le daemon
-     */
+	/*
+	 * Info sur le daemon
+	 */
 	public static function deamon_info() {
 		$return = array();
 		$return['log'] = __CLASS__;
@@ -60,9 +71,9 @@ class EVcharger extends eqLogic {
 		return $return;
 	}
 
-    /*
-     * Lancement de daemon
-     */
+	/*
+	 * Lancement de daemon
+	 */
 	public static function deamon_start() {
 		self::deamon_stop();
 		$daemon_info = self::deamon_info();
@@ -97,9 +108,9 @@ class EVcharger extends eqLogic {
 		return true;
 	}
 
-    /*
-     * Arret de daemon
-     */
+	/*
+	 * Arret de daemon
+	 */
 	public static function deamon_stop() {
 		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
 		if (file_exists($pid_file)) {
@@ -116,11 +127,11 @@ class EVcharger extends eqLogic {
 		}
 	}
 
-    /*     * ************************ Les widgets **************************** */
+	/*     * ************************ Les widgets **************************** */
 
-    /*
-     * template pour les widget
-     */
+	/*
+	 * template pour les widget
+	 */
 	public static function templateWidget() {
 		$return = array(
 			'action' => array(
@@ -153,6 +164,11 @@ class EVcharger extends eqLogic {
 		return $return;
 	}
 
+	/*     * ************************ engine ********************************* */
+
+	/* L'équipement "engine est créé lors de la promière activation du plugin et
+	 * supprimé lors de la désinstallation du plugin. C'est le "moteur" du plugin.
+	 */
 	public static function createEngine() {
 		$engine = self::getEngine();
 		if (is_object($engine)) {
@@ -175,7 +191,7 @@ class EVcharger extends eqLogic {
 		return self::byLogicalId('engine','EVcharger');
 	}
 
-    /*     * ************************ Les crons **************************** */
+	/*     * ************************ Les crons **************************** */
 
 //	public static function cron() {
 //		EVcharger_account::_cron();
@@ -205,6 +221,14 @@ class EVcharger extends eqLogic {
 //		EVcharger_account::_cron15();
 //	}
 
+    //========================================================================
+    //========================= METHODES D'INSTANCE ==========================
+    //========================================================================
+
+	/*
+	 * Surcharge de getLinkToConfiguration() pour forcer les options "m" et "p"
+	 * à "EVcharger" même pour les classes héritiaires.
+	 */
 	public function getLinkToConfiguration() {
 		if (isset($_SESSION['user']) && is_object($_SESSION['user']) && !isConnect('admin')) {
 			return '#';
@@ -212,6 +236,11 @@ class EVcharger extends eqLogic {
 		return 'index.php?v=d&p=EVcharger&m=EVcharger&id=' . $this->getId();
 	}
 
+	/*
+	 * La suppression de l'équipement "engine" se fait uniquement lors de
+	 * la désinstallation du plugin. On en profite pour supprimer les équipement
+	 * de classes héritières car le core Jeedom ne le fait pas.
+	 */
 	public function preRemove() {
 		if ($this->getLogicalId() != 'engine') {
 			return true;
