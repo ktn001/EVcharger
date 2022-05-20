@@ -32,6 +32,34 @@ class EVcharger_vehicle extends EVcharger {
 		return $types;
 	}
 
+    // Création des listeners
+	public static function createListeners() {
+		log::add("EVcharger","debug",__("Création des listeners pour les véhicules",__FILE__));
+		$vehicles = EVcharger::byType('EVcharger_vehiculs', true);
+		$logicalIds = array(
+			'connected' => 'vehicleConnect',
+		);
+		foreach ($logicalIds as $logicalId => $function) {
+			$listerner = listerner::byClassAndFunction('EVcharger', $fonction);
+			if (!is_object($listerner)) {
+				$listerner = new listener();
+				$listener->setClass('EVcharger');
+				$listener->setFunction($function);
+			}
+			$listener->emptyEvent();
+			foreach ($vehicles as $vehicle) {
+				log::add("EVcharger","debug",__("Création des listeners pour le véhicule",__FILE__) . $vehicle->getHumanName());
+				if ($vehicle->getIsEnable() == 1){
+					$cmd = cmd::byEqLogicIdAndLogicalId($vehicle->getId(),$logicalId);
+					if (is_object($cmd)){
+						$listener->addEvent($cmd->getId());
+					}
+				}
+			}
+			$listener->save();
+		}
+	}
+
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
 		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'refresh');

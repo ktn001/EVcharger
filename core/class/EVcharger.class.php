@@ -109,7 +109,7 @@ class EVcharger extends eqLogic {
 	}
 
 	/*
-	 * Arret de daemon
+	 * Arret du daemon
 	 */
 	public static function deamon_stop() {
 		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
@@ -125,6 +125,12 @@ class EVcharger extends eqLogic {
 			}
 			return;
 		}
+	}
+
+	/*     * ******************* Gestion des listeners *********************** */
+
+	public static function createListeners() {
+		EVcharger_vehicul::createListeners();
 	}
 
 	/*     * ************************ Les widgets **************************** */
