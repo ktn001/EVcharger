@@ -127,12 +127,6 @@ class EVcharger extends eqLogic {
 		}
 	}
 
-	/*     * ******************* Gestion des listeners *********************** */
-
-	public static function createListeners() {
-		EVcharger_vehicul::createListeners();
-	}
-
 	/*     * ************************ Les widgets **************************** */
 
 	/*

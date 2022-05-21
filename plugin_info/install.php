@@ -17,18 +17,33 @@
  */
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
+require_once dirname(__FILE__) . '/../core/php/EVcharger.inc.php';
 
 // Fonction exécutée automatiquement après l'installation du plugin
 function EVcharger_install() {
+	log::add("EVcharger","info","Execution de EVcharger_install");
 	config::save('daemon::port', '34739', 'EVcharger');
 	config::save('api', config::genKey(), 'EVcharger');
 	config::save('api::EVcharger::mode', 'localhost');
 	config::save('api::EVcharger::restricted', '1');
-	log::add("EVcharger","info","Execution de EVcharger_install");
 	try {
 		EVcharger::createEngine();
+		foreach (EVcharger::byType("EVcharger_%") as $eqLogic){
+			$changed = false;
+			if ($eqLogic->getIsEnable() == 0 and $eqLogic->getConfiguration('previousIsEnable',0) == 1) {
+				$eqLogic->setIsEnable(1);
+				$changed = true;
+			}
+			if ($eqLogic->getIsVisible() == 0 and $eqLogic->getConfiguration('previousIsVisible',0) == 1) {
+				$eqLogic->setIsVisible(1);
+				$changed = true;
+			}
+			if ($changed) {
+				$eqLogic->save();
+			}
+		}
 	} catch (Exception $e) {
-		log::add("EVcharger","error",$e->gerMessage());
+		log::add("EVcharger","error",$e->getMessage());
 	}
 }
 
@@ -40,6 +55,17 @@ function EVcharger_update() {
 // Fonction exécutée automatiquement après la suppression du plugin
   function EVcharger_remove() {
 	log::add("EVcharger","info","Execution de EVcharger_remove");
+	try {
+		foreach (EVcharger::byType("EVcharger_%") as $eqLogic){
+			$eqLogic->setConfiguration('previousIsEnable',$eqLogic->getIsEnable());
+			$eqLogic->setConfiguration('previousIsVisible',$eqLogic->getIsVisible());
+			$eqLogic->setIsEnable(0);
+			$eqLogic->setIsVisible(0);
+			$eqLogic->save();
+		}
+	} catch (Exception $e) {
+		log::add("EVcharger","error",$e->getMessage());
+	}
   }
 
 ?>

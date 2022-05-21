@@ -38,7 +38,7 @@ sendVarToJS('defaultPort', config::getDefaultConfiguration('EVcharger')['EVcharg
           {{Port}}
           <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
         </label>
-        <input class="configKey form-control col-sm-4" data-l1key="deamon::port" placeholder="<?php echo $defaultPort ?>"/>
+        <input class="configKey form-control col-sm-4" data-l1key="deamon::port" placeholder="<?php echo "defaultPort" ?>"/>
         <legend class='col-sm-12'><i class="fas fa-laptop"></i> {{Interface}}</legend>
         <label class="col-sm-2 control-label">{{Confirme}}</label>
         <label class='col-sm-10'>
