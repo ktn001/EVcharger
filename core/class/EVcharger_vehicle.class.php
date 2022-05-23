@@ -32,31 +32,37 @@ class EVcharger_vehicle extends EVcharger {
 		return $types;
 	}
 
+	public static function vehiclePlugged ($options) {
+		log::add("EVcharger","debug","vehiclePlugged: " . print_r($options,true));
+	}
+
     // Création des listeners
-	public static function createListeners() {
-		log::add("EVcharger","info",__("Création des listeners pour les véhicules",__FILE__));
-		$vehicles = eqLogic::byType('EVcharger_vehicle', false);
+	public function checkListeners() {
+		if ($this->getIsEnable() == 0){
+			return;
+		}
+		log::add("EVcharger","info",__("vérification des listeners pour le véhicule ",__FILE__). $this->getHumanName());
 		$logicalIds = array(
-			'connected' => 'vehicleConnect',
+			'plugged' => 'EvchargerEventHandler',
 		);
 		foreach ($logicalIds as $logicalId => $function) {
-			log::add("EVcharger","info","XXXXXXXXXXXXXx");
-			$listener = listerner::byClassAndFunction('EVcharger', $fonction);
+			$listener = listener::byClassAndFunction('EVcharger', $function);
 			if (!is_object($listener)) {
 				$listener = new listener();
 				$listener->setClass('EVcharger');
 				$listener->setFunction($function);
 			}
-			$listener->emptyEvent();
-			foreach ($vehicles as $vehicle) {
-				log::add("EVcharger","info",__("Création des listeners pour le véhicule",__FILE__) . $vehicle->getHumanName());
-				if ($vehicle->getIsEnable() == 1){
-					$cmd = cmd::byEqLogicIdAndLogicalId($vehicle->getId(),$logicalId);
-					if (is_object($cmd)){
-						$listener->addEvent($cmd->getId());
-					}
-				}
+			$changed = false;
+			$cmds = cmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId,true);
+			if (! is_array($cmds)){
+				continue;
 			}
+			foreach ($cmds as $cmd) {
+				$listener->addEvent($cmd->getId());
+				$changed = true;
+			}
+		}
+		if ($changed){
 			$listener->save();
 		}
 	}
@@ -93,16 +99,20 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('longitude');
 			$cmd->save();
 		}
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'branche');
+		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'plugged');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName(__('Branché',__FILE__));
 			$cmd->setType('info');
 			$cmd->setSubType('binary');
-			$cmd->setLogicalId('branche');
+			$cmd->setLogicalId('plugged');
 			$cmd->save();
 		}
+	}
+
+	public function postSave() {
+		$this->checkListeners();
 	}
 
     // Retourne l'image du véhicule en fonction de son type

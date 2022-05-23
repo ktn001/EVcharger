@@ -22,6 +22,13 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 class EVcharger extends eqLogic {
 
     //========================================================================
+    //============================== ATTRIBUTS ===============================
+    //========================================================================
+	
+	public static $_fdQueue = null;
+	public static $_fdRun = null;
+
+    //========================================================================
     //========================== METHODES STATIQUES ==========================
     //========================================================================
 	
@@ -164,6 +171,69 @@ class EVcharger extends eqLogic {
 		return $return;
 	}
 
+	/*     * ************************ events ********************************* */
+
+	public static function getFileDescriptorQueueLock() {
+		if (self::$_fdQueue == null) {
+			self::$_fdQueue = fopen(jeedom::getTmpFolder() . '/EVcharger_queue_lock', 'w');
+			@chmod(jeedom::getTmpFolder() . '/EVcharger_queue_lock', 0777);
+		}
+		return self::$_fdQueue;
+	}
+
+	public static function getFileDescriptorRunLock() {
+		if (self::$_fdRun == null) {
+			self::$_fdRun = fopen(jeedom::getTmpFolder() . '/EVcharger_run_lock', 'w');
+			@chmod(jeedom::getTmpFolder() . '/EVcharger_run_lock', 0777);
+		}
+		return self::$_fdRun;
+	}
+
+	private static function nextEvent() {
+		$fdQueue = self::getFileDescriptorQueueLock();
+		if (flock($fdQueue, LOCK_EX)) {
+			$cache = cache::byKey('EVcharger_queue');
+			$values = json_decode($cache->getValue('[]'),true);
+			$value = array_shift($values);
+			$cache->setValue(json_encode($values));
+			$cache->save();
+			flock($fdQueue, LOCK_UN);
+			
+		} else {
+			log::add("EVcharger","error",__("Erreur lors de l'obtention du lock pour le cache des events",__FILE__));
+			$value = null;
+		}
+		return $value;
+	}
+
+	public static function EVchargerEventHandler($_options) {
+		$fdQueue = self::getFileDescriptorQueueLock();
+		if (flock($fdQueue, LOCK_EX)) {
+
+			/** Enregistrement du nouvel event **/
+			$cache = cache::byKey('EVcharger_queue');
+			$value = json_decode($cache->getValue('[]'),true);
+			$value[] = is_json($_options,$_options);
+			$cache->setValue(json_encode($value));
+			$cache->save();
+
+			/** Check si un autre handler est en cours d'exécution **/
+			$fdRun = self::getFileDescriptorRunLock();
+			if (flock($fdRun, LOCK_EX | LOCK_NB)) {
+				flock($fdQueue, LOCK_UN);
+				while ($event = self::nextEvent()){
+					log::add("EVcharger","info","===== " . getmypid() . " ++++ " . print_r($event,true));
+				}
+			} else {
+				flock($fdQueue, LOCK_UN);
+			}
+		} else {
+			log::add("EVcharger","error",__("Erreur lors de l'obtention du lock",__FILE__));
+		}
+	}
+
+		
+
 	/*     * ************************ engine ********************************* */
 
 	/* L'équipement "engine est créé lors de la promière activation du plugin et
@@ -174,7 +244,6 @@ class EVcharger extends eqLogic {
 		if (is_object($engine)) {
 			return;
 		}
-		log::add("EVcharger","info","CCCCC " . print_r(self,true));
 		try {
 			$engine = new self();
 			$engine->setEqType_name("EVcharger");
@@ -189,6 +258,10 @@ class EVcharger extends eqLogic {
 
 	public static function getEngine() {
 		return self::byLogicalId('engine','EVcharger');
+	}
+
+	public static function vehiclePlugged($options){
+		log::add("EVcharger","info","vehiclePlugged: " . print_r($options,true));
 	}
 
 	/*     * ************************ Les crons **************************** */
