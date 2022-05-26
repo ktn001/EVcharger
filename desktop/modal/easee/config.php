@@ -28,7 +28,7 @@ if (!isConnect('admin')) {
         <legend class"cal-sm-12"><i class="fas fa-university"></i> {{Démon}}:</legend>
         <label class="control-label col-sm-5">{{log complet}}:</label>
         <input class="configKey" data-l1key='TOTO' type="checkbox"></input>
-        <sup><i class="fas fa-question-circle" title="{{Le deamon log aussi la communication avec le cloud (très verbeux en mode debug)}}"></i></sup>
+        <sup><i class="fas fa-question-circle" title="{{Le daemon log aussi la communication avec le cloud (très verbeux en mode debug)}}"></i></sup>
       </div>
     </fieldset>
   </form>

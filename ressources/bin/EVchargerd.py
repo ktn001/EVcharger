@@ -231,7 +231,7 @@ try:
 
     # Envoi d'un message au plugin
     jeedom_com.send_change_immediate({
-        'object' : 'deamon',
+        'object' : 'daemon',
         'info'   : 'started'
     })
 

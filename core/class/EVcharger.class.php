@@ -63,6 +63,10 @@ class EVcharger extends eqLogic {
 	 * Info sur le daemon
 	 */
 	public static function deamon_info() {
+		return self::daemon_info();
+	}
+
+	public static function daemon_info() {
 		$return = array();
 		$return['log'] = __CLASS__;
 		$return['state'] = 'nok';
@@ -82,8 +86,12 @@ class EVcharger extends eqLogic {
 	 * Lancement de daemon
 	 */
 	public static function deamon_start() {
-		self::deamon_stop();
-		$daemon_info = self::deamon_info();
+		return self::daemon_start();
+	}
+
+	public static function daemon_start() {
+		self::daemon_stop();
+		$daemon_info = self::daemon_info();
 		if ($daemon_info['launchable'] != 'ok') {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
@@ -91,7 +99,7 @@ class EVcharger extends eqLogic {
 		$path = realpath(dirname(__FILE__) . '/../../ressources/bin'); // répertoire du démon
 		$cmd = 'python3 ' . $path . '/EVchargerd.py';
 		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
-		$cmd .= ' --socketport ' . config::byKey('deamon::port', __CLASS__); // port
+		$cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/EVcharger/core/php/jeeEVcharger.php';
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);
 		$cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
@@ -100,7 +108,7 @@ class EVcharger extends eqLogic {
 		$result = exec($cmd . ' >> ' . log::getPathToLog('EVcharger_daemon.out') . ' 2>&1 &');
 		$i = 0;
 		while ($i < 20) {
-			$daemon_info = self::deamon_info();
+			$daemon_info = self::daemon_info();
 			if ($daemon_info['state'] == 'ok') {
 				break;
 			}
@@ -119,13 +127,17 @@ class EVcharger extends eqLogic {
 	 * Arret du daemon
 	 */
 	public static function deamon_stop() {
+		return self::daemon_stop();
+	}
+
+	public static function daemon_stop() {
 		$pid_file = jeedom::getTmpFolder(__CLASS__) . '/daemon.pid';
 		if (file_exists($pid_file)) {
 			$pid = intval(trim(file_get_contents($pid_file)));
 			log::add(__CLASS__, 'info', __('kill process: ',__FILE__) . $pid);
 			system::kill($pid, false);
 			foreach (range(0,15) as $i){
-				if (self::deamon_info()['state'] == 'nok'){
+				if (self::daemon_info()['state'] == 'nok'){
 					break;
 				}
 				sleep(1);
@@ -208,6 +220,12 @@ class EVcharger extends eqLogic {
 
 	public static function EVchargerEventHandler($_options) {
 		$fdQueue = self::getFileDescriptorQueueLock();
+		$_options = is_json($_options,$_options);
+		if (! is_array($_options)) {
+			log::add("EVcharger","error",__("Récection d'un event ne pouvant pas être traité",__FILE__));
+			return;
+		}
+		$_options['_time'] = time();
 		if (flock($fdQueue, LOCK_EX)) {
 
 			/** Enregistrement du nouvel event **/
@@ -222,7 +240,19 @@ class EVcharger extends eqLogic {
 			if (flock($fdRun, LOCK_EX | LOCK_NB)) {
 				flock($fdQueue, LOCK_UN);
 				while ($event = self::nextEvent()){
-					log::add("EVcharger","info","===== " . getmypid() . " ++++ " . print_r($event,true));
+					log::add("EVcharger","debug","event: " . print_r($event,true));
+					$delaiMax = 60;
+					if (time() - $event['_time'] > $delaiMax) {
+						log::add("EVcharger","error",sprintf(__("Event de plus de %d secondes! Il ne sera pas traité",__FILE__),$delaiMax));
+					}
+					$cmd = cmd::byId($event['event_id']);
+					if (!is_object($cmd)){
+						throw new Exception (sprintf(__("EVchargerEventHandler: Commande %s introuvable!",__FILE__),$event['event_id']));
+					}
+					if ($cmd->getEqlogic()->getEqType_name() == 'EVcharger_vehicle') {
+						$vehicle = $cmd->getEqlogic();
+						$vehicle->searchConnectedCharger();
+					}
 				}
 			} else {
 				flock($fdQueue, LOCK_UN);

@@ -25,7 +25,10 @@ include_file('core', 'EVcharger', 'class', 'EVcharger');
 sendVarToJS('usedTypes',model::allUsed());
 sendVarToJS('defaultTagColor', config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTagColor']);
 sendVarToJS('defaultTagTextColor', config::getDefaultConfiguration('EVcharger')['EVcharger']['defaultTextTagColor']);
-sendVarToJS('defaultPort', config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon::port']);
+
+$defaultPort = config::getDefaultConfiguration('EVcharger')['EVcharger']['daemon::port'];
+$defaultMaxPlugDelay = config::getDefaultConfiguration('EVcharger')['EVcharger']['maxPlugDelay'];
+$defaultMaxDistance = config::getDefaultConfiguration('EVcharger')['EVcharger']['maxDistance'];
 ?>
 
 <form class="form-horizontal">
@@ -33,19 +36,23 @@ sendVarToJS('defaultPort', config::getDefaultConfiguration('EVcharger')['EVcharg
     <div class="form-group">
       <div class='col-sm-6'>
 
-        <legend class='col-sm-12'><i class="fas fa-university"></i> {{Démon}}:</legend>
+        <legend class="col-sm-12"><i class="fas fa-university"></i> {{Démon}}:</legend>
         <label class="col-sm-2 control-label">
           {{Port}}
           <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
         </label>
-        <input class="configKey form-control col-sm-4" data-l1key="deamon::port" placeholder="<?php echo "defaultPort" ?>"/>
-        <legend class='col-sm-12'><i class="fas fa-laptop"></i> {{Interface}}</legend>
-        <label class="col-sm-2 control-label">{{Confirme}}</label>
-        <label class='col-sm-10'>
-          <input class="configKey" type="checkbox" data-l1key="confirmDelete"/>
-          {{Suppressions}}
-          <sup><i class="fas fa-question-circle" title="{{Demande de confirmation en cas de suppression d'un élément}}"></i></sup>
+        <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo $defaultPort ?>"/>
+        <legend class="col-sm-12"><i class="fas fa-cog"></i> {{Détection de branchement}}:</legend>
+        <label class="col-sm-2 control-label">
+          {{Délai max}}
+          <sup><i class="fas fa-question-circle" title="{{Délai, en secondes, maximum entre branchement d'un chargeur et branchement d'un véhicule}}"></i></sup>
         </label>
+	<input class="configKey form-control col-sm-3" data-l1key="maxPlugDelay" placeholder="<?php echo $defaultMaxPlugDelay ?>"/>
+        <label class="col-sm-2 control-label">
+          {{Distance max}}
+          <sup><i class="fas fa-question-circle" title="{{Distance, en mètres, maximum entre un chargeur et un véhicule}}"></i></sup>
+        </label>
+	<input class="configKey form-control col-sm-3" data-l1key="maxDistance" placeholder="<?php echo $defaultMaxDistance ?>"/>
       </div>
       <div class='col-sm-6'>
         <legend><i class="fas fa-charging-station"></i> {{Les modèles de chargeurs}}:</legend>

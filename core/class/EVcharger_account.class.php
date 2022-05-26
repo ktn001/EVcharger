@@ -87,14 +87,14 @@ class EVcharger_account extends EVcharger {
 	}
 
 	/*
-	 * Envoi d'un message au deamon
+	 * Envoi d'un message au daemon
 	 */
 	public function send2Deamon($message) {
 		if ($this->getIsEnable() and $this::$_haveDeamon){
 			if (is_array($message)) {
 				$message = json_encode($message);
 			}
-			if (EVcharger::deamon_info()['state'] != 'ok'){
+			if (EVcharger::daemon_info()['state'] != 'ok'){
 				log::add('EVcharger','debug',__("Le démon n'est pas démarré!",__FILE__));
 				return;
 			}
@@ -104,14 +104,14 @@ class EVcharger_account extends EVcharger {
 			$params['message'] = $message;
 			$payLoad = json_encode($params);
 			$socket = socket_create(AF_INET, SOCK_STREAM, 0);
-			socket_connect($socket,'127.0.0.1',(int)config::byKey('deamon::port','EVcharger'));
+			socket_connect($socket,'127.0.0.1',(int)config::byKey('daemon::port','EVcharger'));
 			socket_write($socket, $payLoad, strlen($payLoad));
 			socket_close($socket);
 		}
 	}
 
 	/*
-	 * Lancement d'un thread du deamon pour l'account
+	 * Lancement d'un thread du daemon pour l'account
 	 */
 	public function startDeamonThread() {
 		if ($this->getIsEnable() and $this::$_haveDeamon){

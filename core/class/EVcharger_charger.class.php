@@ -186,9 +186,13 @@ class EVcharger_charger extends EVcharger {
 				if (! $cmdValue) {
 					log::add("EVcharger","error",sprintf(__("La commande '%s' pour la valeur de '%s' est introuvable",__FILE__),$config['value'],$cmd->getLogicalId()));
 				} else {
-					$value = $cmdValue->getId();
+					if ($cmd->getType() == 'info') {
+						$value = '#' . $cmdValue->getId() . '#';
+					} else {
+						$value = $cmdValue->getId();
+					}
 					if ($cmd->getValue() != $value) {
-						log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'value'",__FILE__), $logicalId));
+						log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'value' (%s)",__FILE__), $logicalId,$value));
 						$cmd->setValue($value);
 						$needSave = true;
 					}
@@ -290,6 +294,17 @@ class EVcharger_charger extends EVcharger {
 		}
 	}
 
+	public function isConnected() {
+		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this-getId(),'connected');
+		if (! is_object($connectedCmd)) {
+			return null;
+		}
+		$connected = $connectedCmd->execCmd();
+		if ($connected == 1) {
+			return true;
+		}
+		return false;
+	}
 	public function getModel() {
 		return model::byId($this->getConfiguration('modelId'));
 	}
@@ -353,31 +368,33 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 				}
 			}
 			$calcul = $this->getConfiguration('calcul');
-			if (strpos($calcul, '#' . $this->getId() . '#') !== false) {
-				throw new Exception(__('Vous ne pouvez appeler la commande elle-même (boucle infinie) sur',__FILE__) . ' : '.$this->getName());
-			}
-			$added_value = [];
-			preg_match_all("/#([0-9]+)#/", $calcul, $matches);
-			$value = '';
-			foreach ($matches[1] as $cmd_id) {
-				$cmd = self::byId($cmd_id);
-				if (is_object($cmd) && $cmd->getType() == 'info') {
-					if(isset($added_value[$cmd_id])) {
+			if ($calcul != '') {
+				if (strpos($calcul, '#' . $this->getId() . '#') !== false) {
+					throw new Exception(__('Vous ne pouvez appeler la commande elle-même (boucle infinie) sur',__FILE__) . ' : '.$this->getName());
+				}
+				$added_value = [];
+				preg_match_all("/#([0-9]+)#/", $calcul, $matches);
+				$value = '';
+				foreach ($matches[1] as $cmd_id) {
+					$cmd = self::byId($cmd_id);
+					if (is_object($cmd) && $cmd->getType() == 'info') {
+						if(isset($added_value[$cmd_id])) {
+							continue;
+						}
+						$value .= '#' . $cmd_id . '#';
+						$added_value[$cmd_id] = $cmd_id;
+					}
+				}
+				preg_match_all("/variable\((.*?)\)/",$calcul, $matches);
+				foreach ($matches[1] as $variable) {
+					if(isset($added_value['#variable(' . $variable . ')#'])){
 						continue;
 					}
-					$value .= '#' . $cmd_id . '#';
-					$added_value[$cmd_id] = $cmd_id;
+					$value .= '#variable(' . $variable . ')#';
+					$added_value['#variable(' . $variable . ')#'] = '#variable(' . $variable . ')#';
 				}
+				$this->setValue($value);
 			}
-			preg_match_all("/variable\((.*?)\)/",$calcul, $matches);
-			foreach ($matches[1] as $variable) {
-				if(isset($added_value['#variable(' . $variable . ')#'])){
-					continue;
-				}
-				$value .= '#variable(' . $variable . ')#';
-				$added_value['#variable(' . $variable . ')#'] = '#variable(' . $variable . ')#';
-			}
-			$this->setValue($value);
 		} else if ($this->getType() == 'action') {
 			if ($this->getConfiguration('destination') == 'cmd') {
 				if ($this->getConfiguration('destId') == '') {
@@ -405,7 +422,18 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 			if ($calcul) {
 				return jeedom::evaluateExpression($calcul);
 			}
+			if ($this->getLogicalId() == 'vehicle') {
+				$connectedCmd = cmd::byEqLogicIdAndLogicalId($this->getEqLogic_id(),'connected');
+				if (is_object($connectedCmd)) {
+					if ($connectedCmd->execCmd() != 1){
+						return 0;
+					} else {
+						return $this->execCmd();
+					}
+				}
+			}
 			break;
+
 		case 'action':
 			$this->getEqLogic()->getAccount()->execute($this);
 		}

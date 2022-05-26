@@ -4,7 +4,7 @@ try {
 	require_once __DIR__ . '/../class/EVcharger.class.php';
 	require_once __DIR__ . '/../php/EVcharger.inc.php';
 
-	function process_deamon_message($message) {
+	function process_daemon_message($message) {
 		if ($message['info'] == 'started'){
 			EVcharger_account::startAllDeamonThread();
 		}
@@ -57,12 +57,12 @@ try {
 	log::add("EVcharger","debug","[jeeEVcharger] Message reçu du démon: " . print_r($message,true));
 
 	if (!array_key_exists('object',$message)){
-		log::error('EVcharger','error','[jeeEVcharger] Message reçu du deamon sans champ "object"');
+		log::error('EVcharger','error','[jeeEVcharger] Message reçu du daemon sans champ "object"');
 		die();
 	}
 	switch ($message['object']) {
-	case 'deamon':
-		process_deamon_message($message);
+	case 'daemon':
+		process_daemon_message($message);
 		break;
 	case 'account':
 		process_account_message($message);

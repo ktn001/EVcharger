@@ -125,6 +125,41 @@ class EVcharger_vehicle extends EVcharger {
 		return $image;
 	}
 
+	public function isConnected() {
+		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicalId($this->getId(),'plugged');
+		$connected = $connectedCmd->execCmd();
+		if ($connected == 1){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public function connectionTime() {
+		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicaliId($this->getId(),'plugged');
+		$connected = $connectedCmd->execCmd();
+		if ($connected != 1){
+			return 0;
+		}
+		$connectionDate = $connected->getValueDate();
+		$connectionTime = DateTime::createFromFormat("Y-m-d H:i:s", $connectionDate)->getTimeStamp();
+		log::add("EVcharger","debug","XX " . $connectionDate . "   " . $connectionTime);
+	}
+
+	public function searchConnectedCharger() {
+		if (! $this->isConnected()) {
+			return 0;
+		}
+		$connctionTime = $this->getConnectionTime();
+		$chargers = EVcharger_charger::byType('EVcharger_charger',true);
+		$connectedChargers = array ();
+		foreach ($chargers as $charger) {
+			if ($charger->isConnected() !== false) {
+				$connectedChargers[] = $charger;
+			}
+		}
+	}
+
     /*     * **********************Getteur Setteur*************************** */
 
 	public function setType($_type) {

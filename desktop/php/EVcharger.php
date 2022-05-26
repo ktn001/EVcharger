@@ -13,7 +13,6 @@ sendVarToJS('eqType', $plugin->getId());
 sendVarToJS('accountType', $plugin->getId() . "_account");
 sendVarToJS('chargerType', $plugin->getId() . "_charger");
 sendVarToJS('vehicleType', $plugin->getId() . "_vehicle");
-sendVarToJs('confirmDelete',config::byKey('confirmDelete','EVcharger'));
 sendVarToJS('modelLabels',model::labels());
 ?>
 
