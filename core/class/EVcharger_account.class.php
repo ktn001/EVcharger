@@ -175,7 +175,7 @@ class EVcharger_account extends EVcharger {
 
 	public function execute ($cmd_charger) {
 		try {
-			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $cmd_charger->getLogicalId())); 
+			log::add("EVcharger","debug","┌─" . sprintf(__("%s: execution de %s",__FILE__), $this->getHumanName() , $cmd_charger->getLogicalId()));
 			if (! is_a($cmd_charger, "EVcharger_chargerCmd")){
 				throw new Exception (sprintf(__("| La commande %s n'est pas une commande de type %s",__FILE__),$cmd_charger->getId(), "EVcharger_chargerCmd"));
 			}

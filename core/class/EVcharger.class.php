@@ -24,14 +24,14 @@ class EVcharger extends eqLogic {
     //========================================================================
     //============================== ATTRIBUTS ===============================
     //========================================================================
-	
+
 	public static $_fdQueue = null;
 	public static $_fdRun = null;
 
     //========================================================================
     //========================== METHODES STATIQUES ==========================
     //========================================================================
-	
+
 	/*
 	 * Surcharge de la function "byType" pour permettre de chercher les
 	 * eqLogics du classe et des classes héritières.
@@ -210,7 +210,7 @@ class EVcharger extends eqLogic {
 			$cache->setValue(json_encode($values));
 			$cache->save();
 			flock($fdQueue, LOCK_UN);
-			
+
 		} else {
 			log::add("EVcharger","error",__("Erreur lors de l'obtention du lock pour le cache des events",__FILE__));
 			$value = null;
@@ -240,7 +240,7 @@ class EVcharger extends eqLogic {
 			if (flock($fdRun, LOCK_EX | LOCK_NB)) {
 				flock($fdQueue, LOCK_UN);
 				while ($event = self::nextEvent()){
-					log::add("EVcharger","debug","event: " . print_r($event,true));
+					log::add("EVcharger","debug","Listener event: " . print_r($event,true));
 					$delaiMax = 60;
 					if (time() - $event['_time'] > $delaiMax) {
 						log::add("EVcharger","error",sprintf(__("Event de plus de %d secondes! Il ne sera pas traité",__FILE__),$delaiMax));
@@ -262,7 +262,7 @@ class EVcharger extends eqLogic {
 		}
 	}
 
-		
+
 
 	/*     * ************************ engine ********************************* */
 
@@ -292,6 +292,22 @@ class EVcharger extends eqLogic {
 
 	public static function vehiclePlugged($options){
 		log::add("EVcharger","info","vehiclePlugged: " . print_r($options,true));
+	}
+
+	/*     * ********************* Les utilitaires ************************* */
+
+	public static function distance($lat1, $lng1, $lat2, $lng2 ) {
+		$earth_radius = 6378137;   // Terre = sphère de 6378km de rayon
+		$rlo1 = deg2rad($lng1);
+		$rla1 = deg2rad($lat1);
+		$rlo2 = deg2rad($lng2);
+		$rla2 = deg2rad($lat2);
+		$dlo = ($rlo2 - $rlo1) / 2;
+		$dla = ($rla2 - $rla1) / 2;
+		$a = (sin($dla) * sin($dla)) + cos($rla1) * cos($rla2) * (sin($dlo) * sin($dlo));
+		$d = 2 * atan2(sqrt($a), sqrt(1 - $a));
+		$meter = ($earth_radius * $d);
+		return $meter;
 	}
 
 	/*     * ************************ Les crons **************************** */
@@ -363,7 +379,13 @@ class EVcharger extends eqLogic {
 }
 
 class EVchargerCmd extends cmd {
+	public function getValueTime() {
+		return DateTime::createFromFormat("Y-m-d H:i:s", $this->getValueDate())->getTimeStamp();
+	}
 
+	public function getCollectTime() {
+		return DateTime::createFromFormat("Y-m-d H:i:s", $this->getCollectDate())->getTimeStamp();
+	}
 }
 
 require_once __DIR__  . '/model.class.php';

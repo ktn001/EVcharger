@@ -78,7 +78,7 @@ class EVcharger_charger extends EVcharger {
 			} elseif ($createOnly) {
 				continue;
 			}
-				
+
 			if ($cmd->getConfiguration('destination') != $config['destination']) {
 				log::add("EVcharger","debug","  " . sprintf(__("%s: Mise à jour de 'destination'",__FILE__), $logicalId));
 				$cmd->setConfiguration('destination',$config['destination']);
@@ -210,6 +210,9 @@ class EVcharger_charger extends EVcharger {
 			if ($this->getAccountId() == '') {
 				throw new Exception (__("Le compte n'est pas défini",__FILE__));
 			}
+			if ($this->getConfiguration('latitude') == '' or $this->getConfiguration('longitude') == '') {
+				throw new Exception (__('Les coordonnées GPS ne sont pas définies!',__FILE__));
+			}
 		}
 		$accountId = $this->getAccountId();
 		if ($accountId != '') {
@@ -295,7 +298,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function isConnected() {
-		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this-getId(),'connected');
+		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'connected');
 		if (! is_object($connectedCmd)) {
 			return null;
 		}
@@ -305,6 +308,21 @@ class EVcharger_charger extends EVcharger {
 		}
 		return false;
 	}
+
+	public function getConnectionTime() {
+		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'connected');
+		if ($connectedCmd->execCmd() != 1) {
+			return 0;
+		}
+		return $connectedCmd->getValueTime();
+	}
+
+	public function distanceTo ($lgt, $lat) {
+		$myLgt = $this->getConfiguration('longitude');
+		$myLat = $this->getConfiguration('latitude');
+		return EVcharger::distance($lgt,$lat,$myLgt,$maLat);
+	}
+
 	public function getModel() {
 		return model::byId($this->getConfiguration('modelId'));
 	}

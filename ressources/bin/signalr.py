@@ -23,7 +23,7 @@ if args.serial is None:
 def get_access_token() -> str:
     return args.token
 
-def product_update(stuff: list): 
+def product_update(stuff: list):
     print(f"received product update: {stuff}")
 
 def charger_update(stuff: list):

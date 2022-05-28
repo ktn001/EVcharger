@@ -105,7 +105,7 @@ def start_account(accountModel, accountId):
         'info' : 'thread_started',
         'account_id' : accountId
     })
-            
+
     return
 
 # -------- Lecture du socket (les messages provenant du plugin)-----------------

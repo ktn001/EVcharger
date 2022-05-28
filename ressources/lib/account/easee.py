@@ -147,7 +147,7 @@ class easee(account):
             self._mapping = configparser.ConfigParser()
             self._mapping.read(f'{configDir}/mapping.ini')
         self.start_charger_listener(msg['identifiant'])
-        
+
     def do_stop_charger_listener(self,message):
         msg = json.loads(message)
         if not 'identifiant' in msg:

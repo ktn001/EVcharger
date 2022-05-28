@@ -16,7 +16,7 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* 
+/*
  * Les codes des exceptions
  *    0 : Sans signification particulière
  *    1 : Un password doit être saisi

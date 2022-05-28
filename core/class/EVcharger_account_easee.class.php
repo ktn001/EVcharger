@@ -42,7 +42,7 @@ class EVcharger_account_easee extends EVcharger_account {
 		if (is_array($data)) {
 			$data = json_encode($data);
 		}
-		 
+
 		$curl = curl_init();
 		curl_setopt_array($curl, [
 			CURLOPT_URL => $this->getUrl() . $path,
@@ -159,7 +159,7 @@ class EVcharger_account_easee extends EVcharger_account {
 					} else {
 						$txt = $msg['title'];
 					}
-				} 
+				}
 				throw new Exception($txt);
 			}
 		}

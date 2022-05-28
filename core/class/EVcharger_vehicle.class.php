@@ -115,6 +115,13 @@ class EVcharger_vehicle extends EVcharger {
 		$this->checkListeners();
 	}
 
+	public function refresh() {
+		$refreshCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		if (is_object($refreshCmd)) {
+			$refreshCmd->execute();
+		}
+	}
+
     // Retourne l'image du véhicule en fonction de son type
 	public function getImage() {
 		$type = $this->getConfiguration('type');
@@ -135,28 +142,99 @@ class EVcharger_vehicle extends EVcharger {
 		}
 	}
 
-	public function connectionTime() {
-		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicaliId($this->getId(),'plugged');
-		$connected = $connectedCmd->execCmd();
-		if ($connected != 1){
+	public function getConnectionTime() {
+		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicalId($this->getId(),'plugged');
+		if ($connectedCmd->execCmd() != 1){
 			return 0;
 		}
-		$connectionDate = $connected->getValueDate();
-		$connectionTime = DateTime::createFromFormat("Y-m-d H:i:s", $connectionDate)->getTimeStamp();
-		log::add("EVcharger","debug","XX " . $connectionDate . "   " . $connectionTime);
+		return $connectedCmd->getValueTime();
+	}
+
+	public function getLongitude( $actuel = false) {
+		$lgtCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'longitude');
+		if (!is_object($lgtCmd)) {
+			return null;
+		}
+		if ((time() - $lgtCmd->getCollectTime()) > 30 and $actuel) {
+			$this->refresh();
+			$lgtCmd->setCollectDate('');
+			$ok = false;
+			for ($i = 0; $i < 10; $i++) {
+				if ((time() - $lgtCmd->getCollectTime()) <= 30) {
+					$ok = true;
+					break;
+				}
+				sleep (1);
+				$lgtCmd->setCollectDate('');
+			}
+			if (! $ok) {
+				return null;
+			}
+		}
+		return $lgtCmd->execCmd();
+	}
+
+	public function getLatitude( $actuel = false) {
+		$latCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'latitude');
+		if (!is_object($latCmd)) {
+			return null;
+		}
+		if ((time() - $latCmd->getCollectTime()) > 30 and $actuel) {
+			$this->refresh();
+			$latCmd->setCollectDate('');
+			$ok = false;
+			for ($i = 0; $i < 10; $i++) {
+				if ((time() - $latCmd->getCollectTime()) <= 30) {
+					$ok = true;
+					break;
+				}
+				sleep (1);
+				$latCmd->setCollectDate('');
+			}
+			if (! $ok) {
+				return null;
+			}
+		}
+		return $latCmd->execCmd();
 	}
 
 	public function searchConnectedCharger() {
 		if (! $this->isConnected()) {
 			return 0;
 		}
-		$connctionTime = $this->getConnectionTime();
+		log::add("EVcharger","debug",sprintf(__("Recherche d'un chargeur pour %s",__FILE__),$this->getHumanName()));
+		$connectionTime = $this->getConnectionTime();
+		$maxPlugDelay = config::byKey('maxPlugDelay','EVcharger');
+		$latitude = $this->getLatitude(true);
+		$longitude = $this->getLongitude(true);
 		$chargers = EVcharger_charger::byType('EVcharger_charger',true);
 		$connectedChargers = array ();
 		foreach ($chargers as $charger) {
-			if ($charger->isConnected() !== false) {
-				$connectedChargers[] = $charger;
+			log::add("EVcharger","debug","  -- " . $charger->getHumanName());
+			$isConnected = $charger->isConnected();
+			if ($isConnected === false) {
+				log::add("EVcharger","debug","  " . sprintf(__("%s n'est pas connecté",__FILE__),$charger->getHumanName()));
+				continue;
 			}
+			if ($isConnected === true) {
+				if (abs($connectionTime - $charger->getConnectionTime()) > $maxPlugDelay) {
+					log::add("EVcharger","debug","  " . sprintf(__("%s: pas de connection récente",__FILE__),$charger->getHumanName()));
+					continue;
+				}
+			}
+			log::add("EVcharger","debug","  Longitude: " . $longitude);
+			log::add("EVcharger","debug","  Latitude:  " . $latitude);
+			if ($latitude != null and $longitude != null) {
+				$distance = $charger->distanceTo($latitude,$longitude);
+//				$distance = "15";
+				log::add("EVcharger","debug","WWW " . print_r($distance,true));
+				log::add("EVcharger","debug","  " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
+			}
+			$connectedChargers[] = $charger;
+		}
+		log::add("EVcharger","debug","  " . __("Chargeur possibles:",__FILE__));
+		foreach ($connectedChargers as $charger) {
+			log::add("EVcharger","debug"," ++ " . $charger->getHumanName());
 		}
 	}
 
@@ -234,7 +312,7 @@ class EVcharger_vehicleCmd extends EVchargerCmd  {
 			}
 		}
 		if ($this->getType() == 'action') {
-			$linkedCmd_Id = str_replace('#','',$this->getConfiguration('linkedCmd'));	
+			$linkedCmd_Id = str_replace('#','',$this->getConfiguration('linkedCmd'));
 			$linkedCmd = cmd::byId($linkedCmd_Id);
 			if (!is_object($linkedCmd)) {
 				throw new Exception(sprintf(__("Exécution de %s: La commande %s est introuvable!",__FILE__),$this->gewtHumanName(),$linkedCmd));
