@@ -226,8 +226,6 @@ class EVcharger_vehicle extends EVcharger {
 			log::add("EVcharger","debug","  Latitude:  " . $latitude);
 			if ($latitude != null and $longitude != null) {
 				$distance = $charger->distanceTo($latitude,$longitude);
-//				$distance = "15";
-				log::add("EVcharger","debug","WWW " . print_r($distance,true));
 				log::add("EVcharger","debug","  " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
 			}
 			$connectedChargers[] = $charger;

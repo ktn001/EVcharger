@@ -317,10 +317,10 @@ class EVcharger_charger extends EVcharger {
 		return $connectedCmd->getValueTime();
 	}
 
-	public function distanceTo ($lgt, $lat) {
-		$myLgt = $this->getConfiguration('longitude');
+	public function distanceTo ($lat, $lgt) {
 		$myLat = $this->getConfiguration('latitude');
-		return EVcharger::distance($lgt,$lat,$myLgt,$maLat);
+		$myLgt = $this->getConfiguration('longitude');
+		return EVcharger::distance($lat,$lgt,$myLat,$myLgt);
 	}
 
 	public function getModel() {

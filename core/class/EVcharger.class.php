@@ -306,8 +306,7 @@ class EVcharger extends eqLogic {
 		$dla = ($rla2 - $rla1) / 2;
 		$a = (sin($dla) * sin($dla)) + cos($rla1) * cos($rla2) * (sin($dlo) * sin($dlo));
 		$d = 2 * atan2(sqrt($a), sqrt(1 - $a));
-		$meter = ($earth_radius * $d);
-		return $meter;
+		return round($earth_radius * $d);
 	}
 
 	/*     * ************************ Les crons **************************** */
