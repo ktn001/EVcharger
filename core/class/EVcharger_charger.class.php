@@ -323,8 +323,19 @@ class EVcharger_charger extends EVcharger {
 		return EVcharger::distance($lat,$lgt,$myLat,$myLgt);
 	}
 
+	public function getVehicleId() {
+		$vehicleCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'vehicle');
+		if (is_object($vehicleCmd)) {
+			return $vehicleCmd->execCmd();
+		}
+		return 0;
+	}
+
 	public function getModel() {
 		return model::byId($this->getConfiguration('modelId'));
+	}
+
+	public function searchConnectdVehicle() {
 	}
 
     /*     * **********************Getteur Setteur*************************** */

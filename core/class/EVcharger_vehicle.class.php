@@ -205,20 +205,32 @@ class EVcharger_vehicle extends EVcharger {
 		log::add("EVcharger","debug",sprintf(__("Recherche d'un chargeur pour %s",__FILE__),$this->getHumanName()));
 		$connectionTime = $this->getConnectionTime();
 		$maxPlugDelay = config::byKey('maxPlugDelay','EVcharger');
+		$maxDistance = config::byKey('maxDistance','EVcharger');
 		$latitude = $this->getLatitude(true);
 		$longitude = $this->getLongitude(true);
 		$chargers = EVcharger_charger::byType('EVcharger_charger',true);
-		$connectedChargers = array ();
+		$candidateChargers = array ();
 		foreach ($chargers as $charger) {
-			log::add("EVcharger","debug","  -- " . $charger->getHumanName());
+			log::add("EVcharger","debug","  " . $charger->getHumanName());
 			$isConnected = $charger->isConnected();
 			if ($isConnected === false) {
-				log::add("EVcharger","debug","  " . sprintf(__("%s n'est pas connecté",__FILE__),$charger->getHumanName()));
+				log::add("EVcharger","debug","    " . sprintf(__("%s n'est pas connecté",__FILE__),$charger->getHumanName()));
 				continue;
 			}
 			if ($isConnected === true) {
 				if (abs($connectionTime - $charger->getConnectionTime()) > $maxPlugDelay) {
-					log::add("EVcharger","debug","  " . sprintf(__("%s: pas de connection récente",__FILE__),$charger->getHumanName()));
+					log::add("EVcharger","debug","    " . sprintf(__("%s: pas de connection récente",__FILE__),$charger->getHumanName()));
+					continue;
+				}
+				$vehicleId=$charger->getVehicleId();
+				if ($vehicleId != '' and $vehicleId != 0 and $vehicleId != $this->getId()){
+					$vehicle = EVcharger_vehicle::byId($vehicleId);
+					if (is_object($vehicle)){
+						$vehicleName = $vehicle->getHumanName();
+					} else {
+						$vehicleName = $vehicleId;
+					}
+					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur",__FILE__),$vehicleName));
 					continue;
 				}
 			}
@@ -226,13 +238,25 @@ class EVcharger_vehicle extends EVcharger {
 			log::add("EVcharger","debug","  Latitude:  " . $latitude);
 			if ($latitude != null and $longitude != null) {
 				$distance = $charger->distanceTo($latitude,$longitude);
-				log::add("EVcharger","debug","  " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
+				if ($distance > $maxDistance){
+					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
+					continue;
+				}
 			}
-			$connectedChargers[] = $charger;
+			$candidateChargers[] = $charger;
 		}
-		log::add("EVcharger","debug","  " . __("Chargeur possibles:",__FILE__));
-		foreach ($connectedChargers as $charger) {
-			log::add("EVcharger","debug"," ++ " . $charger->getHumanName());
+		foreach ($candidateChargers as $charger) {
+			log::add("EVcharger","debug"," " . $charger->getHumanName());
+		}
+		if (count($candidateChargers) == 0) {
+			log::add("EVcharger","debug",__("Pas de chargeur trouvé!",__FILE__));
+		} elseif (count($candidateChargers) == 1) {
+			$candidateChargers[0]->checkAndUpdateCmd('vehicle',$this->getId());
+		} else {
+			log::add("EVcharger","debug","  " . __("Trop de chargeur possibles:",__FILE__));
+			foreach ($candidateChargers as $charger) {
+				log::add("EVcharger","debug","   " . $charger->getHumanName());
+			}
 		}
 	}
 

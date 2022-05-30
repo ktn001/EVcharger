@@ -252,6 +252,9 @@ class EVcharger extends eqLogic {
 					if ($cmd->getEqlogic()->getEqType_name() == 'EVcharger_vehicle') {
 						$vehicle = $cmd->getEqlogic();
 						$vehicle->searchConnectedCharger();
+					} elseif ($cmd->getEqlogic()->getEqType_name() == 'EVcharger_charger') {
+						$charger = $cmd->getEqlogic();
+						$charger->searchConnectedVehicle();
 					}
 				}
 			} else {
