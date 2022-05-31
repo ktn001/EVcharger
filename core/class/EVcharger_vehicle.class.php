@@ -109,6 +109,16 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('plugged');
 			$cmd->save();
 		}
+		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'charger');
+		if (!is_object($cmd)){
+			$cmd = new EVcharger_vehicleCMD();
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName(__('Chargeur',__FILE__));
+			$cmd->setType('info');
+			$cmd->setSubType('numeric');
+			$cmd->setLogicalId('charger');
+			$cmd->save();
+		}
 	}
 
 	public function postSave() {
