@@ -325,7 +325,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function isConnected() {
-		$connectedCmd = $this->getCmd(null,'connected');
+		$connectedCmd = $this->getCmd('info','connected');
 		if (! is_object($connectedCmd)) {
 			return null;
 		}
@@ -337,7 +337,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getConnectionTime() {
-		$connectedCmd = $this->getCmd(null,'connected');
+		$connectedCmd = $this->getCmd('info','connected');
 		if ($connectedCmd->execCmd() != 1) {
 			return 0;
 		}
@@ -365,8 +365,41 @@ class EVcharger_charger extends EVcharger {
 	public function searchConnectedVehicle() {
 		if (! $this->isConnected()) {
 			log::add("EVcarger","debug",sprintf(__("Déconnection du chargeur %s",__FILE__), $this->getHumanName()));
-			$this->checkAndUpdateCmd('vehicle',0);
+			$this->checkAndUpdateCmd("vehicle",0);
 		}
+		log::add("EVcharger","debug",sprintf(__("Recherche d'un véhicule pour %s",__FILE__),$this->getHumanName()));
+		$connectionTime = $this->getConnectionTime();
+		$maxPlugDelay = config::byKey("maxPlugDelay","EVcharger");
+		$maxDistance = condif::byKey("maxDistance","EVcharger");
+		$latitude = $this->getLatitude(true);
+		$longitude = $this->getLongitude(true);
+		$vehicles = EVcharger_vehicle::byType("EVcharger_vehicle",true);
+		$candidateVehicles = array();
+		foreach ($vehicles as $vehicle) {
+			log::add("EVcharger","debug","  " . $vehicle->getHumanName());
+			$isConnected = $vehicle->isConnected();
+			if ($isConnected === false) {
+				log::add("EVcharger","debug","    " . sprintf(__("%s n'est pas connecté",__FILE__),$vehicle->getHumanName()));
+				continue;
+			}
+			if ($isConnected === true) {
+				if (abs($connectionTime - $vehicle->getConnectionTime()) > $maxPlugDelay) {
+					log::add("EVcharger","    " . sprintf(__("%s n'est pas connecté",__FILE),$vehicle->getHumanName()));
+					continue;
+				}
+				$chargerId = $vehicle->getChargerId();
+				if ($chargerId != '' and $chargerId != 0 and $chargerId != $this->getId()){
+					$charger = EVcharger_vehicle::byId($chargerId);
+					if (is_object($charger)){
+						$chargerName = $charger->getHumanName();
+					} else {
+						$chargerName = $chargerId;
+					}
+					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicle->getHumanName(),$charger->getHumanName()));
+					continue;
+				}
+			}
+
 	}
 
     /*     * **********************Getteur Setteur*************************** */

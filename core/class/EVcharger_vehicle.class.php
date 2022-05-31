@@ -232,7 +232,7 @@ class EVcharger_vehicle extends EVcharger {
 					log::add("EVcharger","debug","    " . sprintf(__("%s: pas de connection récente",__FILE__),$charger->getHumanName()));
 					continue;
 				}
-				$vehicleId=$charger->getVehicleId();
+				$vehicleId = $charger->getVehicleId();
 				if ($vehicleId != '' and $vehicleId != 0 and $vehicleId != $this->getId()){
 					$vehicle = EVcharger_vehicle::byId($vehicleId);
 					if (is_object($vehicle)){
