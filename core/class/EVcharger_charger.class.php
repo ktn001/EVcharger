@@ -336,6 +336,9 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function searchConnectdVehicle() {
+		if (! $this->is_connected()) {
+			$this->checkAndUpdateCmd('vehicle',0);
+		}
 	}
 
     /*     * **********************Getteur Setteur*************************** */
