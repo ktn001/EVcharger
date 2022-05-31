@@ -69,7 +69,7 @@ class EVcharger_vehicle extends EVcharger {
 
     // Fonction exécutée automatiquement après la création de l'équipement
 	public function postInsert() {
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		$cmd = $this->getCmd('action','refresh');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
@@ -79,7 +79,7 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('refresh');
 			$cmd->save();
 		}
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'latitude');
+		$cmd = $this->getCmd('info','latitude');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
@@ -89,7 +89,7 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('latitude');
 			$cmd->save();
 		}
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'longitude');
+		$cmd = $this->getCmd('info','longitude');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
@@ -99,7 +99,7 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('longitude');
 			$cmd->save();
 		}
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'plugged');
+		$cmd = $this->getCmd('info','plugged');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
@@ -109,7 +109,7 @@ class EVcharger_vehicle extends EVcharger {
 			$cmd->setLogicalId('plugged');
 			$cmd->save();
 		}
-		$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),'charger');
+		$cmd = $this->getCmd('info','charger');
 		if (!is_object($cmd)){
 			$cmd = new EVcharger_vehicleCMD();
 			$cmd->setEqLogic_id($this->getId());
@@ -126,7 +126,7 @@ class EVcharger_vehicle extends EVcharger {
 	}
 
 	public function refresh() {
-		$refreshCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		$refreshCmd = $this->getCmd('action','refresh');
 		if (is_object($refreshCmd)) {
 			$refreshCmd->execute();
 		}
@@ -143,7 +143,7 @@ class EVcharger_vehicle extends EVcharger {
 	}
 
 	public function isConnected() {
-		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicalId($this->getId(),'plugged');
+		$connectedCmd = $this->getCmd('info','plugged');
 		$connected = $connectedCmd->execCmd();
 		if ($connected == 1){
 			return true;
@@ -153,7 +153,7 @@ class EVcharger_vehicle extends EVcharger {
 	}
 
 	public function getConnectionTime() {
-		$connectedCmd = EVcharger_vehicleCmd::byEqLogicIdAndLogicalId($this->getId(),'plugged');
+		$connectedCmd = $this->getCmd('info','plugged');
 		if ($connectedCmd->execCmd() != 1){
 			return 0;
 		}
@@ -161,7 +161,7 @@ class EVcharger_vehicle extends EVcharger {
 	}
 
 	public function getLongitude( $actuel = false) {
-		$lgtCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'longitude');
+		$lgtCmd = $this->getCmd('info','longitude');
 		if (!is_object($lgtCmd)) {
 			return null;
 		}
@@ -185,7 +185,7 @@ class EVcharger_vehicle extends EVcharger {
 	}
 
 	public function getLatitude( $actuel = false) {
-		$latCmd = cmd::byEqLogicIdAndLogicalId($this->getId(),'latitude');
+		$latCmd = $this->getCmd('info','latitude');
 		if (!is_object($latCmd)) {
 			return null;
 		}

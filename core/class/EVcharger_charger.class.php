@@ -54,7 +54,7 @@ class EVcharger_charger extends EVcharger {
 		log::add("EVcharger","debug",sprintf(__("%s: (re)création des commandes",__FILE__),$this->getHumanName()));
 		$model = $this->getModel();
 		foreach ($model->commands() as $logicalId => $config) {
-			$cmd = (__CLASS__ . "Cmd")::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			$cmd = $this->getCmd(null,$logicalId);
 			if (!is_object($cmd)){
 				if ($updateOnly) {
 					continue;
@@ -158,7 +158,7 @@ class EVcharger_charger extends EVcharger {
 			$cmd->save();
 		}
 		foreach ($model->commands() as $logicalId => $config) {
-			$cmd = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId);
+			$cmd = $this->getCmd(null,$logicalId);
 			$needSave = false;
 			if (array_key_exists('calcul',$config)){
 				$calcul = $config['calcul'];
@@ -168,7 +168,7 @@ class EVcharger_charger extends EVcharger {
 				}
 				preg_match_all('/#(.+?)#/',$calcul,$matches);
 				foreach ($matches[1] as $logicalId) {
-					$id = cmd::byEqLogicIdAndLogicalId($this->getId(), $logicalId)->getId();
+					$id = $this->getCmd(null, $logicalId)->getId();
 					$calcul = str_replace('#' . $logicalId . '#', '#' . $id . '#', $calcul);
 				}
 				if ($cmd->getConfiguration('calcul') !=  $calcul) {
@@ -182,7 +182,7 @@ class EVcharger_charger extends EVcharger {
 					log::add("EVcharger","error",(sprintf(__("Commande avec logicalId = %s introuvable",__FILE__),$logicalId)));
 					continue;
 				}
-				$cmdValue = cmd::byEqLogicIdAndLogicalId($this->getId(), $config['value']);
+				$cmdValue = $this->getCmd(null, $config['value']);
 				if (! $cmdValue) {
 					log::add("EVcharger","error",sprintf(__("La commande '%s' pour la valeur de '%s' est introuvable",__FILE__),$config['value'],$cmd->getLogicalId()));
 				} else {
@@ -275,7 +275,7 @@ class EVcharger_charger extends EVcharger {
 		if ($this->getAccountId() == '') {
 			return;
 		}
-		$cmd_refresh = EVchargerCmd::byEqLogicIdAndLogicalId($this->getId(),'refresh');
+		$cmd_refresh = $this->getCmd(null,'refresh');
 		if (!is_object($cmd_refresh)) {
 			return;
 		}
@@ -325,7 +325,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function isConnected() {
-		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'connected');
+		$connectedCmd = $this->getCmd(null,'connected');
 		if (! is_object($connectedCmd)) {
 			return null;
 		}
@@ -337,7 +337,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getConnectionTime() {
-		$connectedCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'connected');
+		$connectedCmd = $this->getCmd(null,'connected');
 		if ($connectedCmd->execCmd() != 1) {
 			return 0;
 		}
@@ -351,7 +351,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getVehicleId() {
-		$vehicleCmd = EVcharger_chargerCmd::byEqLogicIdAndLogicalId($this->getId(),'vehicle');
+		$vehicleCmd = $this->getCmd('null','vehicle');
 		if (is_object($vehicleCmd)) {
 			return $vehicleCmd->execCmd();
 		}
@@ -362,8 +362,9 @@ class EVcharger_charger extends EVcharger {
 		return model::byId($this->getConfiguration('modelId'));
 	}
 
-	public function searchConnectdVehicle() {
-		if (! $this->is_connected()) {
+	public function searchConnectedVehicle() {
+		if (! $this->isConnected()) {
+			log::add("EVcarger","debug",sprintf(__("Déconnection du chargeur %s",__FILE__), $this->getHumanName()));
 			$this->checkAndUpdateCmd('vehicle',0);
 		}
 	}
