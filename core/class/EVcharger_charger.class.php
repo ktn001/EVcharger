@@ -236,14 +236,41 @@ class EVcharger_charger extends EVcharger {
 
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
 	public function postSave() {
-		//if ($this->getIsEnable()){
-		//	$this->startListener();
-		//} else {
-		//	$this->stopListener();
-		//}
+		$this->checkListeners();
 	}
 
-	// Fonction exécutée automatiquement après la sauvegarde de l'eqLogid ET des commandes si sauvegarde lancée via un AJAX
+    // Création des listeners
+	public function checkListeners() {
+		if ($this->getIsEnable() == 0){
+			return;
+		}
+		log::add("EVcharger","info",__("vérification des listeners pour le chargeur ",__FILE__). $this->getHumanName());
+		$logicalIds = array(
+			'connected' => 'EvchargerEventHandler',
+		);
+		foreach ($logicalIds as $logicalId => $function) {
+			$listener = listener::byClassAndFunction('EVcharger', $function);
+			if (!is_object($listener)) {
+				$listener = new listener();
+				$listener->setClass('EVcharger');
+				$listener->setFunction($function);
+			}
+			$changed = false;
+			$cmds = cmd::byEqLogicIdAndLogicalId($this->getId(),$logicalId,true);
+			if (! is_array($cmds)){
+				continue;
+			}
+			foreach ($cmds as $cmd) {
+				$listener->addEvent($cmd->getId());
+				$changed = true;
+			}
+		}
+		if ($changed){
+			$listener->save();
+		}
+	}
+
+    // Fonction exécutée automatiquement après la sauvegarde de l'eqLogid ET des commandes si sauvegarde lancée via un AJAX
 	public function postAjax() {
 		if ($this->getAccountId() == '') {
 			return;
