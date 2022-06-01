@@ -240,23 +240,18 @@ class EVcharger_vehicle extends EVcharger {
 					} else {
 						$vehicleName = $vehicleId;
 					}
-					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur",__FILE__),$vehicleName));
+					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicleName,$charger->getHumanName()));
 					continue;
 				}
 			}
-			log::add("EVcharger","debug","  Longitude: " . $longitude);
-			log::add("EVcharger","debug","  Latitude:  " . $latitude);
 			if ($latitude != null and $longitude != null) {
-				$distance = $charger->distanceTo($latitude,$longitude);
-				if ($distance > $maxDistance){
+				$distance = $charger->distanceTo($latitude, $longitude);
+				if ($distance > $maxDistance) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
 					continue;
 				}
 			}
 			$candidateChargers[] = $charger;
-		}
-		foreach ($candidateChargers as $charger) {
-			log::add("EVcharger","debug"," " . $charger->getHumanName());
 		}
 		if (count($candidateChargers) == 0) {
 			log::add("EVcharger","debug",__("Pas de chargeur trouvé!",__FILE__));
