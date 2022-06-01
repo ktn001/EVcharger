@@ -395,11 +395,29 @@ class EVcharger_charger extends EVcharger {
 					} else {
 						$chargerName = $chargerId;
 					}
-					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicle->getHumanName(),$charger->getHumanName()));
+					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicle->getHumanName(),$chargerName));
 					continue;
 				}
 			}
-
+			if ($latitude =! null and $longitude != null) {
+				$distance = $vehicle->distanceTo($latitude, $longitude);
+				if ($distance > $maxDistance) {
+					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$vehicle->getHumanName(),$distance,$this->getHumanName()));
+					continue;
+				}
+			}
+			$candidateVehicles[] = $vehicle;
+		}
+		if (count($candidateVehicles) == 0) {
+			log::add("EVcharger","debug",__("Pas de chargeur trouvé!",__FILE__));
+		} elseif (count($candidateVehicles) == 1) {
+			$candidateVehicles[0]->checkAndUpdateCmd('charger',$this->getId());
+		} else {
+			log::add("EVcharger","debug","  " . __("Trop de véhicules possibles:",__FILE__));
+			foreach ($candidateVehicles as $vehicle) {
+				log::add("EVcharger","debug","   " . $vehicle->getHumanName());
+			}
+		} 
 	}
 
     /*     * **********************Getteur Setteur*************************** */
