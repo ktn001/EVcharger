@@ -351,7 +351,7 @@ class EVcharger_charger extends EVcharger {
 	}
 
 	public function getVehicleId() {
-		$vehicleCmd = $this->getCmd('null','vehicle');
+		$vehicleCmd = $this->getCmd('info','vehicle');
 		if (is_object($vehicleCmd)) {
 			return $vehicleCmd->execCmd();
 		}
@@ -362,17 +362,32 @@ class EVcharger_charger extends EVcharger {
 		return model::byId($this->getConfiguration('modelId'));
 	}
 
+	public function getLatitude() {
+		return $this->getConfiguration("latitude");
+	}
+
+	public function getLongitude() {
+		return $this->getConfiguration("longitude");
+	}
+
 	public function searchConnectedVehicle() {
 		if (! $this->isConnected()) {
-			log::add("EVcarger","debug",sprintf(__("Déconnection du chargeur %s",__FILE__), $this->getHumanName()));
+			log::add("EVcharger","debug",sprintf(__("Déconnection du chargeur %s",__FILE__), $this->getHumanName()));
+			$vehicleId = $this->getCmd('info','vehicle')->execCmd();
+			log::add("EVcharger","debug","vehicleId : " . $vehicleId);
+			$vehicle = EVcharger_vehicle::byId($vehicleId);
+			if (is_object($vehicle)) {
+				$vehicle->checkAndUpdateCmd('charger',0);
+			}
 			$this->checkAndUpdateCmd("vehicle",0);
+			return;
 		}
 		log::add("EVcharger","debug",sprintf(__("Recherche d'un véhicule pour %s",__FILE__),$this->getHumanName()));
 		$connectionTime = $this->getConnectionTime();
 		$maxPlugDelay = config::byKey("maxPlugDelay","EVcharger");
-		$maxDistance = condif::byKey("maxDistance","EVcharger");
-		$latitude = $this->getLatitude(true);
-		$longitude = $this->getLongitude(true);
+		$maxDistance = config::byKey("maxDistance","EVcharger");
+		$latitude = $this->getLatitude();
+		$longitude = $this->getLongitude();
 		$vehicles = EVcharger_vehicle::byType("EVcharger_vehicle",true);
 		$candidateVehicles = array();
 		foreach ($vehicles as $vehicle) {
@@ -384,7 +399,7 @@ class EVcharger_charger extends EVcharger {
 			}
 			if ($isConnected === true) {
 				if (abs($connectionTime - $vehicle->getConnectionTime()) > $maxPlugDelay) {
-					log::add("EVcharger","    " . sprintf(__("%s n'est pas connecté",__FILE),$vehicle->getHumanName()));
+					log::add("EVcharger","debug","    " . sprintf(__("%s pas de connection récente",__FILE__),$vehicle->getHumanName()));
 					continue;
 				}
 				$chargerId = $vehicle->getChargerId();
@@ -399,7 +414,7 @@ class EVcharger_charger extends EVcharger {
 					continue;
 				}
 			}
-			if ($latitude =! null and $longitude != null) {
+			if ($latitude != null and $longitude != null) {
 				$distance = $vehicle->distanceTo($latitude, $longitude);
 				if ($distance > $maxDistance) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$vehicle->getHumanName(),$distance,$this->getHumanName()));
@@ -412,6 +427,7 @@ class EVcharger_charger extends EVcharger {
 			log::add("EVcharger","debug",__("Pas de chargeur trouvé!",__FILE__));
 		} elseif (count($candidateVehicles) == 1) {
 			$candidateVehicles[0]->checkAndUpdateCmd('charger',$this->getId());
+			$this->checkAndUpdateCmd('vehicle',$candidateVehicles[0]->getId());
 		} else {
 			log::add("EVcharger","debug","  " . __("Trop de véhicules possibles:",__FILE__));
 			foreach ($candidateVehicles as $vehicle) {
@@ -526,24 +542,13 @@ class EVcharger_chargerCmd extends EVchargerCmd  {
 
     // Exécution d'une commande
 	public function execute($_options = array()) {
-		log::add("EVcharger","debug","Execute : " . $this->getLogicalId());
 		switch ($this->getType()) {
 		case 'info':
 			$calcul = $this->getConfiguration('calcul');
-			if ($calcul) {
+			if ($calcul != '') {
 				return jeedom::evaluateExpression($calcul);
 			}
-			if ($this->getLogicalId() == 'vehicle') {
-				$connectedCmd = cmd::byEqLogicIdAndLogicalId($this->getEqLogic_id(),'connected');
-				if (is_object($connectedCmd)) {
-					if ($connectedCmd->execCmd() != 1){
-						return 0;
-					} else {
-						return $this->execCmd();
-					}
-				}
-			}
-			break;
+			return $this->execCmd();
 
 		case 'action':
 			$this->getEqLogic()->getAccount()->execute($this);

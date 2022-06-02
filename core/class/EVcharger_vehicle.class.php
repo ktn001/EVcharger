@@ -160,6 +160,20 @@ class EVcharger_vehicle extends EVcharger {
 		return $connectedCmd->getValueTime();
 	}
 
+	public function getChargerId() {
+		$chargerCmd = $this->getCmd('info','charger');
+		if (is_object($chargerId)) {
+			return $chargerCmd->execCmd();
+		}
+		return 0;
+	}
+
+	public function distanceTo ($lat, $lgt) {
+		$myLat = $this->getLatitude(true);
+		$myLgt = $this->getLongitude(true);
+		return EVcharger::distance($lat,$lgt,$myLat,$myLgt);
+	}
+
 	public function getLongitude( $actuel = false) {
 		$lgtCmd = $this->getCmd('info','longitude');
 		if (!is_object($lgtCmd)) {
@@ -210,6 +224,13 @@ class EVcharger_vehicle extends EVcharger {
 
 	public function searchConnectedCharger() {
 		if (! $this->isConnected()) {
+			log::add("EVcharger","debug",sprintf(__("Déconnection du véhicule %s",__FILE__). $this->getHumanName()));
+			$chargerId = $this->getCmd('info','charger')->execCmd();
+			$charger = EVcharger_charger::byId($chargerId);
+			if (is_object($charger)) {
+				$charger->checkAndUpdateCmd('vehicle',0);
+			}
+			$this->checkAndUpdateCmd("charger",0);
 			return 0;
 		}
 		log::add("EVcharger","debug",sprintf(__("Recherche d'un chargeur pour %s",__FILE__),$this->getHumanName()));
@@ -257,6 +278,7 @@ class EVcharger_vehicle extends EVcharger {
 			log::add("EVcharger","debug",__("Pas de chargeur trouvé!",__FILE__));
 		} elseif (count($candidateChargers) == 1) {
 			$candidateChargers[0]->checkAndUpdateCmd('vehicle',$this->getId());
+			$this->checkAndUpdateCmd('charger',$candidateChargers[0]->getId());
 		} else {
 			log::add("EVcharger","debug","  " . __("Trop de chargeur possibles:",__FILE__));
 			foreach ($candidateChargers as $charger) {
