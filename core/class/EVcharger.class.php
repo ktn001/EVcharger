@@ -96,9 +96,14 @@ class EVcharger extends eqLogic {
 			throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 		}
 
+		$logLevel = log::convertLogLevel(log::getLogLevel(__CLASS__));
+		if ($logLevel == 'debug' and config::bykey('extendedDebug','EVcharger') == 1) {
+			$logLevel = 'extendedDebug';
+		}
+
 		$path = realpath(dirname(__FILE__) . '/../../ressources/bin'); // répertoire du démon
 		$cmd = 'python3 ' . $path . '/EVchargerd.py';
-		$cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
+		$cmd .= ' --loglevel ' . $logLevel;
 		$cmd .= ' --socketport ' . config::byKey('daemon::port', __CLASS__); // port
 		$cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/EVcharger/core/php/jeeEVcharger.php';
 		$cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__);

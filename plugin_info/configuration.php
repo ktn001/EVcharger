@@ -34,27 +34,37 @@ $defaultMaxDistance = config::getDefaultConfiguration('EVcharger')['EVcharger'][
 <form class="form-horizontal">
   <fieldset>
     <div class="form-group">
-      <div class='col-sm-6'>
+      <div class='col-sm-6'> <!-- partie gauche -->
 
         <legend class="col-sm-12"><i class="fas fa-university"></i> {{Démon}}:</legend>
+
         <label class="col-sm-2 control-label">
           {{Port}}
           <sup><i class="fas fa-question-circle" title="{{Redémarrer le démon en cas de modification}}"></i></sup>
         </label>
-        <input class="configKey form-control col-sm-4" data-l1key="daemon::port" placeholder="<?php echo $defaultPort ?>"/>
+        <input class="configKey form-control col-sm-2" data-l1key="daemon::port" placeholder="<?php echo $defaultPort ?>"/>
+
+	<label class="col-sm-4 control-label">
+	  {{Debug étendu}}
+	  <sup><i class="fas fa-question-circle" title="{{Niveau debug étendu pour le démon (très verbeux)}}"></i></sup>
+	</label>
+	<input class="configKey form-control" type="checkbox" data-l1key="extendedDebug"/>
+
         <legend class="col-sm-12"><i class="fas fa-cog"></i> {{Détection de branchement}}:</legend>
         <label class="col-sm-2 control-label">
           {{Délai max}}
           <sup><i class="fas fa-question-circle" title="{{Délai, en secondes, maximum entre branchement d'un chargeur et branchement d'un véhicule}}"></i></sup>
         </label>
-	<input class="configKey form-control col-sm-3" data-l1key="maxPlugDelay" placeholder="<?php echo $defaultMaxPlugDelay ?>"/>
-        <label class="col-sm-2 control-label">
+	<input class="configKey form-control col-sm-2" data-l1key="maxPlugDelay" placeholder="<?php echo $defaultMaxPlugDelay ?>"/>
+
+        <label class="col-sm-4 control-label">
           {{Distance max}}
           <sup><i class="fas fa-question-circle" title="{{Distance, en mètres, maximum entre un chargeur et un véhicule}}"></i></sup>
         </label>
-	<input class="configKey form-control col-sm-3" data-l1key="maxDistance" placeholder="<?php echo $defaultMaxDistance ?>"/>
-      </div>
-      <div class='col-sm-6'>
+	<input class="configKey form-control col-sm-2" data-l1key="maxDistance" placeholder="<?php echo $defaultMaxDistance ?>"/>
+      </div> <!-- partie gauche -->
+
+      <div class='col-sm-6'> <!-- partie droite -->
         <legend><i class="fas fa-charging-station"></i> {{Les modèles de chargeurs}}:</legend>
         <table id='models' class='table table-bordered'>
           <thead>
@@ -69,7 +79,8 @@ $defaultMaxDistance = config::getDefaultConfiguration('EVcharger')['EVcharger'][
           </thead>
           <tbody></tbody>
         </table>
-      </div>
+      </div> <!-- partie droite -->
+
     </div>
   </fieldset>
 </form>

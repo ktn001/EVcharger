@@ -10,6 +10,7 @@ from signalrcore.hub_connection_builder import HubConnectionBuilder
 libDir = os.path.realpath(os.path.dirname(os.path.abspath(__file__)) + '/../')
 sys.path.append(libDir)
 
+from jeedom import *
 from account import account
 
 class easee(account):
@@ -23,7 +24,26 @@ class easee(account):
 
         if identifiant in self.connections:
             return
-        connection = HubConnectionBuilder().with_url(url,options)\
+
+        _logLevel = jeedom_utils.get_logLevel()
+        _extendedDebug = jeedom_utils.get_extendedDebug()
+
+        print ('XXXXXXXXXXXXXXXx _logLevel : ' + _logLevel) 
+        if _logLevel == 'error':
+            logLevel = logging.ERROR
+        elif _logLevel == 'warning':
+            logLevel = logging.WARNING
+        elif _logLevel == 'info':
+            logLevel = logging.INFO
+        elif _logLevel == 'debug':
+            if _extendedDebug:
+                logLevel = logging.DEBUG
+            else:
+                logLevel = logging.INFO
+
+        connection = HubConnectionBuilder()\
+                .with_url(url,options)\
+                .configure_logging(logLevel)\
                 .with_automatic_reconnect({
                     "type": "raw",
                     "keep_alive_interval": 10,

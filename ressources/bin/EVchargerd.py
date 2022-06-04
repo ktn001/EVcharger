@@ -33,6 +33,7 @@ from jeedom import *
 import account
 
 _logLevel = "error"
+_extendedDebug = False
 _socketPort = -1
 _socketHost = 'localhost'
 _pidfile = '/tmp/jeedom/EVcharger/daemond.pid'
@@ -47,6 +48,7 @@ accounts = {}
 #===============================================================================
 def options():
     global _logLevel
+    global _extendedDebug
     global _callback
     global _apiKey
     global _pidfile
@@ -61,7 +63,12 @@ def options():
     args = parser.parse_args()
 
     if args.loglevel:
-        _logLevel = args.loglevel
+        if args.loglevel == 'extendedDebug':
+            _logLevel = 'debug'
+            _extendedDebug = True
+        else:
+            _logLevel = args.loglevel
+            _extendedDebug = False
     if args.callback:
         _callback = args.callback
     if args.apikey:
@@ -71,12 +78,13 @@ def options():
     if args.socketport:
         _socketPort = int(args.socketport)
 
-
-    jeedom_utils.set_logLevel(_logLevel)
+    jeedom_utils.set_logLevel(_logLevel, _extendedDebug)
 
     logging.info('Start demond')
-    logging.info('Log level : '+str(_logLevel))
-    logging.debug('Apikey : '+str(_apiKey))
+    logging.info('Log level : '+ _logLevel)
+    if _logLevel == 'debug':
+        logging.info('extendedDebug : ' + str(_extendedDebug))
+    logging.debug('Apikey : '+ _apiKey)
     logging.info('Socket port : '+str(_socketPort))
     logging.info('Socket host : '+str(_socketHost))
     logging.info('PID file : '+str(_pidfile))
