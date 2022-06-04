@@ -231,6 +231,10 @@ class EVcharger_vehicle extends EVcharger {
 				$charger->checkAndUpdateCmd('vehicle',0);
 			}
 			$this->checkAndUpdateCmd("charger",0);
+			$chargers = EVcharger_charger::byType('EVcharger_charger',true);
+			foreach ($chargers as $charger) {
+				$charger->refresh();
+			}
 			return 0;
 		}
 		log::add("EVcharger","debug",sprintf(__("Recherche d'un chargeur pour %s",__FILE__),$this->getHumanName()));
@@ -246,11 +250,13 @@ class EVcharger_vehicle extends EVcharger {
 			$isConnected = $charger->isConnected();
 			if ($isConnected === false) {
 				log::add("EVcharger","debug","    " . sprintf(__("%s n'est pas connecté",__FILE__),$charger->getHumanName()));
+				$charger->refresh();
 				continue;
 			}
 			if ($isConnected === true) {
 				if (abs($connectionTime - $charger->getConnectionTime()) > $maxPlugDelay) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s: pas de connection récente",__FILE__),$charger->getHumanName()));
+					$charger->refresh();
 					continue;
 				}
 				$vehicleId = $charger->getVehicleId();
@@ -262,6 +268,7 @@ class EVcharger_vehicle extends EVcharger {
 						$vehicleName = $vehicleId;
 					}
 					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicleName,$charger->getHumanName()));
+					$charger->refresh();
 					continue;
 				}
 			}
@@ -269,6 +276,7 @@ class EVcharger_vehicle extends EVcharger {
 				$distance = $charger->distanceTo($latitude, $longitude);
 				if ($distance > $maxDistance) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$this->getHumanName(),$distance,$charger->getHumanName()));
+					$charger->refresh();
 					continue;
 				}
 			}

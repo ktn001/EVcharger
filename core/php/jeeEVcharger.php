@@ -36,7 +36,6 @@ try {
 			log::add('EVcharger','error',"[jeeEVcharger] " . __("Message du demon de modèle <cmd> mais sans <logicalId>!",__FILE__));
 		}
 		foreach (EVcharger_charger::byModelAndIdentifiant($message['modelId'],$message['charger']) as $charger){
-			log::add("EVcharger","debug",__("Traitement pour :",__FILE__) . $charger->getHumanName());
 			$charger->checkAndUpdateCmd($message['logicalId'],$message['value']);
 		}
 	}

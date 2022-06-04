@@ -374,12 +374,15 @@ class EVcharger_charger extends EVcharger {
 		if (! $this->isConnected()) {
 			log::add("EVcharger","debug",sprintf(__("Déconnection du chargeur %s",__FILE__), $this->getHumanName()));
 			$vehicleId = $this->getCmd('info','vehicle')->execCmd();
-			log::add("EVcharger","debug","vehicleId : " . $vehicleId);
 			$vehicle = EVcharger_vehicle::byId($vehicleId);
 			if (is_object($vehicle)) {
 				$vehicle->checkAndUpdateCmd('charger',0);
 			}
 			$this->checkAndUpdateCmd("vehicle",0);
+			$vehicles = EVcharger_vehicle::byType("EVcharger_vehicle",true);
+			foreach ($vehicles as $vehicle) {
+				$vehicle->refresh();
+			}
 			return;
 		}
 		log::add("EVcharger","debug",sprintf(__("Recherche d'un véhicule pour %s",__FILE__),$this->getHumanName()));
@@ -395,11 +398,13 @@ class EVcharger_charger extends EVcharger {
 			$isConnected = $vehicle->isConnected();
 			if ($isConnected === false) {
 				log::add("EVcharger","debug","    " . sprintf(__("%s n'est pas connecté",__FILE__),$vehicle->getHumanName()));
+				$vehicle->refresh();
 				continue;
 			}
 			if ($isConnected === true) {
 				if (abs($connectionTime - $vehicle->getConnectionTime()) > $maxPlugDelay) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s pas de connection récente",__FILE__),$vehicle->getHumanName()));
+					$vehicle->refresh();
 					continue;
 				}
 				$chargerId = $vehicle->getChargerId();
@@ -411,6 +416,7 @@ class EVcharger_charger extends EVcharger {
 						$chargerName = $chargerId;
 					}
 					log::add("EVcharger","debug","    " . sprintf(__("Le véhicule %s est connecté au chargeur %s",__FILE__),$vehicle->getHumanName(),$chargerName));
+					$vehicle->refresh();
 					continue;
 				}
 			}
@@ -418,6 +424,7 @@ class EVcharger_charger extends EVcharger {
 				$distance = $vehicle->distanceTo($latitude, $longitude);
 				if ($distance > $maxDistance) {
 					log::add("EVcharger","debug","    " . sprintf(__("%s est à %s mètres de %s",__FILE__),$vehicle->getHumanName(),$distance,$this->getHumanName()));
+					$vehicle->refresh();
 					continue;
 				}
 			}

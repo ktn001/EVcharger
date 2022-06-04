@@ -189,9 +189,7 @@ class EVcharger_account extends EVcharger {
 				return;
 			} else if ($cmd_charger->getConfiguration('destination') == 'cmd') {
 				log::add("EVcharger","debug","| " . __("Transfert vers une CMD",__FILE__));
-				log::add("EVcharger","debug","AAAAA " . $cmd_charger->getConfiguration('destId'));
 				$cmds = explode('&&', $cmd_charger->getConfiguration('destId'));
-				log::add("EVcharger","debug","BBBBBB ");
 				if (is_array($cmds)) {
 					foreach ($cmds as $cmd_id) {
 						$cmd = cmd::byId(str_replace('#', '', $cmd_id));
