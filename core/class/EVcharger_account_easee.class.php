@@ -88,7 +88,7 @@ class EVcharger_account_easee extends EVcharger_account {
 
 	protected function msgToStartDeamonThread() {
 		$message = array(
-			'cmd' => 'start',
+			'cmd' => 'start_account',
 			'url' => $this->getUrl(),
 			'token' => $this->getToken()
 		);

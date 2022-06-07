@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # This file is part of Jeedom.
 #
 # Jeedom is free software: you can redistribute it and/or modify
@@ -155,16 +156,18 @@ def read_socket():
         message = json.loads(payload['message'])
 
         # Lancement du thread si le message le demande
-        if 'cmd' in message and message['cmd'] == 'start':
+        if 'cmd' in message and message['cmd'] == 'start_account':
             start_account(accountModel, accountId);
 
         # Envoi du message dans la queue de traitement de l'account
-        accounts[accountId]['queue'].put(json.dumps(message))
+        if accountId in accounts:
+            accounts[accountId]['queue'].put(json.dumps(message))
 
         # Si la commande était l'arrêt de l'account...
         if 'cmd' in message and message['cmd'] == 'stop':
             # on retire l'account de la liste
-            del accounts[accountId]
+            if 'accountId' in accounts:
+                del accounts[accountId]
 
 def showThreads(level = 'debug'):
     eval ('logging.' + level)("Threads en cours:")

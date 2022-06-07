@@ -126,7 +126,7 @@ class easee(account):
     def on_CommandResponse(self,messages):
         pass
 
-    def do_start(self,message):
+    def do_start_account(self,message):
         msg = json.loads(message)
         if not 'token' in msg:
             self.log_error ('do_start(): token is missing')
@@ -140,8 +140,9 @@ class easee(account):
         return
 
     def do_stop(self,message):
-        for serial, connection in list(self.connections.items()):
-            self.stop_charger_listener(serial)
+        if hasattr(self, 'connections'):
+            for serial, connection in list(self.connections.items()):
+                self.stop_charger_listener(serial)
         return
 
     def do_newToken(self,message):

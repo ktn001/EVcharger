@@ -115,12 +115,22 @@ class EVcharger_account extends EVcharger {
 	 */
 	public function startDeamonThread() {
 		if ($this->getIsEnable() and $this::$_haveDeamon){
-			log::add("EVcharger","info",$this->getHumanName() . ": " . __("Lancement du thread",__FILE__));
-			$message = array('cmd' => 'start');
+			log::add("EVcharger","info","Account " . $this->getHumanName() . ": " . __("Lancement du thread",__FILE__));
+			$message = array('cmd' => 'start_account');
 			if (method_exists($this,'msgToStartDeamonThread')){
 				$message = $this->msgToStartDeamonThread();
 			}
 			$this->send2Deamon($message);
+		}
+	}
+
+	/*
+	 * Après démarrage du thread de l'account
+	 */
+	public function deamonThreadStarted() {
+		log::add("EVcharger","info","Account " . $this->getHumanName() . ": " . __("Le thread est démarré",__FILE__));
+		foreach (EVcharger_charger::byAccountId($this->getId()) as $charger) {
+			$charger->startDeamonThread();
 		}
 	}
 

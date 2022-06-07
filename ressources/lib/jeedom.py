@@ -228,7 +228,7 @@ JEEDOM_SOCKET_MESSAGE = Queue()
 class jeedom_socket_handler(StreamRequestHandler):
     def handle(self):
         global JEEDOM_SOCKET_MESSAGE
-        logging.debug("Client connected to [%s:%d]" % self.client_address)
+        logging.debug("Client connected from [%s:%d]" % self.client_address)
         lg = self.rfile.readline()
         JEEDOM_SOCKET_MESSAGE.put(lg)
         logging.debug("Message read from socket: " + str(lg.strip()))

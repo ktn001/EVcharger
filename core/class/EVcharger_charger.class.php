@@ -301,16 +301,17 @@ class EVcharger_charger extends EVcharger {
 		return $this->getConfiguration($configName);
 	}
 
-	public function startListener() {
+	public function startDeamonThread() {
 		if (! $this->getIsEnable()) {
 			return;
 		}
+		log::add("EVcharger","info","Charger " . $this->getHumanName() . ": " . __("Lancement de thread",__FILE__));
 		$message = array(
-			'cmd' => 'start_charger_listener',
+			'cmd' => 'start_charger_thread',
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
-		EVcharger_account::byId($this->getAccountId())->send2Deamon($message);
+		$this->getAccount()->send2Deamon($message);
 	}
 
 	public function stopListener() {
