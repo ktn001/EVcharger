@@ -121,10 +121,10 @@ class EVcharger extends eqLogic {
 			$i++;
 		}
 		if ($daemon_info['state'] != 'ok') {
-			log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDeamon');
+			log::add(__CLASS__, 'error', __('Impossible de lancer le démon, vérifiez le log', __FILE__), 'unableStartDaemon');
 			return false;
 		}
-		message::removeAll(__CLASS__, 'unableStartDeamon');
+		message::removeAll(__CLASS__, 'unableStartDaemon');
 		return true;
 	}
 

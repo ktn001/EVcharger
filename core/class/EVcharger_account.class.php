@@ -18,7 +18,7 @@
 
 class EVcharger_account extends EVcharger {
 
-	protected static $_haveDeamon = false;
+	protected static $_haveDaemon = false;
 
 	public static function byModel($_modelId){
 		$eqType_name = "EVcharger_account_" . $_modelId;
@@ -80,17 +80,17 @@ class EVcharger_account extends EVcharger {
 	/*
 	 * Démarre le thread du démon pour chaque account actif
 	 */
-	public static function startAllDeamonThread(){
+	public static function startAllDaemonThread(){
 		foreach (EVcharger::byType("EVcharger_account_%",true) as $account) {
-			$account->startDeamonThread();
+			$account->startDaemonThread();
 		}
 	}
 
 	/*
 	 * Envoi d'un message au daemon
 	 */
-	public function send2Deamon($message) {
-		if ($this->getIsEnable() and $this::$_haveDeamon){
+	public function send2Daemon($message) {
+		if ($this->getIsEnable() and $this::$_haveDaemon){
 			if (is_array($message)) {
 				$message = json_encode($message);
 			}
@@ -114,42 +114,42 @@ class EVcharger_account extends EVcharger {
 	/*
 	 * Lancement d'un thread du daemon pour l'account
 	 */
-	public function startDeamonThread() {
-		if ($this->getIsEnable() and $this::$_haveDeamon){
+	public function startDaemonThread() {
+		if ($this->getIsEnable() and $this::$_haveDaemon){
 			log::add("EVcharger","info","Account " . $this->getHumanName() . ": " . __("Lancement du thread",__FILE__));
 			$message = array('cmd' => 'start_account');
-			if (method_exists($this,'msgToStartDeamonThread')){
-				$message = $this->msgToStartDeamonThread();
+			if (method_exists($this,'msgToStartDaemonThread')){
+				$message = $this->msgToStartDaemonThread();
 			}
-			$this->send2Deamon($message);
+			$this->send2Daemon($message);
 		}
 	}
 
 	/*
 	 * Après démarrage du thread de l'account
 	 */
-	public function deamonThreadStarted() {
+	public function daemonThreadStarted() {
 		log::add("EVcharger","info","Account " . $this->getHumanName() . ": " . __("Le thread est démarré",__FILE__));
 		foreach (EVcharger_charger::byAccountId($this->getId()) as $charger) {
-			$charger->startDeamonThread();
+			$charger->startDaemonThread();
 		}
 	}
 
 	/*
 	 * Arrêt du thread dédié au compte
 	 */
-	public function stopDeamonThread() {
+	public function stopDaemonThread() {
 		foreach (EVcharger_charger::byAccountId($this->getId()) as $charger){
 			if ($charger->getIsEnable()) {
 				$message = array(
 					'cmd' => 'stop',
 					'charger' => $charger->getIdentifiant(),
 				);
-				$this->send2Deamon($message);
+				$this->send2Daemon($message);
 			}
 		}
 		$message = array('cmd' => 'stop_account');
-		$this->send2Deamon($message);
+		$this->send2Daemon($message);
 	}
 
 	public function getImage() {

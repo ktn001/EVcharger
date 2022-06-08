@@ -301,7 +301,7 @@ class EVcharger_charger extends EVcharger {
 		return $this->getConfiguration($configName);
 	}
 
-	public function startDeamonThread() {
+	public function startDaemonThread() {
 		if (! $this->getIsEnable()) {
 			return;
 		}
@@ -311,17 +311,17 @@ class EVcharger_charger extends EVcharger {
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
-		$this->getAccount()->send2Deamon($message);
+		$this->getAccount()->send2Daemon($message);
 	}
 
-	public function stopListener() {
+	public function stopDaemonThread() {
 		$message = array(
 			'cmd' => 'stop_charger_listener',
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);
 		if ($this->getAccountId()) {
-			EVcharger_account::byId($this->getAccountId())->send2Deamon($message);
+			EVcharger_account::byId($this->getAccountId())->send2Daemon($message);
 		}
 	}
 

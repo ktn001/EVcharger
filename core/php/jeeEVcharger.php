@@ -6,7 +6,7 @@ try {
 
 	function process_daemon_message($message) {
 		if ($message['info'] == 'started'){
-			EVcharger_account::startAllDeamonThread();
+			EVcharger_account::startAllDaemonThread();
 		}
 	}
 
@@ -14,7 +14,7 @@ try {
 		if ($message['info'] == 'thread_started'){
 			$account = EVcharger_account::byId($message['account_id']);
 			if (is_object($account)) {
-				$account->deamonThreadStarted();
+				$account->daemonThreadStarted();
 			} else {
 				log::add("EVcharger","error",sprintf(__("L'account %s est introuvable",__FILE__),$message['account_id']));
 			}

@@ -19,7 +19,7 @@
 
 class EVcharger_account_easee extends EVcharger_account {
 
-	protected static $_haveDeamon = true;
+	protected static $_haveDaemon = true;
 
 	public function decrypt() {
 		$this->setConfiguration('password', utils::decrypt($this->getConfiguration('password')));
@@ -86,7 +86,7 @@ class EVcharger_account_easee extends EVcharger_account {
 		return json_decode($reponse, true);
 	}
 
-	protected function msgToStartDeamonThread() {
+	protected function msgToStartDaemonThread() {
 		$message = array(
 			'cmd' => 'start_account',
 			'url' => $this->getUrl(),
@@ -165,8 +165,8 @@ class EVcharger_account_easee extends EVcharger_account {
 		}
 		if ($changed) {
 			log::add("EVcharger","debug",__("Relance du thread",__FILE__));
-			$this->stopDeamonThread();
-			$this->startDeamonThread();
+			$this->stopDaemonThread();
+			$this->startDaemonThread();
 		}
 		return $token['accessToken'];
 	}
