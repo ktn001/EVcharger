@@ -186,7 +186,6 @@ def handler(signum=None, frame=None):
 def shutdown():
     logging.debug("Shutdown...")
     msgStop = json.dumps({'cmd' : 'stop'})
-    logging.debug(accounts)
     for accountId in accounts:
         queue = accounts[accountId]['queue']
         queue.put(msgStop)
