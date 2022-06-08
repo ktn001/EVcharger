@@ -237,6 +237,11 @@ class EVcharger_charger extends EVcharger {
     // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
 	public function postSave() {
 		$this->checkListeners();
+		if ($this->getIsEnable()) {
+			$this->startDaemonThread();
+		} else {
+			$this->stopDaemonThread();
+		}
 	}
 
     // Création des listeners
@@ -316,7 +321,7 @@ class EVcharger_charger extends EVcharger {
 
 	public function stopDaemonThread() {
 		$message = array(
-			'cmd' => 'stop_charger_listener',
+			'cmd' => 'stop_charger_thread',
 			'chargerId' => $this->id,
 			'identifiant' => $this->getIdentifiant()
 		);

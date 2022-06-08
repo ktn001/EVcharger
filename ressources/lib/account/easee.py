@@ -60,7 +60,7 @@ class easee(account):
         connection.start()
         return
 
-    def stop_charger_listener(self,serial):
+    def stop_charger_thread(self,serial):
         self.connections[serial].stopping = True
         self.connections[serial].stop()
         i = 15
@@ -69,7 +69,8 @@ class easee(account):
             i -= 1
         if i == 0:
             self.log_error(f"Timeout while stopping {serial}")
-            return false
+            return False
+        self.log_debug("XXXXXXXXXXXXXX i=" + str(i))
         return True
 
     def on_open(self,serial):
@@ -141,7 +142,7 @@ class easee(account):
     def do_stop(self,message):
         if hasattr(self, 'connections'):
             for serial, connection in list(self.connections.items()):
-                self.stop_charger_listener(serial)
+                self.stop_charger_thread(serial)
         return
 
     def do_newToken(self,message):
@@ -152,7 +153,7 @@ class easee(account):
             self.log_warning("Reception d'une commande 'newToken' sans modification du token")
             for serial, connection in list(self.connections.items()):
                 self.log_info(f"Restarting {serial}...")
-                self.stop_charger_listener(serial)
+                self.stop_charger_thread(serial)
                 self.start_charger_listener(serial)
         return
 
@@ -168,16 +169,17 @@ class easee(account):
             self._mapping.read(f'{configDir}/mapping.ini')
         self.start_charger_thread(msg['identifiant'])
 
-    def do_stop_charger_listener(self,message):
+    def do_stop_charger_thread(self,message):
+        self.log_info("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
         msg = json.loads(message)
         if not 'identifiant' in msg:
-            self.log_error(f"do_stop_charger_listener(): identifiant is missing")
+            self.log_error(f"do_stop_charger_thread(): identifiant is missing")
             return
         if not hasattr(self,'connections'):
             return
         if not msg['identifiant'] in self.connections:
             return
-        self.stop_charger_listener(msg['identifiant'])
+        self.stop_charger_thread(msg['identifiant'])
 
     def test(self, level = 'debug'):
         ok = True

@@ -69,6 +69,7 @@ class account():
                 self.log_error(f'command is missing in message "{message}"')
                 return
             commande = 'do_' + msg['cmd']
+            self.log_debug("AAAAAAAAAAAAAAAAAAAAAA " + commande)
             if (hasattr(self, commande)):
                 function = eval(f"self.{commande}")
                 if callable(function):
