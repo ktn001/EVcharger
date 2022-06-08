@@ -102,6 +102,7 @@ class EVcharger_account extends EVcharger {
 			$params['modelId'] = $this->getModelId();
 			$params['id'] = $this->getId();
 			$params['message'] = $message;
+			log::add("EVcharger","debug",__("Envoi de message au daemon: ",__FILE__) . print_r($params,true));
 			$payLoad = json_encode($params);
 			$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 			socket_connect($socket,'127.0.0.1',(int)config::byKey('daemon::port','EVcharger'));

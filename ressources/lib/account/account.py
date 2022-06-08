@@ -63,10 +63,10 @@ class account():
     def read_jeedom_queue(self):
         if not self._jeedomQueue.empty():
             message = self._jeedomQueue.get()
-            self.log_debug(f'message reçu: {message}')
+            self.log_debug(f'Processing message: {message}')
             msg = json.loads(message)
             if not 'cmd' in msg:
-                self.log_error(f'le message "{message}" n\'a pas de commande')
+                self.log_error(f'command is missing in message "{message}"')
                 return
             commande = 'do_' + msg['cmd']
             if (hasattr(self, commande)):
@@ -74,7 +74,7 @@ class account():
                 if callable(function):
                     function(message)
                 else:
-                    self.log_error(f'Fonction "{function}" introuvable!')
+                    self.log_error(f'Function "{function}" inot found!')
 
     def listen_jeedom(self):
         self._stop = False

@@ -125,7 +125,7 @@ def read_socket():
 
     if not JEEDOM_SOCKET_MESSAGE.empty():
         # jeedom_socket a reçu un message qu'il a mis en queue. On récupère ici
-        logging.debug("Message received in socket JEEDOM_SOCKET_MESSAGE")
+        logging.debug("Message received in queue JEEDOM_SOCKET_MESSAGE")
         payload = json.loads(JEEDOM_SOCKET_MESSAGE.get().decode())
 
         # Vérification de la clé API
@@ -155,13 +155,14 @@ def read_socket():
             return
         message = json.loads(payload['message'])
 
-        # Lancement du thread si le message le demande
+        # Lancement du thread de l'account si le message le demande
         if 'cmd' in message and message['cmd'] == 'start_account':
             start_account(accountModel, accountId);
 
         # Envoi du message dans la queue de traitement de l'account
         if accountId in accounts:
             accounts[accountId]['queue'].put(json.dumps(message))
+            # Le message sera repris dans le thread de l'account
 
         # Si la commande était l'arrêt de l'account...
         if 'cmd' in message and message['cmd'] == 'stop':
