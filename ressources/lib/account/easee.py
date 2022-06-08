@@ -18,7 +18,7 @@ class easee(account):
     def getToken(self):
         return self.token
 
-    def start_charger_listener(self,identifiant):
+    def start_charger_thread(self,identifiant):
         url = self._url + '/hubs/chargers'
         options = {'access_token_factory': self.getToken}
 
@@ -28,7 +28,6 @@ class easee(account):
         _logLevel = jeedom_utils.get_logLevel()
         _extendedDebug = jeedom_utils.get_extendedDebug()
 
-        print ('XXXXXXXXXXXXXXXx _logLevel : ' + _logLevel) 
         if _logLevel == 'error':
             logLevel = logging.ERROR
         elif _logLevel == 'warning':
@@ -157,17 +156,17 @@ class easee(account):
                 self.start_charger_listener(serial)
         return
 
-    def do_start_charger_listener(self,message):
+    def do_start_charger_thread(self,message):
         msg = json.loads(message)
         if not 'identifiant' in msg:
-            self.log_error(f"do_start_charger_listener(): identifiant is missing")
+            self.log_error("do_start_charger_thread(): identifiant is missing")
             return
         if not hasattr(self,'connections'):
             self.connections = {}
             configDir = os.path.dirname(__file__) + '/../../../core/config/easee'
             self._mapping = configparser.ConfigParser()
             self._mapping.read(f'{configDir}/mapping.ini')
-        self.start_charger_listener(msg['identifiant'])
+        self.start_charger_thread(msg['identifiant'])
 
     def do_stop_charger_listener(self,message):
         msg = json.loads(message)
