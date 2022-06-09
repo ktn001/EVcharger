@@ -62,8 +62,9 @@ class easee(account):
 
     def stop_charger_thread(self,serial):
         self.connections[serial].stopping = True
+        self.log_debug("------------- " + self.connections[serial].__class__)
         self.connections[serial].stop()
-        i = 15
+        i = 30
         while serial in self.connections and i > 0:
             time.sleep(1)
             i -= 1
@@ -170,7 +171,6 @@ class easee(account):
         self.start_charger_thread(msg['identifiant'])
 
     def do_stop_charger_thread(self,message):
-        self.log_info("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111")
         msg = json.loads(message)
         if not 'identifiant' in msg:
             self.log_error(f"do_stop_charger_thread(): identifiant is missing")
