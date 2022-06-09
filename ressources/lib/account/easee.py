@@ -62,16 +62,14 @@ class easee(account):
 
     def stop_charger_thread(self,serial):
         self.connections[serial].stopping = True
-        self.log_debug("------------- " + self.connections[serial].__class__)
         self.connections[serial].stop()
-        i = 30
+        i = 15
         while serial in self.connections and i > 0:
             time.sleep(1)
             i -= 1
         if i == 0:
             self.log_error(f"Timeout while stopping {serial}")
             return False
-        self.log_debug("XXXXXXXXXXXXXX i=" + str(i))
         return True
 
     def on_open(self,serial):
@@ -82,12 +80,8 @@ class easee(account):
         self.log_debug("on_close, serial: " + serial)
         if serial in self.connections:
             if not hasattr(self.connections[serial],'stopping'):
-                del self.connections[serial]
-                msg2Account  = {}
-                msg2Account['cmd'] = 'start_charger_listener'
-                msg2Account['identifiant'] =  serial
-                self._jeedomQueue.put(json.dumps(msg2Account))
-                return
+                self.log_warning("Restart connection to " . serial)
+                self.connections[serial].start()
             else:
                 msg2Jeedom = {}
                 msg2Jeedom['object'] = 'charger'
@@ -97,6 +91,8 @@ class easee(account):
                 self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
                 self.send2Jeedom(msg2Jeedom)
                 del self.connections[serial]
+        else:
+            self.log_error(f"connection to '{serial}' was not registered")
 
     def on_reconnect(self,serial):
         self.log_warning("reconnecting to serial " + serial)
@@ -160,7 +156,7 @@ class easee(account):
 
     def do_start_charger_thread(self,message):
         msg = json.loads(message)
-        if not 'identifiant' in msg:
+        if not 'identifiant' in msg or msg['identifiant'] == '':
             self.log_error("do_start_charger_thread(): identifiant is missing")
             return
         if not hasattr(self,'connections'):
@@ -189,6 +185,10 @@ class easee(account):
         if ok:
             eval ("self.log_" + level)("RUNNING")
         for serial in self.connections:
-            eval ("self.log_" + level)(serial + " is running")
+            if self.connections[serial].transport.is_running():
+                eval ("self.log_" + level)(serial + " is running")
+            else:
+                eval ("self.log_" + level)(serial + " is not running")
+
         return ok
 
