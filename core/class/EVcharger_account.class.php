@@ -77,6 +77,16 @@ class EVcharger_account extends EVcharger {
 //		}
 //	}
 
+	public function postSave() {
+		if (! $this->getIsEnable()){
+			$chargers = EVcharger_charger::byAccountId($this->getId());
+			foreach ($chargers as $charger) {
+				$charger->setIsEnable(0);
+				$charger->save();
+			}
+		}
+	}
+
 	/*
 	 * Démarre le thread du démon pour chaque account actif
 	 */

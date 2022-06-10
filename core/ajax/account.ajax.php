@@ -30,7 +30,7 @@ try {
 
 	if (init('action') == 'images') {
 		$modelId = init('modelId');
-		if (modelId == '') {
+		if ($modelId == '') {
 			throw new Exception(__("Le model de compte n'est pas indiqué",__FILE__));
 		}
 		$modelId = model::byId($modelId);

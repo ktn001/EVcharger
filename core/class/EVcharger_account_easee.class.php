@@ -66,7 +66,7 @@ class EVcharger_account_easee extends EVcharger_account {
 		log::add("EVcharger","debug", "  " . __("Requête: URL: ",__FILE__) . $this->getUrl() . $path);
 		log::add("EVcharger","debug", "  " . "Header: " . print_r($header,true));
 		$data = json_decode($data,true);
-		if (array_key_exists('password',$data) and ($data['password'] != '')) {
+		if (is_array($data) and  array_key_exists('password',$data) and ($data['password'] != '')) {
 			$data['password'] = "**********";
 		}
 		$data = json_encode($data);

@@ -21,8 +21,18 @@ class EVcharger_charger extends EVcharger {
 
     /*     * *********************** Methode static *************************** */
 
-	public static function byAccountId($accountId) {
-		return self::byTypeAndSearchConfiguration(__CLASS__,'"accountId":"'.$accountId.'"');
+	public static function byAccountId($accountId, $_onlyEnable=true) {
+		$chargers = self::byTypeAndSearchConfiguration(__CLASS__,'"accountId":"'.$accountId.'"');
+		if ($_onlyEnable) {
+			$tmpChargers = $chargers;
+			$chargers = array();
+			foreach ($tmpChargers as $charger){
+				if ($charger->getIsEnable()) {
+					$chargers[] = $charger;
+				}
+			}
+		}
+		return $chargers;
 	}
 
 	public static function byModelAndIdentifiant($modelId, $identifiant) {
@@ -204,22 +214,22 @@ class EVcharger_charger extends EVcharger {
 		}
 	}
 
-    // Fonction exécutée automatiquement avant la sauvegarde de l'équipement
-	public function preSave() {
-		if ($this->getIsEnable()) {
-			if ($this->getAccountId() == '') {
-				throw new Exception (__("Le compte n'est pas défini",__FILE__));
-			}
-			if ($this->getConfiguration('latitude') == '' or $this->getConfiguration('longitude') == '') {
-				throw new Exception (__('Les coordonnées GPS ne sont pas définies!',__FILE__));
-			}
-		}
+
+    // Fonction exécutée automatiquement avant la mise à jour de l'équipement
+	public function preUpdate() {
 		$accountId = $this->getAccountId();
-		if ($accountId != '') {
-			$account = EVcharger_account::byId($accountId);
-			if (! is_a($account, "EVcharger_account")) {
-				throw new Exception (sprintf(__("L'account %s est introuvable!",__FILE__), $accountId));
-			}
+		if ($accountId == '') {
+			throw new Exception (__("Le compte n'est pas défini",__FILE__));
+		}
+		$account = EVcharger_account::byId($accountId);
+		if (! is_a($account, "EVcharger_account")) {
+			throw new Exception (sprintf(__("L'account %s est introuvable!",__FILE__), $accountId));
+		}
+		if ($this->getConfiguration('latitude') == '' or $this->getConfiguration('longitude') == '') {
+			throw new Exception (__('Les coordonnées GPS ne sont pas définies!',__FILE__));
+		}
+		if ($this->getIsEnable() and ! $account->getIsEnable()) {
+			throw new Exception(__("L'account doit être activé avant l'activation du chargeur",__FILE__));
 		}
 
 	}
