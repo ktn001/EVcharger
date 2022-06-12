@@ -68,12 +68,20 @@ class easee(account):
             time.sleep(1)
             i -= 1
         if i == 0:
-            self.log_error(f"Timeout while stopping {serial}")
+            self.log_warning(f"Timeout while stopping {serial}")
+            msg2Jeedom = {}
+            msg2Jeedom['object'] = 'charger'
+            msg2Jeedom['modelId'] = 'easee'
+            msg2Jeedom['charger'] = serial
+            msg2Jeedom['info'] = 'closed'
+            self.log_debug("msg2Jeddom: " + str(msg2Jeedom))
+            self.send2Jeedom(msg2Jeedom)
+            del self.connections[serial]
             return False
         return True
 
     def on_open(self,serial):
-        self.log_debug("openning connection " + serial)
+        self.log_debug("Openning connection " + serial)
         self.connections[serial].send("SubscribeWithCurrentState", [serial, True])
 
     def on_close(self,serial):
@@ -142,16 +150,23 @@ class easee(account):
                 self.stop_charger_thread(serial)
         return
 
-    def do_newToken(self,message):
+    def do_token(self,message):
         msg = json.loads(message)
+        if 'token' not in msg:
+            self.log_error("Message without token")
+            return
         if not hasattr(self,'token') or self.token != msg['token']:
-            self.log_debug("Nouveau token reçu")
+            self.log_debug("New token received")
+            self.token = msg['token']
         else:
-            self.log_warning("Reception d'une commande 'newToken' sans modification du token")
-            for serial, connection in list(self.connections.items()):
-                self.log_info(f"Restarting {serial}...")
-                self.stop_charger_thread(serial)
-                self.start_charger_listener(serial)
+            self.log_debug("Token not modified")
+
+#        else:
+#            self.log_warning("Reception d'une commande 'newToken' sans modification du token")
+#            for serial, connection in list(self.connections.items()):
+#                self.log_info(f"Restarting {serial}...")
+#                self.stop_charger_thread(serial)
+#                self.start_charger_listener(serial)
         return
 
     def do_start_charger_thread(self,message):
@@ -184,11 +199,12 @@ class easee(account):
             ok = False
         if ok:
             eval ("self.log_" + level)("RUNNING")
-        for serial in self.connections:
-            if self.connections[serial].transport.is_running():
-                eval ("self.log_" + level)(serial + " is running")
-            else:
-                eval ("self.log_" + level)(serial + " is not running")
+        if hasattr(self,'connections'):
+            for serial in self.connections:
+                if self.connections[serial].transport.is_running():
+                    eval ("self.log_" + level)(serial + " is connected")
+                else:
+                    eval ("self.log_" + level)(serial + " is not connected")
 
         return ok
 

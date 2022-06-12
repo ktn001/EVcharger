@@ -74,7 +74,10 @@ class account():
                 if callable(function):
                     function(message)
                 else:
-                    self.log_error(f'Function "{function}" inot found!')
+                    self.log_error(f'Function "{function}" not callable!')
+            else:
+                self.log_error(f'Function "{commande}" not found!')
+
 
     def listen_jeedom(self):
         self._stop = False

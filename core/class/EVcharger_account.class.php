@@ -20,62 +20,21 @@ class EVcharger_account extends EVcharger {
 
 	protected static $_haveDaemon = false;
 
-	public static function byModel($_modelId){
+	public static function byModel($_modelId, $_onlyEnable = false){
 		$eqType_name = "EVcharger_account_" . $_modelId;
-		return self::byType($eqType_name);
+		return self::byType($eqType_name, $_onlyEnable);
 	}
 
-//	public static function _cron() {
-//		log::add("EVcharger","debug","CRON ACCOUNT");
-//		log::add("EVcharger","debug","XXXX " . $class);
-//		foreach (model::all(true) as $model){
-//			$modelId = $model->getId();
-//			$class='EVcharger_account_' . $modelId;
-//			if (method_exists($class,'cron')) {
-//				$class::cron();
-//			}
-//		}
-//	}
-//
-//	public static function _cron5() {
-//		foreach (model::all(true) as $model){
-//			$modelId = $model->getId();
-//			$class='EVcharger_account_' . $modelId;
-//			if (method_exists($class,'cron5')) {
-//				$class::cron5();
-//			}
-//		}
-//	}
-//
-//	public static function _cron10() {
-//		foreach (model::all(true) as $model){
-//			$modelId = $model->getId();
-//			$class='EVcharger_account_' . $modelId;
-//			if (method_exists($class,'cron10')) {
-//				$class::cron10();
-//			}
-//		}
-//	}
-//
-//	public static function _cron15() {
-//		foreach (model::all(true) as $model){
-//			$modelId = $model->getId();
-//			$class='EVcharger_account_' . $modelId;
-//			if (method_exists($class,'cron15')) {
-//				$class::cron15();
-//			}
-//		}
-//	}
-//
-//	public static function _cronHourly() {
-//		foreach (model::all(true) as $model){
-//			$modelId = $model->getId();
-//			$class='EVcharger_account_' . $modelId;
-//			if (method_exists($class,'cronHourly')) {
-//				$class::cronHourly();
-//			}
-//		}
-//	}
+	public static function do_cron($frequency) {
+		foreach (model::all(true) as $model){
+			$modelId = $model->getId();
+			$class='EVcharger_account_' . $modelId;
+			$method= "_cron" . $frequency;
+			if (method_exists($class,$method)) {
+				$class::$method();
+			}
+		}
+	}
 
 	public function postSave() {
 		if (! $this->getIsEnable()){

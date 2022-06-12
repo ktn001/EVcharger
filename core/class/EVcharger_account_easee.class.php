@@ -21,6 +21,22 @@ class EVcharger_account_easee extends EVcharger_account {
 
 	protected static $_haveDaemon = true;
 
+	public static function _cron5() {
+		log::add("EVcharger","debug","Acount Easee : _cron5");
+		$accounts = self::bymodel('easee',true);
+		foreach ($accounts as $account) {
+			$message = array(
+				'cmd' => 'token',
+				'token' => $account->getToken(),
+			);
+			$account->send2Daemon($message);
+		}
+	}
+
+	public static function _cronHourly() {
+		log::add("EVcharger","debug","Acount Easee : _cronHourly");
+	}
+
 	public function decrypt() {
 		$this->setConfiguration('password', utils::decrypt($this->getConfiguration('password')));
 	}

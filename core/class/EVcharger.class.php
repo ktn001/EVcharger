@@ -320,31 +320,31 @@ class EVcharger extends eqLogic {
 	/*     * ************************ Les crons **************************** */
 
 //	public static function cron() {
-//		EVcharger_account::_cron();
+//		EVcharger_account::do_cron("");
 //	}
 //
-//	public static function cron5() {
-//		EVcharger_account::_cron5();
-//	}
+	public static function cron5() {
+		EVcharger_account::do_cron("5");
+	}
 //
 //	public static function cron10() {
-//		EVcharger_account::_cron10();
+//		EVcharger_account::do_cron("10");
 //	}
 //
 //	public static function cron15() {
-//		EVcharger_account::_cron15();
+//		EVcharger_account::do_cron("15");
 //	}
 //
 //	public static function cron30() {
-//		EVcharger_account::_cron30();
+//		EVcharger_account::do_cron("30");
 //	}
 //
-//	public static function cronHourly() {
-//		EVcharger_account::_cronHourly();
-//	}
+	public static function cronHourly() {
+		EVcharger_account::do_cron("Hourly");
+	}
 //
 //	public static function cronDaily() {
-//		EVcharger_account::_cron15();
+//		EVcharger_account::do_cron("Daily");
 //	}
 
     //========================================================================
